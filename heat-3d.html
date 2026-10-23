@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heat, in three dimensions: an interactive atlas of heat transfer for food engineers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEEF0;--paper-2:#E1E4E8;--ink:#181B21;--ink-2:#545B67;--rule:#CBD0D6;--ember:#C9481A;--ice:#23799B;--stage:#12151B;
+  --thermal:linear-gradient(90deg,#1E2B55,#2A78A8,#7ACFC5,#F3D27A,#EE7B30,#C22B2D);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;--sans:"Schibsted Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0E1014;--paper-2:#161920;--ink:#E9E6E0;--ink-2:#9AA1AC;--rule:#272B33;--ember:#F07A3E;--ice:#5CB8D6;--stage:#090B0F;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0E1014;--paper-2:#161920;--ink:#E9E6E0;--ink-2:#9AA1AC;--rule:#272B33;--ember:#F07A3E;--ice:#5CB8D6;--stage:#090B0F;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 68px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.02rem;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#0B0D11}
+canvas{max-width:100%}
+.wrap{max-width:1360px;margin:0 auto;padding:0 clamp(1rem,3.5vw,3rem)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:#0B0D11;color:#E9E6E0}
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--thermal)}
+header.top .wrap{display:flex;align-items:center;gap:1rem;min-height:56px;flex-wrap:wrap;padding-top:.35rem;padding-bottom:.45rem}
+.mark{font-family:var(--serif);font-style:italic;font-size:1.3rem;margin-right:auto;white-space:nowrap}
+.mark small{font-family:var(--sans);font-style:normal;font-size:.78rem;color:#8E95A1;margin-left:.6rem}
+nav{display:flex;flex-wrap:wrap;gap:.1rem}
+nav button{font-family:var(--sans);font-size:.84rem;color:#9AA1AC;background:none;border:0;padding:.4rem .6rem;border-radius:6px;cursor:pointer;min-height:36px}
+nav button:hover{color:#fff}
+nav button i{font-family:var(--serif);font-style:italic;color:#F3B07A;margin-right:.3rem}
+#motion{border:1px solid #333944;border-radius:999px;color:#E9E6E0;margin-left:.4rem}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #F3B07A;outline-offset:2px}
+.hero{position:relative;height:clamp(32rem,88vh,52rem);background:#0B0D11;color:#EDE9E2;overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.hero .copy{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
+.hero .copy .wrap{padding-bottom:clamp(2rem,6vh,4.5rem)}
+.hero h1{font-family:var(--serif);font-weight:300;font-size:clamp(3.6rem,10.5vw,9.5rem);line-height:.86;letter-spacing:-.035em;margin:0 0 1.2rem;max-width:9ch}
+.hero h1 em{font-style:italic;font-weight:300}
+.hero p{font-family:var(--serif);font-size:clamp(1.15rem,2vw,1.5rem);line-height:1.35;max-width:30em;margin:0 0 1.1rem;color:#D9D4CB}
+.hero .tools{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;pointer-events:auto}
+.hero .tools span{font-size:.85rem;color:#9AA1AC;margin-right:.3rem}
+.hero .credit{font-size:.82rem;color:#8E95A1;margin-top:1rem;max-width:44em}
+.hero .credit a{color:#C9CED6}
+.pill{font-family:var(--sans);font-size:.86rem;color:inherit;background:none;border:1px solid currentColor;border-radius:999px;padding:.38rem .9rem;cursor:pointer;min-height:36px;opacity:.75}
+.pill:hover{opacity:1}
+.pill[aria-pressed="true"]{opacity:1;background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.hero .pill[aria-pressed="true"]{background:#EDE9E2;color:#0B0D11;border-color:#EDE9E2}
+.ch{padding:clamp(3.5rem,8vw,7rem) 0 clamp(2rem,5vw,4rem);border-top:1px solid var(--rule)}
+.ch:first-of-type{border-top:0}
+.chgrid{display:grid;grid-template-columns:minmax(0,25rem) minmax(0,1fr);gap:clamp(1.5rem,4vw,4rem);align-items:start}
+@media (max-width:980px){.chgrid{grid-template-columns:minmax(0,1fr)}}
+.text{position:sticky;top:90px}
+@media (max-width:980px){.text{position:static}}
+.num{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(3.4rem,6vw,5.2rem);line-height:.8;color:var(--ember);margin:0 0 .6rem}
+.kind{font-weight:500;font-size:.88rem;color:var(--ink-2);margin:0 0 .3rem}
+.ch h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 1.1rem}
+.prose p{font-family:var(--serif);font-size:1.16rem;line-height:1.55;margin:0 0 .9rem}
+.eq{border-left:2px solid var(--ember);padding:.4rem 0 .4rem 1rem;margin:1.25rem 0;font-family:var(--serif);font-size:1.2rem}
+.eq .law{font-style:italic;font-size:1.35rem}
+.eq .live{display:block;font-family:var(--sans);font-size:.9rem;color:var(--ink-2);margin-top:.35rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.eq + .eq{margin-top:-.5rem}
+.eq.dim{opacity:.35}
+.stage{position:relative;background:var(--stage);border-radius:6px;overflow:hidden}
+.stage canvas{display:block;width:100%;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.lbl{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--serif);font-style:italic;font-size:15px;color:#EDE8DE;white-space:nowrap;padding:0 0 0 8px;margin-top:-10px;border-left:1px solid rgba(237,232,222,.55);transition:opacity .3s;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.lbl.r{transform-origin:right}
+.stage .tip{position:absolute;right:12px;bottom:10px;font-family:var(--serif);font-style:italic;font-size:14px;color:#8E95A1;pointer-events:none}
+.scale{position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#B8BEC8;pointer-events:none}
+.scale i{display:block;width:120px;height:6px;border-radius:3px;background:var(--thermal)}
+.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:1rem 2rem;margin-top:1.25rem}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--ink-2);margin-bottom:.25rem;gap:.5rem}
+.ctrl output{font-family:var(--serif);font-size:1.2rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.group{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.group .gl{font-size:.86rem;color:var(--ink-2);width:100%}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--thermal);border-radius:2px}
+input[type=range]::-moz-range-track{height:3px;background:var(--thermal);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);margin-top:-8px;cursor:grab}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);cursor:grab}
+.reads{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:1rem;margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.reads b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.reads span{display:block;font-size:.8rem;color:var(--ink-2);margin-top:.25rem;line-height:1.3}
+.share{display:flex;height:34px;margin-top:1.2rem;border-radius:4px;overflow:hidden;font-size:.78rem;color:#fff}
+.share div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;transition:flex-basis .3s;min-width:0}
+.chart{display:block;width:100%;margin-top:1.2rem}
+.insight{margin:1.2rem 0 0;padding-left:.9rem;border-left:3px solid var(--ice);font-size:.98rem}
+.end{background:#0B0D11;color:#E9E6E0;padding:clamp(3rem,7vw,5rem) 0}
+.end h2{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2rem,4vw,3rem);margin:0 0 1rem}
+.end p{max-width:46em;color:#AEB4BE;margin:0 0 .8rem}
+.end a{color:#E9E6E0}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">Heat, in three dimensions<small>Pickle &amp; Python</small></div>
+  <nav aria-label="Chapters">
+    <button data-go="modes"><i>I</i>Modes</button>
+    <button data-go="fourier"><i>II</i>Walls</button>
+    <button data-go="layers"><i>III</i>Layers</button>
+    <button data-go="convection"><i>IV</i>Convection</button>
+    <button data-go="overall"><i>V</i>Overall U</button>
+    <button data-go="exchangers"><i>VI</i>Exchangers</button>
+    <button data-go="unsteady"><i>VII</i>Unsteady</button>
+    <button id="motion" aria-pressed="false">Pause motion</button>
+  </nav>
+</div></header>
+
+<main>
+<section class="hero" aria-label="Introduction">
+  <canvas id="cHero" aria-label="A metal rod heated by a flame that follows your pointer; heat spreads along the rod at a speed set by the metal’s thermal diffusivity"></canvas>
+  <div class="copy"><div class="wrap">
+    <h1>Heat, in <em>three dimensions</em></h1>
+    <p>Seven interactive models of how heat moves through food and the machines that process it. Move across the rod to drag the flame.</p>
+    <div class="tools" role="group" aria-label="Rod material"><span>Rod material</span>
+      <button class="pill" data-rod="copper" aria-pressed="true">Copper</button>
+      <button class="pill" data-rod="steel" aria-pressed="false">Stainless steel</button>
+      <button class="pill" data-rod="glass" aria-pressed="false">Glass</button>
+    </div>
+    <p class="credit">The chapters follow the heat transfer modules of R. Paul Singh’s <a href="https://www.rpaulsingh.com/course/lectures/modesOfHeatTrf.html">Introduction to Food Engineering</a> online course: modes, conduction in single and layered walls, convection, the overall coefficient, heat exchangers and unsteady heating.</p>
+  </div></div>
+</section>
+
+<section class="ch" id="modes"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">I</p><p class="kind">Modes of heat transfer</p>
+    <h2>Three roads into a loaf of bread</h2>
+    <div class="prose">
+      <p>Heat content is how much energy something holds; heat transfer is how fast it moves. An oven delivers it three ways at once. Glowing elements radiate infrared straight onto the crust. Hot air loops around and hands over energy by convection. Inside the dough, heat creeps inward molecule to molecule by conduction.</p>
+      <p>Raise the oven temperature and watch radiation take over: it grows with the fourth power of absolute temperature.</p>
+    </div>
+    <div class="eq" id="e1r"><span class="law">q = εσA(T<sub>o</sub>⁴ − T<sub>s</sub>⁴)</span><span class="live" id="l1r"></span></div>
+    <div class="eq" id="e1v"><span class="law">q = hA(T<sub>o</sub> − T<sub>s</sub>)</span><span class="live" id="l1v"></span></div>
+    <div class="eq" id="e1c"><span class="law">q = kA(T<sub>s</sub> − T<sub>c</sub>) / Δx</span><span class="live" id="l1c"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c1" aria-label="Cut-away oven with radiant elements, a circulating loop of hot air and a loaf heating from the outside in"></canvas><div class="scale">20 °C<i></i>260 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="ctrl"><label for="to">Oven air and elements <output id="toOut"></output></label><input type="range" id="to" min="100" max="260" step="5" value="200"></div>
+      <div class="ctrl"><label for="ts">Crust temperature <output id="tsOut"></output></label><input type="range" id="ts" min="20" max="100" step="1" value="45"></div>
+      <div class="group" role="group" aria-label="Show"><span class="gl">Show</span>
+        <button class="pill" data-mode="all" aria-pressed="true">All three</button><button class="pill" data-mode="rad" aria-pressed="false">Radiation</button><button class="pill" data-mode="conv" aria-pressed="false">Convection</button><button class="pill" data-mode="cond" aria-pressed="false">Conduction</button>
+      </div>
+      <div class="group"><span class="gl">Air movement</span><button class="pill" id="fan" aria-pressed="false">Fan off, natural convection</button></div>
+    </div>
+    <div class="share" id="sh1" aria-label="Share of heat by mode"></div>
+  </div>
+</div></section>
+
+<section class="ch" id="fourier"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">II</p><p class="kind">Conduction in walls</p>
+    <h2>Fourier’s law, one wall at a time</h2>
+    <div class="prose">
+      <p>In steady conduction the temperature falls in a straight line from the hot face to the cold one, and the heat flow is set by three things: how conductive the material is, how big the temperature difference is, and how thick the wall is.</p>
+      <p>Swap aluminium for foam and the same wall passes eight thousand times less heat. Double the thickness and the flow halves.</p>
+    </div>
+    <div class="eq"><span class="law">q = kA (T<sub>1</sub> − T<sub>2</sub>) / Δx</span><span class="live" id="l2"></span></div>
+    <div class="eq"><span class="law">R = Δx / kA</span><span class="live" id="l2r"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c2" aria-label="A wall glowing hot on one face and cold on the other, with heat-flux arrows and a straight-line temperature profile drawn above it"></canvas><div class="scale">−20 °C<i></i>200 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Material"><span class="gl">Material</span>
+        <button class="pill" data-mat="205" aria-pressed="false">Aluminium</button><button class="pill" data-mat="16" aria-pressed="true">Stainless steel</button><button class="pill" data-mat="2.2" aria-pressed="false">Ice</button><button class="pill" data-mat="0.8" aria-pressed="false">Glass</button><button class="pill" data-mat="0.55" aria-pressed="false">Potato</button><button class="pill" data-mat="0.025" aria-pressed="false">Polyurethane foam</button>
+      </div>
+      <div class="ctrl"><label for="dx">Thickness <output id="dxOut"></output></label><input type="range" id="dx" min="1" max="20" step="0.5" value="5"></div>
+      <div class="ctrl"><label for="t1">Hot face <output id="t1Out"></output></label><input type="range" id="t1" min="0" max="200" step="1" value="150"></div>
+      <div class="ctrl"><label for="t2">Cold face <output id="t2Out"></output></label><input type="range" id="t2" min="-20" max="100" step="1" value="20"></div>
+    </div>
+    <div class="reads"><div><b id="r2k"></b><span>Thermal conductivity, W/m·K</span></div><div><b id="r2q"></b><span>Heat flow through 1 m²</span></div><div><b id="r2R"></b><span>Thermal resistance, K/W</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="layers"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">III</p><p class="kind">Conduction in multilayered walls and pipes</p>
+    <h2>Resistances in series</h2>
+    <div class="prose">
+      <p>A cold-store wall is a sandwich: an air film outside, a steel skin, a thick core of insulation, an aluminium liner, and another air film inside. Heat must cross every layer in turn, so their thermal resistances simply add, like resistors in a circuit.</p>
+      <p>The temperature drops most where the resistance is largest. On a pipe the layers are rings, and the resistance of each ring depends on the logarithm of its radii.</p>
+    </div>
+    <div class="eq"><span class="law">q = ΔT<sub>overall</sub> / ΣR</span><span class="live" id="l3"></span></div>
+    <div class="eq" id="e3p"><span class="law">R<sub>ring</sub> = ln(r<sub>o</sub>/r<sub>i</sub>) / 2πkL</span><span class="live" id="l3p"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c3" aria-label="A layered cold-store wall or an insulated steam pipe in cut-away, coloured by temperature, with the stepped temperature profile drawn above"></canvas><div class="scale">−20 °C<i></i>150 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Geometry"><span class="gl">Geometry</span><button class="pill" data-geo="wall" aria-pressed="true">Cold-store wall</button><button class="pill" data-geo="pipe" aria-pressed="false">Insulated steam pipe</button></div>
+      <div class="ctrl"><label for="ins">Insulation thickness <output id="insOut"></output></label><input type="range" id="ins" min="0" max="20" step="0.5" value="8"></div>
+      <div class="group" role="group" aria-label="Insulation"><span class="gl">Insulation</span><button class="pill" data-ins="0.025" aria-pressed="true">Polyurethane</button><button class="pill" data-ins="0.04" aria-pressed="false">Glass wool</button><button class="pill" data-ins="0.045" aria-pressed="false">Cork</button></div>
+    </div>
+    <div class="share" id="sh3" aria-label="Share of resistance by layer"></div>
+    <div class="reads"><div><b id="r3q"></b><span id="r3qs">Heat leak</span></div><div><b id="r3a"></b><span id="r3as">Inner surface</span></div><div><b id="r3b"></b><span id="r3bs">Compared with no insulation</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="convection"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">IV</p><p class="kind">Forced and free convection</p>
+    <h2>The thin layer that decides everything</h2>
+    <div class="prose">
+      <p>A fluid sliding past a surface sticks to it. Close to the wall a boundary layer forms, slow and insulating, and nearly all the temperature change happens inside it. A thinner boundary layer means a larger heat transfer coefficient, h.</p>
+      <p>Blow harder and the layer thins: that’s forced convection, measured by the Reynolds number. Switch the fan off and the warmed fluid rises on its own buoyancy: free convection, measured by the Rayleigh number.</p>
+    </div>
+    <div class="eq" id="e4f"><span class="law">Nu = 0.664 Re<sup>½</sup> Pr<sup>⅓</sup></span><span class="live" id="l4f"></span></div>
+    <div class="eq" id="e4n"><span class="law">Nu = 0.59 Ra<sup>¼</sup></span><span class="live" id="l4n"></span></div>
+    <div class="eq"><span class="law">h = Nu k / L,  q = hAΔT</span><span class="live" id="l4h"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c4" aria-label="Air flowing over a heated plate, with the boundary layer drawn as a translucent sheet that thickens downstream; in free convection the plate stands upright and a warm plume rises"></canvas><div class="scale">air<i></i>plate</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Convection type"><span class="gl">Convection</span><button class="pill" data-cv="forced" aria-pressed="true">Forced, fan on</button><button class="pill" data-cv="free" aria-pressed="false">Free, still air</button></div>
+      <div class="ctrl" id="uCtl"><label for="u">Air velocity <output id="uOut"></output></label><input type="range" id="u" min="0.5" max="20" step="0.5" value="3"></div>
+      <div class="ctrl"><label for="dt4">Plate above air <output id="dt4Out"></output></label><input type="range" id="dt4" min="5" max="100" step="1" value="50"></div>
+    </div>
+    <div class="reads"><div><b id="r4a"></b><span id="r4as">Reynolds number</span></div><div><b id="r4n"></b><span>Nusselt number</span></div><div><b id="r4h"></b><span>h, W/m²·K</span></div><div><b id="r4q"></b><span>Heat lost from the plate</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="overall"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">V</p><p class="kind">Overall heat transfer coefficient</p>
+    <h2>Adding up the obstacles</h2>
+    <div class="prose">
+      <p>Steam condenses on a tube; milk flows inside. Between them heat meets a condensate film, the metal wall, perhaps a layer of baked-on milk protein, and the milk’s own boundary layer. One number, U, sums them all.</p>
+      <p>The biggest resistance dominates. Copper barely helps when the milk film is the bottleneck, but a thin layer of fouling can quietly halve the whole exchanger.</p>
+    </div>
+    <div class="eq"><span class="law">1/U = 1/h<sub>o</sub> + Δx/k + R<sub>f</sub> + 1/h<sub>i</sub></span><span class="live" id="l5"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c5" aria-label="Cut-away tube with steam condensing on the outside, a metal wall, an optional fouling layer and milk flowing inside"></canvas><div class="scale">60 °C<i></i>120 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="ctrl"><label for="hi">Milk-side film, h<sub>i</sub> <output id="hiOut"></output></label><input type="range" id="hi" min="100" max="6000" step="50" value="1500"></div>
+      <div class="group" role="group" aria-label="Heating medium"><span class="gl">Heating medium</span><button class="pill" data-ho="10000" aria-pressed="true">Condensing steam</button><button class="pill" data-ho="2500" aria-pressed="false">Hot water</button><button class="pill" data-ho="40" aria-pressed="false">Hot air</button></div>
+      <div class="group" role="group" aria-label="Wall"><span class="gl">Tube wall, 2 mm</span><button class="pill" data-kw="16" aria-pressed="true">Stainless steel</button><button class="pill" data-kw="390" aria-pressed="false">Copper</button></div>
+      <div class="group"><span class="gl">After a long run</span><button class="pill" id="foul" aria-pressed="false">Add milk fouling</button></div>
+    </div>
+    <div class="share" id="sh5" aria-label="Share of resistance"></div>
+    <canvas class="chart" id="u5" height="190" aria-label="Temperature profile across the tube wall, with each layer’s width proportional to its resistance"></canvas>
+    <div class="reads"><div><b id="r5u"></b><span>U, W/m²·K</span></div><div><b id="r5q"></b><span>Heat flux, steam 120 °C to milk 60 °C</span></div><div><b id="r5w"></b><span>Wall temperature, milk side</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="exchangers"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">VI</p><p class="kind">Heat exchangers</p>
+    <h2>Two streams, one wall</h2>
+    <div class="prose">
+      <p>Hot water warms cold milk through a wall. In parallel flow both enter at the same end, the temperature gap starts huge and collapses, and the milk can never get hotter than the water leaves. In counterflow they pass each other, the gap stays more even along the length, and the milk can leave hotter than the water’s exit.</p>
+      <p>The driving force varies along the exchanger, so designers average it logarithmically.</p>
+    </div>
+    <div class="eq"><span class="law">ΔT<sub>lm</sub> = (ΔT<sub>1</sub> − ΔT<sub>2</sub>) / ln(ΔT<sub>1</sub>/ΔT<sub>2</sub>)</span><span class="live" id="l6"></span></div>
+    <div class="eq"><span class="law">q = UA ΔT<sub>lm</sub></span><span class="live" id="l6q"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c6" aria-label="A double-pipe or shell-and-tube heat exchanger in 3D, with hot and cold streams shown as glowing particles coloured by temperature"></canvas><div class="scale">0 °C<i></i>100 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Type"><span class="gl">Exchanger</span><button class="pill" data-hx="pipe" aria-pressed="true">Double pipe</button><button class="pill" data-hx="shell" aria-pressed="false">Shell and tube</button></div>
+      <div class="group" role="group" aria-label="Arrangement"><span class="gl">Flow</span><button class="pill" data-ar="counter" aria-pressed="true">Counterflow</button><button class="pill" data-ar="par" aria-pressed="false">Parallel</button></div>
+      <div class="ctrl"><label for="ntu">Size, NTU <output id="ntuOut"></output></label><input type="range" id="ntu" min="0.2" max="5" step="0.1" value="2"></div>
+      <div class="ctrl"><label for="cr">Milk flow relative to water <output id="crOut"></output></label><input type="range" id="cr" min="0.2" max="1" step="0.05" value="0.8"></div>
+      <div class="ctrl"><label for="thi">Hot water in <output id="thiOut"></output></label><input type="range" id="thi" min="50" max="98" step="1" value="90"></div>
+      <div class="ctrl"><label for="tci">Milk in <output id="tciOut"></output></label><input type="range" id="tci" min="2" max="40" step="1" value="5"></div>
+    </div>
+    <canvas class="chart" id="u6" height="210" aria-label="Temperature of both streams along the exchanger"></canvas>
+    <div class="reads"><div><b id="r6c"></b><span>Milk out</span></div><div><b id="r6h"></b><span>Water out</span></div><div><b id="r6q"></b><span>Heat duty</span></div><div><b id="r6a"></b><span>Area needed, U = 1200</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="unsteady"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">VII</p><p class="kind">Unsteady heating and Heisler charts</p>
+    <h2>Waiting for the centre</h2>
+    <div class="prose">
+      <p>Drop a cold potato into boiling water and its temperature changes with both position and time. Two numbers tell the whole story. The Biot number compares resistance inside the food with resistance at its surface; the Fourier number is dimensionless time.</p>
+      <p>When Bi is large, the surface jumps straight to the water temperature and the centre lags far behind. When Bi is below about 0.1, the food heats almost uniformly. Heisler’s charts plot exactly this; the one below is drawn live from the exact series solution.</p>
+    </div>
+    <div class="eq"><span class="law">Bi = hR/k,  Fo = αt/R²</span><span class="live" id="l7"></span></div>
+    <div class="eq"><span class="law">θ = (T − T<sub>∞</sub>)/(T<sub>i</sub> − T<sub>∞</sub>) = Σ C<sub>n</sub> e<sup>−λ<sub>n</sub>²Fo</sup> X(λ<sub>n</sub>r/R)</span><span class="live" id="l7c"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c7" aria-label="A cut-away sphere, cylinder or slab of food in a hot water bath; the cut face shows the temperature rising from the surface inward over time"></canvas><div class="scale">20 °C<i></i>95 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Shape"><span class="gl">Shape</span><button class="pill" data-sh="sphere" aria-pressed="true">Sphere</button><button class="pill" data-sh="cyl" aria-pressed="false">Long cylinder</button><button class="pill" data-sh="slab" aria-pressed="false">Slab</button></div>
+      <div class="group" role="group" aria-label="Food"><span class="gl">Food</span><button class="pill" data-food="potato" aria-pressed="true">Potato</button><button class="pill" data-food="apple" aria-pressed="false">Apple</button><button class="pill" data-food="beef" aria-pressed="false">Beef</button></div>
+      <div class="ctrl"><label for="rad">Radius or half-thickness <output id="radOut"></output></label><input type="range" id="rad" min="0.5" max="5" step="0.1" value="2.5"></div>
+      <div class="ctrl"><label for="hh">Surface coefficient, h <output id="hhOut"></output></label><input type="range" id="hh" min="0" max="100" step="1" value="78"></div>
+      <div class="group"><button class="pill" id="play" aria-pressed="true">Pause heating</button><button class="pill" id="rst">Start again</button></div>
+    </div>
+    <canvas class="chart" id="u7" height="260" aria-label="Heisler-style chart of centre temperature against Fourier number for several Biot numbers, with the current food marked"></canvas>
+    <div class="reads"><div><b id="r7t"></b><span>Time in the bath</span></div><div><b id="r7c"></b><span>Centre</span></div><div><b id="r7s"></b><span>Surface</span></div><div><b id="r7b"></b><span>Biot number</span></div></div>
+    <p class="insight" id="i7"></p>
+  </div>
+</div></section>
+</main>
+
+<footer class="end"><div class="wrap">
+  <h2>From here, the course moves on to thermal processing.</h2>
+  <p>Every model on this page is computed live: Fourier’s and Newton’s laws, the Stefan–Boltzmann law, laminar plate correlations for forced and free convection, series resistances, effectiveness–NTU exchanger theory, and the exact series solutions behind Heisler’s charts. Property values are typical textbook figures, rounded.</p>
+  <p>Chapter outline after R. Paul Singh’s <a href="https://www.rpaulsingh.com/course/index.html">Introduction to Food Engineering</a> course. Built by Pickle &amp; Python.</p>
+</div></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+const fmt=(v,d=0)=>Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const W3=v=>Math.abs(v)>=1e4?fmt(v/1000,1)+' kW':fmt(v,Math.abs(v)<10?1:0)+' W';
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let paused=reduce;
+const mBtn=$('motion');const syncM=()=>{mBtn.setAttribute('aria-pressed',paused?'true':'false');mBtn.textContent=paused?'Play motion':'Pause motion'};syncM();mBtn.onclick=()=>{paused=!paused;syncM()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>$(b.dataset.go).scrollIntoView({behavior:reduce?'auto':'smooth'}));
+const H0=location.hash.slice(1);if(['modes','fourier','layers','convection','overall','exchangers','unsteady'].includes(H0))setTimeout(()=>$(H0).scrollIntoView(),120);
+function pills(sel,cb){const bs=[...document.querySelectorAll(sel)];bs.forEach(b=>b.addEventListener('click',()=>{bs.forEach(o=>o.setAttribute('aria-pressed',o===b?'true':'false'));cb(b)}));return bs}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+if(typeof THREE==='undefined'){document.querySelectorAll('.stage').forEach(s=>{s.insertAdjacentHTML('beforeend','<p style="color:#ccc;padding:2rem">The 3D library could not load. Check your connection and reload.</p>')});return}
+
+/* ---------- colour map and helpers ---------- */
+const CM=['#1E2B55','#2A78A8','#7ACFC5','#F3D27A','#EE7B30','#C22B2D'].map(h=>new THREE.Color(h));
+function tcol(t,out){t=clamp(t,0,1)*5;const i=Math.min(4,Math.floor(t));return out.copy(CM[i]).lerp(CM[i+1],t-i)}
+const _c=new THREE.Color();
+function sprTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);
+  gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,255,255,.8)');gr.addColorStop(.6,'rgba(255,255,255,.18)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
+const SPR=sprTex();
+function cloud(n,size){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3),3));
+  const m=new THREE.PointsMaterial({size,map:SPR,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});const p=new THREE.Points(g,m);p.frustumCulled=false;return p}
+function setPt(p,i,x,y,z,t,bright){const a=p.geometry.attributes;a.position.setXYZ(i,x,y,z);tcol(t,_c);const b=bright==null?1:bright;a.color.setXYZ(i,_c.r*b,_c.g*b,_c.b*b)}
+function flush(p){p.geometry.attributes.position.needsUpdate=true;p.geometry.attributes.color.needsUpdate=true}
+function colorize(geo,fn){const p=geo.attributes.position;let c=geo.attributes.color;if(!c){c=new THREE.BufferAttribute(new Float32Array(p.count*3),3);geo.setAttribute('color',c)}
+  for(let i=0;i<p.count;i++){tcol(fn(p.getX(i),p.getY(i),p.getZ(i)),_c);c.setXYZ(i,_c.r,_c.g,_c.b)}c.needsUpdate=true}
+const heatMat=o=>new THREE.MeshStandardMaterial(Object.assign({vertexColors:true,roughness:.55,metalness:.08},o||{}));
+const glass=(op,col)=>new THREE.MeshStandardMaterial({color:col||0x9fb6c8,transparent:true,opacity:op,roughness:.15,metalness:.1,depthWrite:false,side:THREE.DoubleSide});
+function dispose(o){o.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material&&c.material!==SHARED)(Array.isArray(c.material)?c.material:[c.material]).forEach(m=>m.dispose())})}
+const SHARED=null;
+function line(pts,col,op){const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op==null?1:op}))}
+
+/* ---------- stages ---------- */
+const stages=[];const io=new IntersectionObserver(es=>es.forEach(e=>{const S=stages.find(s=>s.cv===e.target);if(S)S.vis=e.isIntersecting}),{rootMargin:'120px'});
+function stage(id,o){const cv=$(id),wrap=cv.parentElement;const r=new THREE.WebGLRenderer({canvas:cv,antialias:true});r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  const sc=new THREE.Scene();sc.background=new THREE.Color(cssv('--stage')||'#12151B');const cm=new THREE.PerspectiveCamera(o.fov||36,1.6,.1,300);
+  sc.add(new THREE.AmbientLight(0xffffff,.78));const dl=new THREE.DirectionalLight(0xffffff,.55);dl.position.set(5,9,7);sc.add(dl);const rl=new THREE.DirectionalLight(0x8fb0ff,.3);rl.position.set(-7,3,-6);sc.add(rl);
+  const S={cv,wrap,r,sc,cm,ratio:o.ratio||.62,base:o.yaw||.6,yaw:o.yaw||.6,pitch:o.pitch||.3,dist:o.dist||10,tg:new THREE.Vector3(...(o.target||[0,0,0])),fill:!!o.fill,orbit:o.orbit!==false,auto:true,idle:0,clock:0,labels:[],vis:false,update:null};
+  if(S.orbit){let down=false,lx=0,ly=0,mouse=false;
+    cv.addEventListener('pointerdown',e=>{down=true;lx=e.clientX;ly=e.clientY;mouse=e.pointerType==='mouse';if(mouse)try{cv.setPointerCapture(e.pointerId)}catch(_){};S.idle=0;S.auto=false});
+    cv.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;S.yaw-=dx*.008;if(mouse)S.pitch=clamp(S.pitch+dy*.006,-.2,1.35);S.idle=0});
+    ['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{down=false}))}
+  stages.push(S);io.observe(cv);return S}
+function label(S,text,pos,right){const el=document.createElement('div');el.className='lbl';el.textContent=text;if(right){el.style.borderLeft='0';el.style.borderRight='1px solid rgba(237,232,222,.55)';el.style.padding='0 8px 0 0'}
+  S.wrap.appendChild(el);const L={el,pos:new THREE.Vector3(...pos),show:true,right};S.labels.push(L);return L}
+const _v=new THREE.Vector3();
+function draw(S,dt){const w=S.cv.clientWidth;let h=S.fill?S.wrap.clientHeight:Math.round(w*(window.innerWidth<700?Math.min(1,S.ratio*1.45):S.ratio));
+  if(S._w!==w||S._h!==h){S.r.setSize(w,h,false);if(!S.fill)S.cv.style.height=h+'px';S.cm.aspect=w/h;S.cm.updateProjectionMatrix();S._w=w;S._h=h}
+  S.clock+=dt;S.idle+=dt;if(!S.auto&&S.idle>7)S.auto=true;
+  if(S.auto&&S.orbit&&!paused)S.yaw+=(S.base+.32*Math.sin(S.clock*.22)-S.yaw)*Math.min(1,dt*.6);
+  const cp=Math.cos(S.pitch);S.cm.position.set(S.tg.x+S.dist*cp*Math.sin(S.yaw),S.tg.y+S.dist*Math.sin(S.pitch),S.tg.z+S.dist*cp*Math.cos(S.yaw));S.cm.lookAt(S.tg);
+  S.r.render(S.sc,S.cm);
+  for(const L of S.labels){_v.copy(L.pos).project(S.cm);const ok=L.show&&_v.z<1&&Math.abs(_v.x)<1.05&&Math.abs(_v.y)<1.05;L.el.style.opacity=ok?1:0;
+    const px=(_v.x*.5+.5)*w,py=(-_v.y*.5+.5)*h;L.el.style.transform=L.right?`translate(calc(${px}px - 100%),${py}px)`:`translate(${px}px,${py}px)`}}
+function chart(id){const cv=$(id);const d=window.devicePixelRatio||1,w=cv.clientWidth,h=+cv.getAttribute('height');if(cv._w!==w||cv._d!==d){cv.width=w*d;cv.height=h*d;cv.style.height=h+'px';cv._w=w;cv._d=d}
+  const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);return[x,w,h]}
+const CK={ink:()=>cssv('--ink'),ink2:()=>cssv('--ink-2'),rule:()=>cssv('--rule')};
+const hex=t=>'#'+tcol(t,_c).getHexString();
+
+/* ================= HERO: heated rod ================= */
+{const S=stage('cHero',{fill:true,yaw:0,pitch:.16,dist:10.5,orbit:false,target:[0,.6,0]});S.sc.background=new THREE.Color('#0B0D11');
+  const N=180,T=new Float32Array(N),geo=new THREE.CylinderGeometry(.34,.34,9,56,N,false);geo.rotateZ(Math.PI/2);
+  const pos=geo.attributes.position,map=new Int16Array(pos.count);for(let i=0;i<pos.count;i++)map[i]=clamp(Math.round((pos.getX(i)+4.5)/9*(N-1)),0,N-1);
+  colorize(geo,()=>0);const rod=new THREE.Mesh(geo,heatMat({metalness:.45,roughness:.32}));rod.position.y=.9;S.sc.add(rod);
+  const caps=[-4.62,4.62].map(x=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.16,40),new THREE.MeshStandardMaterial({color:0x2a2f38,metalness:.6,roughness:.4}));m.rotation.z=Math.PI/2;m.position.set(x,.9,0);S.sc.add(m);return m});
+  const stand=[-3.6,3.6].map(x=>{const m=new THREE.Mesh(new THREE.BoxGeometry(.12,1.6,.12),new THREE.MeshStandardMaterial({color:0x22262e,metalness:.5,roughness:.5}));m.position.set(x,.1,0);S.sc.add(m)});
+  const fl=cloud(220,.42);S.sc.add(fl);const FP=Array.from({length:220},()=>({x:0,y:-1,z:0,l:Math.random()}));
+  const pl=new THREE.PointLight(0xff8a3c,2.2,6);S.sc.add(pl);
+  const D={copper:110,steel:18,glass:2.2};let Dk=D.copper,fx=-3.4,tfx=-3.4,hover=false;
+  pills('[data-rod]',b=>{Dk=D[b.dataset.rod];const steel=b.dataset.rod==='steel',gl=b.dataset.rod==='glass';rod.material.metalness=gl?.05:steel?.55:.45;rod.material.roughness=gl?.12:.32});
+  const ray=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,0,1),0),hit=new THREE.Vector3(),nd=new THREE.Vector2();
+  function aim(e){const r=S.cv.getBoundingClientRect();nd.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(nd,S.cm);if(ray.ray.intersectPlane(plane,hit)){tfx=clamp(hit.x,-4.3,4.3);hover=true}}
+  S.cv.addEventListener('pointermove',aim);S.cv.addEventListener('pointerdown',aim);S.cv.addEventListener('pointerleave',()=>hover=false);
+  let t=0;S.update=dt=>{t+=dt;if(!hover)tfx=-3.2+Math.sin(t*.25)*.6;fx+=(tfx-fx)*Math.min(1,dt*4);
+    const sub=8,h=dt/sub,ci=(fx+4.5)/9*(N-1);
+    for(let s=0;s<sub;s++){const o=T.slice();for(let i=0;i<N;i++){const l=(i>0?o[i-1]:o[i])-2*o[i]+(i<N-1?o[i+1]:o[i]);const src=Math.exp(-Math.pow((i-ci)/5,2));T[i]=o[i]+(Dk*l-.07*o[i]+2.6*src*(1-o[i]))*h}}
+    const c=geo.attributes.color;for(let i=0;i<pos.count;i++){tcol(.08+T[map[i]]*.92,_c);c.setXYZ(i,_c.r,_c.g,_c.b)}c.needsUpdate=true;
+    for(let i=0;i<FP.length;i++){const p=FP[i];p.l-=dt*1.6;if(p.l<=0){p.x=fx+rnd(-.25,.25);p.y=-.55;p.z=rnd(-.25,.25);p.l=rnd(.6,1)}p.y+=dt*1.1;p.x+=rnd(-.4,.4)*dt;
+      setPt(fl,i,p.x,p.y,p.z,.62+.38*(1-p.l),p.l*1.1)}flush(fl);pl.position.set(fx,.3,.6);pl.intensity=1.6+Math.random()*.6};
+  if(reduce){for(let i=0;i<300;i++)S.update(1/30)}}
+
+/* ================= I. Modes ================= */
+{const S=stage('c1',{yaw:.55,pitch:.28,dist:12.5,target:[0,1.3,0]});
+  const dark=new THREE.MeshStandardMaterial({color:0x1d2129,roughness:.9});
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(8.4,5),dark);floor.rotation.x=-Math.PI/2;S.sc.add(floor);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(8.4,3.8),dark);back.position.set(0,1.9,-2.5);S.sc.add(back);
+  [-4.2,4.2].forEach(x=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(5,3.8),glass(.06));w.rotation.y=Math.PI/2;w.position.set(x,1.9,0);S.sc.add(w)});
+  const roof=new THREE.Mesh(new THREE.PlaneGeometry(8.4,5),glass(.04));roof.rotation.x=Math.PI/2;roof.position.y=3.8;S.sc.add(roof);
+  const rods=[-1.1,0,1.1].map(z=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,7.4,16),new THREE.MeshStandardMaterial({color:0x331a10,emissive:0xff5a1a,emissiveIntensity:.8}));m.rotation.z=Math.PI/2;m.position.set(0,3.3,z);S.sc.add(m);return m});
+  const trayG=new THREE.BoxGeometry(3.4,.07,2.1);colorize(trayG,()=>.5);const tray=new THREE.Mesh(trayG,heatMat({metalness:.5,roughness:.35}));tray.position.y=.24;S.sc.add(tray);
+  [-1.5,1.5].forEach(x=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.06,.2,2.1),new THREE.MeshStandardMaterial({color:0x2a2f38}));l.position.set(x,.1,0);S.sc.add(l)});
+  const LW=2.4,LH=1.05,LD=1.5;const loafG=new THREE.BoxGeometry(LW,LH,LD,28,12,18);
+  {const p=loafG.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);const k=Math.pow(Math.max(Math.abs(x)/(LW/2),Math.abs(z)/(LD/2)),6);const top=y>0?1:0;
+    const r=1-.12*k;p.setXYZ(i,x*(1-.06*top*Math.abs(z)/(LD/2)),y+(top?.18*(1-Math.pow(x/(LW/2),2))*(1-Math.pow(z/(LD/2),2)):0),z*r)}loafG.computeVertexNormals()}
+  const loaf=new THREE.Mesh(loafG,heatMat({roughness:.85}));loaf.position.y=.28+LH/2;S.sc.add(loaf);
+  const rad=cloud(160,.26),conv=cloud(380,.24);S.sc.add(rad,conv);
+  const RP=Array.from({length:160},()=>({x:rnd(-3.6,3.6),z:[-1.1,0,1.1][Math.floor(Math.random()*3)],y:3.25,tgt:0,v:rnd(4,6)}));
+  const CPt=Array.from({length:380},()=>({ph:rnd(0,6.283),z:rnd(-2.2,2.2),r:rnd(.8,1.15),s:rnd(.8,1.2)}));
+  const arrows=[];const ag=new THREE.Group();S.sc.add(ag);
+  [[-1.2,0,0,1,0,0],[1.2,0,0,-1,0,0],[0,.52,0,0,-1,0],[0,0,-.75,0,0,1],[0,0,.75,0,0,-1],[-.6,.45,0,.4,-.6,0],[.6,.45,0,-.4,-.6,0]].forEach(a=>{const d=new THREE.Vector3(a[3],a[4],a[5]).normalize();const o=new THREE.Vector3(a[0],a[1]+loaf.position.y,a[2]).addScaledVector(d,-.05);
+    const ar=new THREE.ArrowHelper(d,o,.4,0xffb070,.14,.1);ag.add(ar);arrows.push(ar)});
+  const Lr=label(S,'infrared from the elements',[3.3,3.3,1.1]),Lv=label(S,'hot air circulating',[-3.4,2.7,1.8]),Lc=label(S,'heat soaking inward',[1.3,1.25,.8]);
+  let To=200,Ts=45,fan=false,mode='all';const toEl=$('to'),tsEl=$('ts'),fanB=$('fan');
+  function calc(){To=+toEl.value;Ts=Math.min(+tsEl.value,To-5);$('toOut').textContent=To+' °C';$('tsOut').textContent=Ts+' °C';
+    const A=.08,h=fan?35:10,To4=Math.pow(To+273.15,4),Ts4=Math.pow(Ts+273.15,4);const qr=.9*5.67e-8*A*(To4-Ts4),qv=h*A*(To-Ts),qc=.5*A*(Ts-20)/.04;
+    $('l1r').textContent=`0.9 × 5.67×10⁻⁸ × ${A} × (${fmt(To+273)}⁴ − ${fmt(Ts+273)}⁴) = ${W3(qr)}`;
+    $('l1v').textContent=`${h} × ${A} × (${To} − ${Ts}) = ${W3(qv)}  (h = ${h} W/m²·K, ${fan?'fan on':'still air'})`;
+    $('l1c').textContent=`0.5 × ${A} × (${Ts} − 20) / 0.04 = ${W3(qc)}  into the crumb`;
+    const tot=qr+qv;const sh=$('sh1');sh.innerHTML=`<div style="flex-basis:${qr/tot*100}%;background:#C2522D">radiation ${Math.round(qr/tot*100)}%</div><div style="flex-basis:${qv/tot*100}%;background:#2A78A8">convection ${Math.round(qv/tot*100)}%</div>`;
+    S.q={qr,qv,qc};
+    const tn=T=>(T-20)/240;rods.forEach(r=>{tcol(.55+.45*tn(To),_c);r.material.emissive.copy(_c);r.material.emissiveIntensity=.35+1.1*tn(To)});
+    colorize(trayG,()=>tn(Ts+.6*(To-Ts)));
+    colorize(loafG,(x,y,z)=>{const d=Math.min(LW/2-Math.abs(x),LD/2-Math.abs(z),LH/2+.2-Math.abs(y));const f=Math.pow(clamp(d/.42,0,1),.7);return tn(Ts-(Ts-20)*f)});
+    arrows.forEach(a=>{const L=.18+qc/120*.5;a.setLength(clamp(L,.15,.7),.12,.09)})}
+  [toEl,tsEl].forEach(e=>e.oninput=calc);fanB.onclick=()=>{fan=!fan;fanB.setAttribute('aria-pressed',fan);fanB.textContent=fan?'Fan on, forced convection':'Fan off, natural convection';calc()};
+  pills('[data-mode]',b=>{mode=b.dataset.mode;['e1r','e1v','e1c'].forEach((id,i)=>$(id).classList.toggle('dim',mode!=='all'&&mode!==['rad','conv','cond'][i]))});calc();
+  S.update=dt=>{const tn=T=>(T-20)/240,On=m=>mode==='all'||mode===m;
+    rad.visible=On('rad');conv.visible=On('conv');ag.visible=On('cond');Lr.show=On('rad');Lv.show=On('conv');Lc.show=On('cond');
+    const rate=clamp(S.q.qr/220,.15,1);
+    for(let i=0;i<RP.length;i++){const p=RP[i];p.y-=p.v*dt;const onLoaf=Math.abs(p.x)<LW/2&&Math.abs(p.z)<LD/2,floorY=onLoaf?loaf.position.y+LH/2+.12:.3;
+      if(p.y<floorY){p.y=3.22;p.x=rnd(-3.6,3.6);p.z=[-1.1,0,1.1][Math.floor(Math.random()*3)]}const vis=i/RP.length<rate;
+      setPt(rad,i,p.x,p.y,p.z,.62+.3*tn(To),vis?.9:0)}flush(rad);
+    const sp=fan?1.1:.38;
+    for(let i=0;i<CPt.length;i++){const p=CPt[i];p.ph+=dt*sp*p.s;const x=Math.cos(p.ph)*3.35*p.r,y=1.75+Math.sin(p.ph)*1.35*p.r;const top=.5+.5*Math.sin(p.ph);
+      setPt(conv,i,x,y,p.z+Math.sin(p.ph*2+i)*.1,tn(Ts+(To-Ts)*(.35+.65*top)),.75)}flush(conv)}}
+
+/* ================= II. Fourier ================= */
+{const S=stage('c2',{yaw:.75,pitch:.25,dist:12,target:[0,.4,0]});
+  let k=16,dx=5,T1=150,T2=20,slab=null,hot=null,cold=null,prof=null;const g=new THREE.Group();S.sc.add(g);
+  const flux=cloud(260,.2);S.sc.add(flux);const FP=Array.from({length:260},()=>({u:Math.random(),y:rnd(-1.4,1.4),z:rnd(-1.4,1.4),s:rnd(.7,1.3)}));
+  const arr=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const ar=new THREE.ArrowHelper(new THREE.Vector3(1,0,0),new THREE.Vector3(0,a*.9,b*.9),1,0xff8a4c,.22,.14);S.sc.add(ar);arr.push(ar)}
+  const L1=label(S,'',[0,0,0]),L2=label(S,'',[0,0,0]),L3=label(S,'',[0,0,0]);
+  const tn=T=>(T+20)/220;let w=1;
+  function build(){if(slab){g.remove(slab,hot,cold,prof);dispose(slab);dispose(hot);dispose(cold);dispose(prof)}
+    w=.35+dx*.13;const sg=new THREE.BoxGeometry(w,3,3,60,2,2);colorize(sg,x=>tn(T1+(T2-T1)*((x+w/2)/w)));slab=new THREE.Mesh(sg,heatMat({roughness:k>100?.3:k<.1?.95:.6,metalness:k>10?.4:0}));
+    const hg=new THREE.BoxGeometry(.05,3.2,3.2);colorize(hg,()=>tn(T1));hot=new THREE.Mesh(hg,heatMat({emissive:0x000000}));hot.position.x=-w/2-.03;
+    const cg=new THREE.BoxGeometry(.05,3.2,3.2);colorize(cg,()=>tn(T2));cold=new THREE.Mesh(cg,heatMat());cold.position.x=w/2+.03;
+    const yv=T=>1.85+tn(T)*1.3;prof=line([[-w/2-1.4,yv(T1),-1.5],[-w/2,yv(T1),-1.5],[w/2,yv(T2),-1.5],[w/2+1.4,yv(T2),-1.5]],0xF3D27A,.95);
+    g.add(slab,hot,cold,prof);
+    L1.pos.set(-w/2-1.4,yv(T1)+.12,-1.5);L1.el.textContent='T₁ = '+T1+' °C';L2.pos.set(w/2+.4,yv(T2)+.12,-1.5);L2.el.textContent='T₂ = '+T2+' °C';L3.pos.set(0,-1.75,1.5);L3.el.textContent='Δx = '+dx+' cm';
+    const q=k*(T1-T2)/(dx/100),lq=Math.log10(Math.abs(q)+1);arr.forEach(a=>{a.position.x=-w/2-1.6;a.setLength(clamp(.25+lq*.22,.25,1.5),.2,.13);a.visible=q>0});
+    S.q=q;$('dxOut').textContent=dx+' cm';$('t1Out').textContent=T1+' °C';$('t2Out').textContent=T2+' °C';
+    $('l2').textContent=`${k} × 1 × (${T1} − ${T2}) / ${fmt(dx/100,3)} = ${W3(q)}`;$('l2r').textContent=`${fmt(dx/100,3)} / (${k} × 1) = ${(dx/100/k).toExponential(2)} K/W`;
+    $('r2k').textContent=k;$('r2q').textContent=W3(q);$('r2R').textContent=(dx/100/k).toExponential(1)}
+  pills('[data-mat]',b=>{k=+b.dataset.mat;build()});
+  [['dx',v=>dx=v],['t1',v=>T1=v],['t2',v=>T2=v]].forEach(([id,f])=>$(id).oninput=e=>{f(+e.target.value);if(T2>T1-1){T2=T1-1;$('t2').value=T2}build()});build();
+  S.update=dt=>{const q=S.q,sp=q>0?clamp(.08+Math.log10(q+1)*.07,.08,.5):0,n=Math.round(clamp(Math.log10(q+1)/5.5,0,1)*FP.length);
+    for(let i=0;i<FP.length;i++){const p=FP[i];p.u+=sp*p.s*dt;if(p.u>1)p.u-=1;const X=-w/2-1.5+p.u*(w+3);const inside=X>-w/2&&X<w/2;const T=X<-w/2?T1:X>w/2?T2:T1+(T2-T1)*((X+w/2)/w);
+      setPt(flux,i,X,p.y,p.z,tn(T),i<n?(inside?1.2:.55):0)}flush(flux)}}
+
+/* ================= III. Layers ================= */
+function annulus(r1,r2,len,fnR,arc){arc=arc||Math.PI*1.6;const G=new THREE.Group();
+  const out=new THREE.CylinderGeometry(r2,r2,len,72,1,true,0,arc);colorize(out,()=>fnR(r2));G.add(new THREE.Mesh(out,heatMat({side:THREE.DoubleSide})));
+  const inn=new THREE.CylinderGeometry(r1,r1,len,72,1,true,0,arc);colorize(inn,()=>fnR(r1));G.add(new THREE.Mesh(inn,heatMat({side:THREE.DoubleSide})));
+  for(const th of[0,arc]){const pg=new THREE.PlaneGeometry(r2-r1,len,14,1);pg.rotateY(th-Math.PI/2);const rm=(r1+r2)/2;pg.translate(Math.sin(th)*rm,0,Math.cos(th)*rm);
+    colorize(pg,(x,y,z)=>fnR(Math.hypot(x,z)));G.add(new THREE.Mesh(pg,heatMat({side:THREE.DoubleSide})))}
+  for(const s of[1,-1]){const rg=new THREE.RingGeometry(r1,r2,72,10,-Math.PI/2,arc);rg.rotateX(-Math.PI/2);rg.translate(0,s*len/2,0);colorize(rg,(x,y,z)=>fnR(Math.hypot(x,z)));G.add(new THREE.Mesh(rg,heatMat({side:THREE.DoubleSide})))}
+  return G}
+{const S=stage('c3',{yaw:.7,pitch:.28,dist:13,target:[0,.4,0]});
+  let geo='wall',t=8,kins=.025,G=null,steam=null;const tn=T=>(T+20)/170;
+  const LBL=[0,1,2,3,4].map(()=>label(S,'',[0,0,0]));
+  const SP=Array.from({length:200},()=>({u:Math.random(),a:rnd(0,6.283),r:Math.sqrt(Math.random())*.72}));
+  function build(){if(G){S.sc.remove(G);dispose(G)}G=new THREE.Group();S.sc.add(G);LBL.forEach(l=>{l.show=false});
+    if(geo==='wall'){const To=30,Ti=-20,ho=15,hi=8,lay=[{n:'outside air film',R:1/ho,w:.35,film:1},{n:'steel skin, 2 mm',R:.002/16,w:.22},{n:'insulation, '+t+' cm',R:t/100/kins,w:.3+t*.15},{n:'aluminium liner',R:.001/205,w:.18},{n:'inside air film',R:1/hi,w:.35,film:1}];
+      const Rt=lay.reduce((s,l)=>s+l.R,0),q=(To-Ti)/Rt;let T=To,x=-lay.reduce((s,l)=>s+l.w,0)/2;const prof=[];const yv=T=>1.9+tn(T)*1.4;
+      lay.forEach((l,i)=>{const Ta=T,Tb=T-q*l.R;const bg=new THREE.BoxGeometry(l.w,3,3,24,1,1);const x0=x;colorize(bg,(px)=>tn(Ta+(Tb-Ta)*((px+l.w/2)/l.w)));
+        const m=new THREE.Mesh(bg,l.film?new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:.22,depthWrite:false}):heatMat({metalness:i===1||i===3?.5:0,roughness:i===2?.95:.35}));m.position.x=x0+l.w/2;G.add(m);
+        prof.push([x0,yv(Ta),-1.52],[x0+l.w,yv(Tb),-1.52]);LBL[i].pos.set(x0+l.w/2,-1.75-(i%2)*.4,1.5);LBL[i].el.textContent=l.n;LBL[i].show=true;x+=l.w;T=Tb});
+      G.add(line(prof,0xF3D27A,.95));
+      const sh=$('sh3'),cols=['#3D6E8E','#7A8696','#C2522D','#A9B4C2','#3D6E8E'];sh.innerHTML=lay.map((l,i)=>`<div style="flex-basis:${l.R/Rt*100}%;background:${cols[i]}">${l.R/Rt>.08?Math.round(l.R/Rt*100)+'%':''}</div>`).join('');
+      $('l3').textContent=`(30 − (−20)) / ${Rt.toFixed(3)} = ${fmt(q,1)} W per m²`;$('e3p').classList.add('dim');$('l3p').textContent='switch to the pipe to use this';
+      $('r3q').textContent=fmt(q,1)+' W/m²';$('r3qs').textContent='Heat leaking into the store';const Tin=Ti+q/hi;$('r3a').textContent=fmt(Tin,1)+' °C';$('r3as').textContent='Inner wall surface';
+      const q0=(To-Ti)/(1/ho+1/hi+.002/16+.001/205);$('r3b').textContent=Math.round((1-q/q0)*100)+'% less';$('r3bs').textContent='Leak saved by the insulation';
+      if(steam)steam.visible=false;S.tg.set(0,.6,0);S.dist=13}
+    else{const Ts=150,Ta=25,ho=10,r1=.025,r2=.0285,r3=r2+t/100;const R1=Math.log(r2/r1)/(2*Math.PI*45),R2=t>0?Math.log(r3/r2)/(2*Math.PI*kins):0,R3=1/(2*Math.PI*r3*ho),Rt=R1+R2+R3,q=(Ts-Ta)/Rt;
+      const T2=Ts-q*R1,T3=T2-q*R2;const sc=30,v1=r1*sc,v2=r2*sc,v3=v2+t*.13;
+      const fR=r=>r<=v2?tn(Ts+(T2-Ts)*(r-v1)/(v2-v1)):tn(T2+(T3-T2)*Math.log(1+(r-v2)/v2*6)/Math.log(1+(v3-v2)/v2*6||1));
+      const pipe=annulus(v1,v2,6,fR);const grp=new THREE.Group();grp.add(pipe);if(t>0)grp.add(annulus(v2,v3,5.4,fR));grp.rotation.z=Math.PI/2;G.add(grp);
+      if(!steam){steam=cloud(200,.22);S.sc.add(steam)}steam.visible=true;
+      LBL[0].pos.set(2.6,0,v1*.5);LBL[0].el.textContent='steam, 150 °C';LBL[0].show=true;LBL[1].pos.set(-3,v2,0);LBL[1].el.textContent='steel pipe';LBL[1].show=true;
+      if(t>0){LBL[2].pos.set(-2.7,v3+.05,0);LBL[2].el.textContent='insulation, '+t+' cm';LBL[2].show=true}LBL[3].pos.set(0,v3+.6,0);LBL[3].el.textContent='surface '+fmt(T3,0)+' °C';LBL[3].show=true;
+      const cols=['#7A8696','#C2522D','#3D6E8E'];$('sh3').innerHTML=[R1,R2,R3].map((R,i)=>`<div style="flex-basis:${R/Rt*100}%;background:${cols[i]}">${R/Rt>.08?['steel','insulation','outer air film'][i]+' '+Math.round(R/Rt*100)+'%':''}</div>`).join('');
+      $('l3').textContent=`(150 − 25) / ${Rt.toFixed(3)} = ${fmt(q,1)} W per metre of pipe`;$('e3p').classList.remove('dim');
+      $('l3p').textContent=t>0?`ln(${fmt(r3*100,1)}/${fmt(r2*100,2)}) / (2π × ${kins} × 1) = ${R2.toFixed(3)} K·m/W`:'no insulation yet';
+      const q0=(Ts-Ta)/(R1+1/(2*Math.PI*r2*ho));$('r3q').textContent=fmt(q,1)+' W/m';$('r3qs').textContent='Heat lost per metre of pipe';$('r3a').textContent=fmt(T3,1)+' °C';$('r3as').textContent='Outer surface, safe to touch below about 45 °C';
+      $('r3b').textContent=Math.round((1-q/q0)*100)+'% less';$('r3bs').textContent='Loss saved vs a bare pipe';S.v1=v1;S.tg.set(0,0,0);S.dist=12}
+    $('insOut').textContent=t+' cm'}
+  pills('[data-geo]',b=>{geo=b.dataset.geo;build()});pills('[data-ins]',b=>{kins=+b.dataset.ins;build()});$('ins').oninput=e=>{t=+e.target.value;build()};build();
+  S.update=dt=>{if(!steam||!steam.visible)return;for(let i=0;i<SP.length;i++){const p=SP[i];p.u+=dt*.25;if(p.u>1)p.u-=1;const r=p.r*S.v1;setPt(steam,i,-3+p.u*6,Math.cos(p.a+p.u*3)*r,Math.sin(p.a+p.u*3)*r,.92,.45)}flush(steam)}}
+
+/* ================= IV. Convection ================= */
+{const S=stage('c4',{yaw:.5,pitch:.3,dist:12,target:[0,.2,0]});
+  const L=3,grp=new THREE.Group();S.sc.add(grp);let mode='forced',u=3,dT=50;
+  const pg=new THREE.BoxGeometry(L,.08,2.2);colorize(pg,()=>.85);const plate=new THREE.Mesh(pg,heatMat({metalness:.5,roughness:.3}));grp.add(plate);
+  const heaterLbl=label(S,'heated plate',[0,0,0]);const leLbl=label(S,'leading edge',[0,0,0]);const blLbl=label(S,'boundary layer',[0,0,0]);
+  const shells=[1,-1].map(sg=>{const g=new THREE.PlaneGeometry(L,2.2,60,1);const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0xF3B07A,transparent:true,opacity:.1,side:THREE.DoubleSide,depthWrite:false}));m.rotation.x=-Math.PI/2;grp.add(m);return{m,g,sg}});
+  const pts=cloud(900,.17);grp.add(pts);const P=Array.from({length:900},()=>({s:rnd(-1.6,L+1.6),n:rnd(-1.8,1.8),z:rnd(-1.15,1.15),e:0}));
+  const delta=s=>{s=Math.max(s,0);return mode==='forced'?.64*Math.sqrt(s/u)+.02:.5*Math.pow(s+.05,.25)*Math.pow(50/dT,.25)};
+  function calc(){const nu=1.6e-5,k=.026,Pr=.71,Lr=.3,A=.12;let Nu,h,txt;
+    if(mode==='forced'){const Re=u*Lr/nu;Nu=.664*Math.sqrt(Re)*Math.cbrt(Pr);h=Nu*k/Lr;$('r4a').textContent=fmt(Re);$('r4as').textContent='Reynolds number, laminar below 500,000';
+      $('l4f').textContent=`Re = ${u} × 0.3 / 1.6×10⁻⁵ = ${fmt(Re)};  Nu = 0.664 × ${fmt(Re)}^½ × 0.71^⅓ = ${fmt(Nu,1)}`;$('e4f').classList.remove('dim');$('e4n').classList.add('dim');$('l4n').textContent='switch to free convection'}
+    else{const Ra=9.81*(1/300)*dT*Math.pow(Lr,3)/(nu*nu)*Pr;Nu=.59*Math.pow(Ra,.25);h=Nu*k/Lr;$('r4a').textContent=Ra.toExponential(2);$('r4as').textContent='Rayleigh number, laminar below 10⁹';
+      $('l4n').textContent=`Ra = g β ΔT L³ Pr / ν² = ${Ra.toExponential(2)};  Nu = 0.59 × Ra^¼ = ${fmt(Nu,1)}`;$('e4n').classList.remove('dim');$('e4f').classList.add('dim');$('l4f').textContent='switch to forced convection'}
+    const q=h*A*dT;$('r4n').textContent=fmt(Nu,1);$('r4h').textContent=fmt(h,1);$('r4q').textContent=W3(q);$('l4h').textContent=`h = ${fmt(Nu,1)} × 0.026 / 0.3 = ${fmt(h,1)} W/m²·K;  q = ${fmt(h,1)} × 0.12 × ${dT} = ${W3(q)}`;
+    $('uOut').textContent=u+' m/s';$('dt4Out').textContent=dT+' °C';$('uCtl').style.opacity=mode==='forced'?1:.35;$('u').disabled=mode!=='forced';
+    grp.rotation.z=mode==='forced'?0:Math.PI/2;S.tg.set(0,mode==='forced'?.2:.6,0);
+    colorize(pg,()=>.45+dT/100*.5);
+    for(const sh of shells){const p=sh.g.attributes.position;for(let i=0;i<p.count;i++){const s=p.getX(i)+L/2;p.setZ(i,0);p.setY(i,p.getY(i))}p.needsUpdate=true;
+      const pos=sh.g.attributes.position;for(let i=0;i<pos.count;i++){const s=pos.getX(i)+L/2;pos.setZ(i,-sh.sg*delta(s))}pos.needsUpdate=true}}
+  pills('[data-cv]',b=>{mode=b.dataset.cv;P.forEach(p=>{p.e=0});calc()});$('u').oninput=e=>{u=+e.target.value;calc()};$('dt4').oninput=e=>{dT=+e.target.value;calc()};calc();
+  S.update=dt=>{const U=mode==='forced'?.55+u*.13:.35+dT*.012,pT=.45+dT/100*.5;const lab=(s,n)=>new THREE.Vector3(s-L/2,n,0).applyEuler(grp.rotation);
+    heaterLbl.pos.copy(lab(L*.75,.05).add(new THREE.Vector3(0,0,1.1)));leLbl.pos.copy(lab(0,.05).add(new THREE.Vector3(0,0,1.1)));blLbl.pos.copy(lab(L*.95,delta(L*.95)+.05));
+    for(let i=0;i<P.length;i++){const p=P[i],an=Math.abs(p.n),d=delta(p.s),on=p.s>0&&p.s<L,eta=an/d;let v;
+      if(mode==='forced'){v=on&&eta<1?U*(1.5*eta-.5*eta*eta*eta):U;p.s+=Math.max(v,.06)*dt;if(on&&eta<1)p.e+=((1-eta)-p.e)*Math.min(1,dt*3);else p.e*=Math.exp(-dt*.6);
+        if(p.s>L+1.6){p.s=-1.6;p.n=rnd(-1.8,1.8);p.z=rnd(-1.15,1.15);p.e=0}}
+      else{const dd=Math.max(d,.15);if(p.s>-.2&&eta<1.6){const et=Math.min(eta,1);v=U*6.75*et*(1-et)*(1-et)+.08}else v=.03;
+        if(p.s>L){v=U*.55;p.n*=1-dt*.4}else if(eta>1)p.n-=Math.sign(p.n)*dt*.12;
+        p.s+=v*dt;if(on&&eta<1)p.e+=((1-eta)-p.e)*Math.min(1,dt*2.5);else p.e*=Math.exp(-dt*.35);
+        if(p.s>L+1.7){p.s=rnd(-1.6,-.2);p.n=Math.sign(rnd(-1,1))*rnd(.05,1.8);p.z=rnd(-1.15,1.15);p.e=0}}
+      setPt(pts,i,p.s-L/2,p.n,p.z,.18+p.e*(pT-.18),.35+p.e*.9)}flush(pts)}}
+
+/* ================= V. Overall U ================= */
+{const S=stage('c5',{yaw:.65,pitch:.3,dist:11,target:[0,0,0]});
+  let hi=1500,ho=10000,kw=16,foul=false,G=null,res=null;const tn=T=>(T-60)/60;
+  const milk=cloud(260,.2),cond=cloud(160,.2);S.sc.add(milk,cond);const MP=Array.from({length:260},()=>({u:Math.random(),a:rnd(0,6.283),r:Math.sqrt(Math.random())}));
+  const DP=Array.from({length:160},()=>({x:rnd(-3,3),a:rnd(-.3,Math.PI*1.6),v:rnd(.3,.8),drip:0}));
+  const Ls=[label(S,'steam, 120 °C',[0,0,0]),label(S,'tube wall',[0,0,0]),label(S,'milk, 60 °C',[0,0,0]),label(S,'fouling deposit',[0,0,0])];
+  function calc(){const R=[{n:ho>5000?'condensate film':ho>100?'water film':'air film',R:1/ho,c:'#C2522D'},{n:'wall',R:.002/kw,c:'#7A8696'}];if(foul)R.push({n:'fouling',R:.0005,c:'#8A6A3B'});R.push({n:'milk film',R:1/hi,c:'#2A78A8'});
+    const Rt=R.reduce((s,r)=>s+r.R,0),U=1/Rt,q=U*60;let T=120;R.forEach(r=>{r.Ta=T;r.Tb=T-q*r.R;T=r.Tb});res={R,Rt,U,q};
+    $('hiOut').textContent=fmt(hi)+' W/m²·K';$('r5u').textContent=fmt(U);$('r5q').textContent=fmt(q/1000,1)+' kW/m²';$('r5w').textContent=fmt(R[R.length-1].Ta,1)+' °C';
+    $('l5').textContent='1/U = '+R.map(r=>r.R.toExponential(1)).join(' + ')+` = ${Rt.toExponential(2)}  →  U = ${fmt(U)} W/m²·K`;
+    $('sh5').innerHTML=R.map(r=>`<div style="flex-basis:${r.R/Rt*100}%;background:${r.c}">${r.R/Rt>.1?r.n+' '+Math.round(r.R/Rt*100)+'%':''}</div>`).join('');
+    if(G){S.sc.remove(G);dispose(G)}G=new THREE.Group();const ri=1.0,ro=1.3,rf=.86;const wall=R.find(r=>r.n==='wall'),fo=R.find(r=>r.n==='fouling');
+    G.add(annulus(ri,ro,6,r=>tn(wall.Ta+(wall.Tb-wall.Ta)*(ro-r)/(ro-ri))));if(fo)G.add(annulus(rf,ri,5.8,r=>tn(fo.Ta+(fo.Tb-fo.Ta)*(ri-r)/(ri-rf))));
+    G.rotation.z=Math.PI/2;S.sc.add(G);Ls[3].show=!!fo;Ls[0].pos.set(2.4,1.75,.4);Ls[1].pos.set(-2.9,ro,0);Ls[2].pos.set(3,0,.3);Ls[3].pos.set(-2.6,-rf,.2);drawChart()}
+  function drawChart(){const[x,w,h]=chart('u5'),{R,Rt}=res;const pad=36,bulk=w*.12,usable=w-2*pad-2*bulk,ty=T=>h-28-(T-55)/70*(h-60);
+    x.font='12px "Schibsted Grotesk",sans-serif';x.fillStyle=CK.ink2();x.textAlign='left';x.fillText('120 °C',4,ty(120)+4);x.fillText('60 °C',4,ty(60)+4);
+    let X=pad+bulk;const pts=[[pad,ty(120)],[X,ty(120)]];
+    R.forEach(r=>{const ww=Math.max(6,r.R/Rt*usable);x.fillStyle=r.c;x.globalAlpha=.18;x.fillRect(X,14,ww,h-42);x.globalAlpha=1;x.fillStyle=CK.ink2();x.textAlign='center';
+      if(ww>48)x.fillText(r.n,X+ww/2,h-10);X+=ww;pts.push([X,ty(r.Tb)])});pts.push([w-pad,ty(60)]);
+    x.strokeStyle=CK.ink();x.lineWidth=2;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke();
+    x.textAlign='left';x.fillStyle=CK.ink();x.fillText('steam',pad,ty(120)-8);x.textAlign='right';x.fillText('milk',w-pad,ty(60)-8)}
+  $('hi').oninput=e=>{hi=+e.target.value;calc()};pills('[data-ho]',b=>{ho=+b.dataset.ho;Ls[0].el.textContent=ho>5000?'steam, 120 °C':ho>100?'hot water, 120 °C':'hot air, 120 °C';calc()});
+  pills('[data-kw]',b=>{kw=+b.dataset.kw;calc()});const fb=$('foul');fb.onclick=()=>{foul=!foul;fb.setAttribute('aria-pressed',foul);fb.textContent=foul?'Clean the tube':'Add milk fouling';calc()};calc();
+  window.addEventListener('resize',()=>drawChart());
+  S.update=dt=>{const rin=foul?.82:.96,sp=.15+hi/6000*.6;
+    for(let i=0;i<MP.length;i++){const p=MP[i];p.u+=dt*sp;if(p.u>1)p.u-=1;const r=p.r*rin;const edge=p.r;setPt(milk,i,-3+p.u*6,Math.cos(p.a)*r,Math.sin(p.a)*r,tn(60+edge*edge*(res.R[res.R.length-1].Ta-60)*.9),.6)}flush(milk);
+    const steamy=ho>5000;for(let i=0;i<DP.length;i++){const p=DP[i];if(steamy){if(p.a<Math.PI){p.a+=dt*p.v*(.4+Math.sin(p.a)*.6);}else{p.drip+=dt*2;}
+        if(p.drip>1.4||p.a>Math.PI*1.55){p.a=rnd(-.2,.6);p.drip=0;p.x=rnd(-3,3)}const rr=1.33;const yy=-Math.cos(p.a)*rr-(p.drip>0?p.drip:0);setPt(cond,i,p.x,p.a<Math.PI?Math.cos(p.a)*rr:-rr-p.drip,p.a<Math.PI?Math.sin(p.a)*rr:0,.95,.8)}
+      else{p.a+=dt*.6;setPt(cond,i,p.x,Math.cos(p.a)*1.6,Math.sin(p.a)*1.6,.9,.35)}}flush(cond)}}
+
+/* ================= VI. Heat exchangers ================= */
+{const S=stage('c6',{yaw:.5,pitch:.32,dist:13.5,target:[0,0,0]});
+  let type='pipe',ar='counter',NTU=2,Cr=.8,Thi=90,Tci=5,prof={h:[],c:[]},G=null,wallG=null;const tn=T=>T/100,LEN=8;
+  const hotP=cloud(520,.2),coldP=cloud(360,.2);S.sc.add(hotP,coldP);
+  const HP=Array.from({length:520},()=>({u:Math.random(),a:rnd(0,6.283),r:Math.random(),k:Math.floor(Math.random()*7)})),CP=Array.from({length:360},()=>({u:Math.random(),a:rnd(0,6.283),r:Math.sqrt(Math.random()),k:Math.floor(Math.random()*7)}));
+  const TUBES=[[0,0],...[0,1,2,3,4,5].map(i=>[Math.cos(i*Math.PI/3)*.62,Math.sin(i*Math.PI/3)*.62])];
+  const Lh=label(S,'hot water in',[0,0,0]),Lc=label(S,'cold milk in',[0,0,0]),Lb=label(S,'baffle',[0,0,0]);
+  function solve(){const C=Cr;let eps;if(ar==='par')eps=(1-Math.exp(-NTU*(1+C)))/(1+C);else eps=Math.abs(1-C)<1e-6?NTU/(1+NTU):(1-Math.exp(-NTU*(1-C)))/(1-C*Math.exp(-NTU*(1-C)));
+    const dTm=Thi-Tci,Tho=Thi-eps*dTm,Tco=Tci+C*eps*dTm;const n=100;let th=Thi,tc=ar==='par'?Tci:Tco;prof={h:[th],c:[tc]};
+    for(let i=0;i<n;i++){const d=NTU*(th-tc)/n;th-=d;tc+=ar==='par'?C*d:-C*d;prof.h.push(th);prof.c.push(tc)}
+    const d1=ar==='par'?Thi-Tci:Thi-Tco,d2=ar==='par'?Tho-Tco:Tho-Tci,lm=Math.abs(d1-d2)<1e-6?d1:(d1-d2)/Math.log(d1/d2),Cmin=2090,Q=eps*Cmin*dTm,A=Q/(1200*lm);
+    $('ntuOut').textContent=fmt(NTU,1);$('crOut').textContent=Math.round(Cr*100)+'%';$('thiOut').textContent=Thi+' °C';$('tciOut').textContent=Tci+' °C';
+    $('r6c').textContent=fmt(Tco,1)+' °C';$('r6h').textContent=fmt(Tho,1)+' °C';$('r6q').textContent=fmt(Q/1000,1)+' kW';$('r6a').textContent=fmt(A,2)+' m²';
+    $('l6').textContent=`(${fmt(d1,1)} − ${fmt(d2,1)}) / ln(${fmt(d1,1)}/${fmt(d2,1)}) = ${fmt(lm,1)} °C`;$('l6q').textContent=`${fmt(Q/1000,1)} kW = 1200 × ${fmt(A,2)} m² × ${fmt(lm,1)} °C  (water at 0.5 kg/s)`;
+    Lh.pos.set(-LEN/2-.3,type==='pipe'?1.4:1.9,0);Lc.pos.set(ar==='par'?-LEN/2-.3:LEN/2+.3,type==='pipe'?-.9:-1.2,.6);Lc.right=ar==='par';Lb.show=type==='shell';
+    build();drawChart()}
+  const at=(arr,u)=>{const f=clamp(u,0,1)*100,i=Math.min(99,Math.floor(f));return arr[i]+(arr[i+1]-arr[i])*(f-i)};
+  function build(){if(G){S.sc.remove(G);dispose(G)}G=new THREE.Group();S.sc.add(G);const avg=x=>tn((at(prof.h,x)+at(prof.c,x))/2);
+    if(type==='pipe'){const ig=new THREE.CylinderGeometry(.42,.42,LEN,48,60,true);ig.rotateZ(Math.PI/2);colorize(ig,x=>avg((x+LEN/2)/LEN));G.add(new THREE.Mesh(ig,heatMat({metalness:.5,roughness:.3,side:THREE.DoubleSide})));
+      const og=new THREE.CylinderGeometry(1,1,LEN,64,1,true);og.rotateZ(Math.PI/2);G.add(new THREE.Mesh(og,glass(.13)));
+      for(const x of[-LEN/2,LEN/2]){const t=new THREE.Mesh(new THREE.TorusGeometry(1.02,.06,12,64),new THREE.MeshStandardMaterial({color:0x5a6270,metalness:.7,roughness:.3}));t.rotation.y=Math.PI/2;t.position.x=x;G.add(t)}
+      for(const [x,y] of[[-LEN/2+.5,1],[LEN/2-.5,1]]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.6,24,1,true),glass(.3));n.position.set(x,y+.25,0);G.add(n)}
+      Lb.show=false}
+    else{const og=new THREE.CylinderGeometry(1.4,1.4,LEN,64,1,true);og.rotateZ(Math.PI/2);G.add(new THREE.Mesh(og,glass(.12)));
+      for(const [y,z] of TUBES){const tg=new THREE.CylinderGeometry(.17,.17,LEN+.4,20,40,true);tg.rotateZ(Math.PI/2);tg.translate(0,y,z);colorize(tg,x=>avg((x+LEN/2)/LEN));G.add(new THREE.Mesh(tg,heatMat({metalness:.5,roughness:.3,side:THREE.DoubleSide})))}
+      for(let b=1;b<=6;b++){const up=b%2===0;const bg=new THREE.CircleGeometry(1.38,48,up?0:Math.PI,Math.PI*1.25);bg.rotateZ(up?-Math.PI*.125:-Math.PI*.125);bg.rotateY(Math.PI/2);bg.translate(-LEN/2+b*LEN/7,0,0);
+        G.add(new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:0x8d96a5,metalness:.6,roughness:.4,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false})))}
+      for(const x of[-LEN/2-.2,LEN/2+.2]){const d=new THREE.Mesh(new THREE.CylinderGeometry(1.45,1.45,.12,48),new THREE.MeshStandardMaterial({color:0x4a5260,metalness:.7,roughness:.35,transparent:true,opacity:.7}));d.rotation.z=Math.PI/2;d.position.x=x;G.add(d)}
+      Lb.pos.set(-LEN/2+LEN/7,1.5,0)}}
+  function drawChart(){const[x,w,h]=chart('u6');const pad=34,ty=T=>h-26-(T/100)*(h-46),tx=u=>pad+u*(w-2*pad);
+    x.strokeStyle=CK.rule();x.lineWidth=1;for(const T of[0,25,50,75,100]){x.beginPath();x.moveTo(pad,ty(T));x.lineTo(w-pad,ty(T));x.stroke()}
+    x.font='12px "Schibsted Grotesk",sans-serif';x.fillStyle=CK.ink2();x.textAlign='right';for(const T of[0,50,100])x.fillText(T+'°',pad-6,ty(T)+4);
+    x.textAlign='left';x.fillText('inlet end',pad,h-6);x.textAlign='right';x.fillText('outlet end',w-pad,h-6);
+    for(const [arr,col,name] of[[prof.h,'#D9541E','water'],[prof.c,'#2A78A8','milk']]){x.strokeStyle=col;x.lineWidth=3;x.beginPath();arr.forEach((T,i)=>{i?x.lineTo(tx(i/100),ty(T)):x.moveTo(tx(0),ty(T))});x.stroke();
+      x.fillStyle=col;x.textAlign='left';x.fillText(name,tx(.03),ty(arr[3])+(name==='water'?-8:16))}}
+  pills('[data-hx]',b=>{type=b.dataset.hx;solve()});pills('[data-ar]',b=>{ar=b.dataset.ar;solve()});
+  [['ntu',v=>NTU=v],['cr',v=>Cr=v],['thi',v=>Thi=v],['tci',v=>Tci=v]].forEach(([id,f])=>$(id).oninput=e=>{f(+e.target.value);solve()});solve();window.addEventListener('resize',()=>drawChart());
+  S.update=dt=>{const dir=ar==='par'?1:-1;
+    for(let i=0;i<HP.length;i++){const p=HP[i];p.u+=dt*.12;if(p.u>1)p.u-=1;const X=-LEN/2+p.u*LEN;let y,z;
+      if(type==='pipe'){const r=.5+p.r*.45;y=Math.cos(p.a)*r;z=Math.sin(p.a)*r}else{const t=[...TUBES[p.k]];const r=p.r*.13;y=t[0]+Math.cos(p.a)*r;z=t[1]+Math.sin(p.a)*r}
+      setPt(hotP,i,X,y,z,tn(at(prof.h,p.u)),.85)}flush(hotP);
+    for(let i=0;i<CP.length;i++){const p=CP[i];p.u+=dt*.12*Cr/.8;if(p.u>1)p.u-=1;const uu=dir>0?p.u:1-p.u,X=-LEN/2+uu*LEN;let y,z;
+      if(type==='pipe'){const r=p.r*.36;y=Math.cos(p.a)*r;z=Math.sin(p.a)*r}else{const ph=uu*7*Math.PI;y=Math.cos(ph)*1.05*(.6+.4*p.r);z=Math.sin(p.a)*1.15*Math.sqrt(1-Math.pow(Math.cos(ph)*.75,2))}
+      setPt(coldP,i,X,y,z,tn(at(prof.c,uu)),.85)}flush(coldP)}
+  // in the shell, the cold milk takes the shell side; tube side carries hot water
+}
+
+/* ================= VII. Unsteady ================= */
+function J0(x){const ax=Math.abs(x);if(ax<8){const y=x*x;return(57568490574+y*(-13362590354+y*(651619640.7+y*(-11214424.18+y*(77392.33017+y*-184.9052456)))))/(57568490411+y*(1029532985+y*(9494680.718+y*(59272.64853+y*(267.8532712+y)))))}
+  const z=8/ax,y=z*z,xx=ax-.785398164;const p1=1+y*(-.1098628627e-2+y*(.2734510407e-4+y*(-.2073370639e-5+y*.2093887211e-6))),p2=-.1562499995e-1+y*(.1430488765e-3+y*(-.6911147651e-5+y*(.7621095161e-6-y*.934935152e-7)));
+  return Math.sqrt(.636619772/ax)*(Math.cos(xx)*p1-z*Math.sin(xx)*p2)}
+function J1(x){const ax=Math.abs(x);let a;if(ax<8){const y=x*x;a=x*(72362614232+y*(-7895059235+y*(242396853.1+y*(-2972611.439+y*(15704.4826+y*-30.16036606)))))/(144725228442+y*(2300535178+y*(18583304.74+y*(99447.43394+y*(376.9991397+y)))))}
+  else{const z=8/ax,y=z*z,xx=ax-2.356194491;const p1=1+y*(.183105e-2+y*(-.3516396496e-4+y*(.2457520174e-5+y*-.240337019e-6))),p2=.04687499995+y*(-.2002690873e-3+y*(.8449199096e-5+y*(-.88228987e-6+y*.105787412e-6)));
+    a=Math.sqrt(.636619772/ax)*(Math.cos(xx)*p1-z*Math.sin(xx)*p2);if(x<0)a=-a}return a}
+const ZJ0=[0,2.404826,5.520078,8.653728,11.791534,14.930918,18.071064,21.211637,24.352472,27.493479,30.634606];
+function eig(shape,Bi,n){Bi=Math.max(Bi,1e-5);const out=[];for(let k=1;k<=n;k++){let a,b,f;
+    if(shape==='slab'){a=(k-1)*Math.PI+1e-9;b=(k-.5)*Math.PI-1e-9;f=l=>l*Math.tan(l)-Bi}
+    else if(shape==='sphere'){a=(k-1)*Math.PI+1e-7;b=k*Math.PI-1e-7;f=l=>1-l/Math.tan(l)-Bi}
+    else{a=ZJ0[k-1]+1e-7;b=ZJ0[k]-1e-7;f=l=>l*J1(l)/J0(l)-Bi}
+    for(let i=0;i<60;i++){const m=(a+b)/2;if(f(m)>0)b=m;else a=m}const l=(a+b)/2;
+    const C=shape==='slab'?4*Math.sin(l)/(2*l+Math.sin(2*l)):shape==='sphere'?4*(Math.sin(l)-l*Math.cos(l))/(2*l-Math.sin(2*l)):2*J1(l)/(l*(J0(l)*J0(l)+J1(l)*J1(l)));out.push([l,C])}return out}
+const Xf=(shape,l,r)=>shape==='slab'?Math.cos(l*r):shape==='sphere'?(r<1e-6?1:Math.sin(l*r)/(l*r)):J0(l*r);
+function theta(shape,E,r,Fo){Fo=Math.max(Fo,2e-4);let s=0;for(const [l,C] of E)s+=C*Math.exp(-l*l*Fo)*Xf(shape,l,r);return clamp(s,0,1)}
+{const S=stage('c7',{yaw:.5,pitch:.28,dist:10.5,target:[0,0,-.3]});
+  const FOOD={potato:{k:.55,a:1.4e-7},apple:{k:.42,a:1.37e-7},beef:{k:.45,a:1.25e-7}};let shape='sphere',food='potato',R=.025,h=537,t=0,play=true,E=[],Bi=1,done90=null;
+  const Tinf=95,Ti=20,tn=T=>(T-Ti)/(Tinf-Ti),V=1.5,NB=64,prof=new Float32Array(NB+1);let G=null,parts=[];
+  const bath=new THREE.Mesh(new THREE.BoxGeometry(7,5.2,5.2),glass(.06,0x5ab4d6));bath.position.z=-.6;S.sc.add(bath);
+  const bub=cloud(160,.16);S.sc.add(bub);const BP=Array.from({length:160},()=>({x:rnd(-3.3,3.3),y:rnd(-2.5,2.5),z:rnd(-3,1.8),v:rnd(.6,1.4)}));
+  const Ls=label(S,'surface',[0,0,0]),Lc=label(S,'centre',[0,0,0]);
+  function bins(geo,fr){const p=geo.attributes.position,b=new Int16Array(p.count);for(let i=0;i<p.count;i++)b[i]=clamp(Math.round(fr(p.getX(i),p.getY(i),p.getZ(i))*NB),0,NB);geo.userData.bins=b;colorize(geo,()=>0);parts.push(geo)}
+  function build(){if(G){S.sc.remove(G);dispose(G)}G=new THREE.Group();parts=[];const M=()=>heatMat({side:THREE.DoubleSide,roughness:.75});
+    if(shape==='sphere'){const o=new THREE.SphereGeometry(V,64,40,0,Math.PI);o.rotateY(Math.PI);bins(o,()=>1);const c=new THREE.RingGeometry(.0001,V,96,32);bins(c,(x,y)=>Math.hypot(x,y)/V);G.add(new THREE.Mesh(o,M()),new THREE.Mesh(c,M()));
+      Ls.pos.set(V*.72,V*.72,0);Lc.pos.set(0,0,0)}
+    else if(shape==='cyl'){const H=3.6,o=new THREE.CylinderGeometry(V,V,H,64,1,true,Math.PI/2,Math.PI);bins(o,()=>1);const f=new THREE.PlaneGeometry(2*V,H,64,1);bins(f,x=>Math.abs(x)/V);G.add(new THREE.Mesh(o,M()),new THREE.Mesh(f,M()));
+      for(const s of[1,-1]){const c=new THREE.RingGeometry(.0001,V,64,24,Math.PI,Math.PI);c.rotateX(Math.PI/2);c.translate(0,s*H/2,0);bins(c,(x,y,z)=>Math.hypot(x,z)/V);G.add(new THREE.Mesh(c,M()))}
+      Ls.pos.set(V,H*.3,0);Lc.pos.set(0,H*.3,0)}
+    else{const b=new THREE.BoxGeometry(2*V,3.4,2.8,64,1,1);b.translate(0,0,-1.4);bins(b,x=>Math.abs(x)/V);G.add(new THREE.Mesh(b,M()));Ls.pos.set(V,1.2,0);Lc.pos.set(0,1.2,0)}
+    S.sc.add(G);recolor()}
+  function recalc(){const f=FOOD[food];Bi=h*R/f.k;E=eig(shape,Bi,12);$('radOut').textContent=fmt(R*100,1)+' cm';$('hhOut').textContent=fmt(h)+' W/m²·K';$('r7b').textContent=Bi<10?fmt(Bi,2):fmt(Bi,0);
+    $('l7').textContent=`Bi = ${fmt(h)} × ${fmt(R,3)} / ${f.k} = ${Bi<10?fmt(Bi,2):fmt(Bi,0)};  Fo = ${f.a.toExponential(2)} × t / ${fmt(R,3)}²`;
+    $('l7c').textContent=`first root λ₁ = ${fmt(E[0][0],3)},  C₁ = ${fmt(E[0][1],3)}`;
+    const ins=$('i7');ins.textContent=Bi<.1?'Bi is below 0.1: the inside conducts far faster than the surface can deliver heat, so the food warms almost uniformly. This is the lumped-system case.':Bi>40?'Bi is large: the surface jumps almost instantly to the water temperature, and slow conduction inside controls everything. Stirring the water faster won’t help.':'Both resistances matter: the surface lags the water a little, and the centre lags the surface a lot.';
+    curves=null;done90=null;recolor();drawChart()}
+  function recolor(){const f=FOOD[food],Fo=f.a*t/(R*R);for(let i=0;i<=NB;i++)prof[i]=theta(shape,E,i/NB,Fo);
+    for(const g of parts){const b=g.userData.bins,c=g.attributes.color;for(let i=0;i<b.length;i++){tcol(tn(Tinf+prof[b[i]]*(Ti-Tinf)),_c);c.setXYZ(i,_c.r,_c.g,_c.b)}c.needsUpdate=true}
+    const Tc=Tinf+prof[0]*(Ti-Tinf),Ts=Tinf+prof[NB]*(Ti-Tinf);$('r7c').textContent=fmt(Tc,1)+' °C';$('r7s').textContent=fmt(Ts,1)+' °C';
+    const m=Math.floor(t/60),s=Math.floor(t%60);$('r7t').textContent=m+':'+String(s).padStart(2,'0');S.Fo=Fo;S.thc=prof[0];
+    if(Tc>=90&&done90==null)done90=t}
+  let curves=null;
+  function drawChart(){const[x,w,h2]=chart('u7');const pad=46,lx=v=>pad+(Math.log10(v)+2)/3*(w-pad-20),ly=v=>14+(-Math.log10(Math.max(v,1e-3)))/3*(h2-50);
+    x.strokeStyle=CK.rule();x.lineWidth=1;x.font='12px "Schibsted Grotesk",sans-serif';x.fillStyle=CK.ink2();
+    for(const v of[.01,.1,1,10]){x.beginPath();x.moveTo(lx(v),14);x.lineTo(lx(v),h2-36);x.stroke();x.textAlign='center';x.fillText(v,lx(v),h2-20)}
+    for(const v of[1,.1,.01,.001]){x.beginPath();x.moveTo(pad,ly(v));x.lineTo(w-20,ly(v));x.stroke();x.textAlign='right';x.fillText(v,pad-6,ly(v)+4)}
+    x.textAlign='center';x.fillText('Fourier number, Fo',(pad+w)/2,h2-4);x.save();x.translate(12,(h2-36)/2+7);x.rotate(-Math.PI/2);x.fillText('centre θ',0,0);x.restore();
+    if(!curves){curves=[.1,.5,1,2,5,20,100].map(b=>{const e=eig(shape,b,12);const pts=[];for(let i=0;i<=90;i++){const Fo=Math.pow(10,-2+i/30);pts.push([Fo,theta(shape,e,0,Fo)])}return{b,pts}});
+      const e=E;const pts=[];for(let i=0;i<=90;i++){const Fo=Math.pow(10,-2+i/30);pts.push([Fo,theta(shape,e,0,Fo)])}curves.cur=pts}
+    for(const c of curves){x.strokeStyle=CK.ink2();x.globalAlpha=.45;x.lineWidth=1;x.beginPath();let lp=null;c.pts.forEach(([F,th],i)=>{if(th<1e-3)return;const X=lx(F),Y=ly(th);lp?x.lineTo(X,Y):x.moveTo(X,Y);lp=[X,Y]});x.stroke();x.globalAlpha=.8;
+      if(lp){x.fillStyle=CK.ink2();x.textAlign='left';const mid=c.pts.find(p=>p[1]<.5);if(mid)x.fillText('Bi '+c.b,lx(mid[0])+4,ly(mid[1])-4)}x.globalAlpha=1}
+    x.strokeStyle='#D9541E';x.lineWidth=3;x.beginPath();let st=false;curves.cur.forEach(([F,th])=>{if(th<1e-3)return;st?x.lineTo(lx(F),ly(th)):x.moveTo(lx(F),ly(th));st=true});x.stroke();
+    const Fo=clamp(S.Fo||.01,.01,10);if(S.Fo>=.01&&S.thc>1e-3){x.fillStyle='#D9541E';x.beginPath();x.arc(lx(Fo),ly(S.thc),6,0,7);x.fill();x.fillStyle=CK.ink();x.textAlign='left';x.fillText('your '+food+' now',lx(Fo)+10,ly(S.thc)-8)}}
+  pills('[data-sh]',b=>{shape=b.dataset.sh;build();recalc()});pills('[data-food]',b=>{food=b.dataset.food;recalc()});
+  $('rad').oninput=e=>{R=+e.target.value/100;recalc()};$('hh').oninput=e=>{h=Math.round(Math.pow(10,+e.target.value/100*3.5));recalc()};
+  const pb=$('play');pb.onclick=()=>{play=!play;pb.setAttribute('aria-pressed',play);pb.textContent=play?'Pause heating':'Resume heating'};$('rst').onclick=()=>{t=0;done90=null;recolor();drawChart()};
+  build();recalc();window.addEventListener('resize',()=>drawChart());let acc=0;
+  S.update=dt=>{const f=FOOD[food];if(play&&S.thc>.004){t+=dt*(.6*R*R/f.a)/26;recolor();acc+=dt;if(acc>.12){acc=0;drawChart()}}
+    const n=Math.round(clamp(Math.log10(h)/3.5,0,1)*BP.length);for(let i=0;i<BP.length;i++){const p=BP[i];p.y+=p.v*dt*(.4+h/3000);if(p.y>2.5){p.y=-2.5;p.x=rnd(-3.3,3.3);p.z=rnd(-3,1.8)}setPt(bub,i,p.x,p.y,p.z,.32,i<n?.5:0)}flush(bub)}}
+
+/* ================= loop ================= */
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{const c=cssv('--stage');stages.forEach(S=>{if(S.cv.id!=='cHero')S.sc.background.set(c)});window.dispatchEvent(new Event('resize'))});
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const S of stages){if(!S.vis)continue;if(!paused&&S.update)S.update(dt);draw(S,paused?0:dt)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>
