@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Food Studio by Pickle & Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EFF3E6;--surface:#F8FAF2;--ink:#1C261C;--ink-2:#4B5848;--rule:#C6CFB6;--pipe:#B9C3A8;
+  --pickle:#4E7420;--brine:#22788A;--turmeric:#D08E12;--chili:#BC3D26;--cream:#E9C46A;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --text:"Newsreader",Georgia,"Times New Roman",serif;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#111913;--surface:#152018;--ink:#E5ECDB;--ink-2:#A6B39F;--rule:#2C3A2F;--pipe:#34453A;
+  --pickle:#9AC257;--brine:#5DB6C5;--turmeric:#EDB548;--chili:#E8705A;--cream:#F2D58A;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111913;--surface:#152018;--ink:#E5ECDB;--ink-2:#A6B39F;--rule:#2C3A2F;--pipe:#34453A;
+  --pickle:#9AC257;--brine:#5DB6C5;--turmeric:#EDB548;--chili:#E8705A;--cream:#F2D58A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--text);font-size:1.125rem;line-height:1.6;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+canvas{max-width:100%}
+.wrap{max-width:1240px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--rule)}
+header.top .wrap{display:flex;align-items:center;gap:1rem;min-height:60px;flex-wrap:wrap;padding-top:.5rem;padding-bottom:.5rem}
+.mark{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:-.01em;margin-right:auto;white-space:nowrap}
+.mark small{font-weight:400;color:var(--ink-2);font-size:.85rem;margin-left:.4rem}
+nav{display:flex;gap:.25rem;flex-wrap:wrap}
+button{font-family:var(--display);font-size:.92rem;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:.4rem .9rem;cursor:pointer;min-height:36px}
+button:hover{border-color:var(--ink-2)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brine);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+nav button{border-color:transparent}
+.hero{padding:clamp(2.5rem,7vw,5rem) 0 1rem}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(3.4rem,11vw,8.5rem);line-height:.88;letter-spacing:-.045em;margin:0 0 1.25rem}
+.hero p{max-width:34em;color:var(--ink-2);font-size:clamp(1.15rem,2vw,1.35rem);margin:0}
+.line{padding:clamp(2.5rem,6vw,4.5rem) 0;border-top:1px solid var(--rule)}
+.line:first-of-type{border-top:0;padding-top:1.5rem}
+.module{font-family:var(--display);font-size:.95rem;color:var(--pickle);margin:0 0 .4rem;font-weight:600}
+.line h2{font-family:var(--display);font-weight:600;font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 .75rem;max-width:22em}
+.line p.lede{margin:0 0 1.5rem;color:var(--ink-2);max-width:40em}
+.stage{background:var(--surface);border:1px solid var(--rule);border-radius:20px;padding:clamp(.4rem,1.2vw,1rem);overflow:hidden}
+.stage canvas{display:block;width:100%}
+.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:1rem 2.5rem;margin-top:1.25rem;align-items:start}
+.ctrl label{display:flex;justify-content:space-between;font-family:var(--display);font-size:.9rem;color:var(--ink-2);margin-bottom:.3rem}
+.ctrl output{color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--pickle);height:28px;margin:0}
+.btns{display:flex;gap:.4rem;flex-wrap:wrap;align-self:center}
+dl.read{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1rem;margin:0}
+dl.read dt{color:var(--ink-2);font-size:1rem}
+dl.read dd{margin:0;text-align:right;font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums}
+.status{font-family:var(--display);font-weight:600;margin:1rem 0 0;padding-left:.8rem;border-left:4px solid var(--pickle)}
+.status.bad{border-left-color:var(--chili)}
+.note{font-size:.95rem;color:var(--ink-2);margin:.75rem 0 0}
+.next{padding:clamp(2.5rem,6vw,4rem) 0 clamp(3rem,8vw,6rem);border-top:1px solid var(--rule)}
+.next h2{font-family:var(--display);font-weight:600;font-size:1.6rem;margin:0 0 1rem}
+.next ul{list-style:none;padding:0;margin:0;columns:2 16rem;column-gap:3rem}
+.next li{padding:.55rem 0;border-bottom:1px solid var(--rule);break-inside:avoid}
+.next li b{font-family:var(--display);font-weight:600}
+footer{padding:1.5rem 0 2.5rem;color:var(--ink-2);font-size:.95rem}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">Food Studio<small>by Pickle &amp; Python</small></div>
+  <nav aria-label="Processes">
+    <button data-go="pasteurizer">Pasteurizer</button>
+    <button data-go="spraydryer">Spray dryer</button>
+    <button data-go="separator">Cream separator</button>
+    <button id="motion" aria-pressed="false">Pause motion</button>
+  </nav>
+</div></header>
+
+<main>
+  <div class="wrap hero">
+    <h1>Food Studio</h1>
+    <p>Real food processes, running live. Every line below is a working model: turn a dial on the control panel and watch the plant respond, the way an operator would.</p>
+  </div>
+
+  <section class="line" id="pasteurizer"><div class="wrap">
+    <p class="module">Thermal processing</p>
+    <h2>An HTST milk pasteurizer, running in real time</h2>
+    <p class="lede">Cold raw milk is pre-warmed by milk that’s already been pasteurized, heated by hot water, then held for at least 15 seconds at 72 °C. If either number falls short, the diversion valve sends the milk back to start again.</p>
+    <div class="stage"><canvas id="cPast" aria-label="Animated pasteurization line: raw milk tank, pump, regeneration section, heater, holding tube, diversion valve, cooler and pasteurized milk tank, with milk coloured by temperature"></canvas></div>
+    <div class="panel">
+      <div class="ctrl"><label for="hw">Hot water temperature <output id="hwOut"></output></label><input type="range" id="hw" min="66" max="86" step="0.5" value="79"></div>
+      <div class="ctrl"><label for="fl">Milk flow rate <output id="flOut"></output></label><input type="range" id="fl" min="60" max="145" step="1" value="100"></div>
+      <div class="btns"><button id="pump" aria-pressed="true">Pump running</button></div>
+      <dl class="read">
+        <dt>Holding temperature</dt><dd id="pT"></dd>
+        <dt>Holding time</dt><dd id="pHold"></dd>
+        <dt>Heat recovered</dt><dd>85%</dd>
+      </dl>
+    </div>
+    <p class="status" id="pStatus"></p>
+  </div></section>
+
+  <section class="line" id="spraydryer"><div class="wrap">
+    <p class="module">Drying</p>
+    <h2>A spray dryer turning milk into powder</h2>
+    <p class="lede">Concentrated milk is flung into fine droplets inside a column of hot air. Each droplet dries in a couple of seconds as it falls. Too little heat or too much feed, and wet droplets hit the walls and stick.</p>
+    <div class="stage"><canvas id="cSpray" aria-label="Animated spray dryer: atomizer spraying droplets that shrink and turn to powder as they fall through hot air, with exhaust air leaving through a cyclone"></canvas></div>
+    <div class="panel">
+      <div class="ctrl"><label for="tin">Inlet air temperature <output id="tinOut"></output></label><input type="range" id="tin" min="150" max="220" step="1" value="190"></div>
+      <div class="ctrl"><label for="feed">Feed rate <output id="feedOut"></output></label><input type="range" id="feed" min="40" max="120" step="1" value="80"></div>
+      <div class="btns"><button id="clean">Clean chamber</button></div>
+      <dl class="read">
+        <dt>Outlet air</dt><dd id="sOut"></dd>
+        <dt>Powder moisture</dt><dd id="sMoist"></dd>
+        <dt>Powder collected</dt><dd id="sBin"></dd>
+      </dl>
+    </div>
+    <p class="status" id="sStatus"></p>
+    <p class="note">Simplified model: outlet temperature and moisture follow typical trends, not a full heat and mass balance.</p>
+  </div></section>
+
+  <section class="line" id="separator"><div class="wrap">
+    <p class="module">Mechanical separation</p>
+    <h2>A disc-stack centrifuge splitting cream from skim milk</h2>
+    <p class="lede">Spinning at thousands of rpm, the bowl multiplies gravity several thousand times. Light fat globules drift inward to the cream outlet; denser skim milk is thrown outward. Small globules and cold, thick milk are what let fat escape.</p>
+    <div class="stage"><canvas id="cSep" aria-label="Animated centrifugal separator cross-section: milk enters down the centre, fat globules move inward to the cream outlet and skim milk moves outward to the skim outlet"></canvas></div>
+    <div class="panel">
+      <div class="ctrl"><label for="rpm">Bowl speed <output id="rpmOut"></output></label><input type="range" id="rpm" min="1500" max="7500" step="100" value="5000"></div>
+      <div class="ctrl"><label for="mt">Milk temperature <output id="mtOut"></output></label><input type="range" id="mt" min="10" max="60" step="1" value="50"></div>
+      <dl class="read">
+        <dt>Force at the bowl wall</dt><dd id="gF"></dd>
+        <dt>Fat lost to skim</dt><dd id="lost"></dd>
+        <dt>Fat left in skim milk</dt><dd id="skimFat"></dd>
+      </dl>
+    </div>
+    <p class="status" id="cStatus"></p>
+    <p class="note">Illustrative model: each globule drifts at a speed set by Stokes’ law, so size, spin and viscosity all matter.</p>
+  </div></section>
+
+  <section class="next"><div class="wrap">
+    <h2>Lines being built</h2>
+    <ul>
+      <li><b>Retort canning</b>: steam, pressure and the cold spot</li>
+      <li><b>Freeze dryer</b>: ice turning straight to vapour</li>
+      <li><b>Twin-screw extruder</b>: dough to puffed snack</li>
+      <li><b>Multiple-effect evaporator</b>: one kilo of steam, three kilos of water</li>
+      <li><b>Plate freezer</b>: the freezing front, layer by layer</li>
+      <li><b>Membrane filtration</b>: whey through ultrafiltration</li>
+    </ul>
+  </div></section>
+</main>
+<footer><div class="wrap">Food Studio is the process floor of Pickle &amp; Python: real food questions, answered with real data and Python.</div></footer>
+
+<script>
+(function(){
+const root=document.documentElement;
+let C={};
+function colors(){const s=getComputedStyle(root);['ink','ink-2','rule','pipe','surface','pickle','brine','turmeric','chili','cream'].forEach(k=>C[k]=s.getPropertyValue('--'+k).trim())}
+colors();matchMedia('(prefers-color-scheme: dark)').addEventListener('change',colors);
+const rgb=h=>{h=h.replace('#','');return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16))};
+function mix(a,b,t){t=Math.max(0,Math.min(1,t));const p=rgb(a),q=rgb(b);return`rgb(${p.map((v,i)=>Math.round(v+(q[i]-v)*t)).join(',')})`}
+function heat(t){return t<.5?mix(C.brine,C.turmeric,t*2):mix(C.turmeric,C.chili,(t-.5)*2)}
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let paused=reduce;const mBtn=document.getElementById('motion');
+const syncM=()=>{mBtn.setAttribute('aria-pressed',paused?'true':'false');mBtn.textContent=paused?'Play motion':'Pause motion'};syncM();
+mBtn.onclick=()=>{paused=!paused;syncM()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.go).scrollIntoView({behavior:reduce?'auto':'smooth'}));
+const hsh=location.hash.slice(1);if(['pasteurizer','spraydryer','separator'].includes(hsh))setTimeout(()=>document.getElementById(hsh).scrollIntoView(),60);
+const VW=1000,VH=540;
+function view(cv){const d=devicePixelRatio||1,w=cv.clientWidth,h=Math.round(w*VH/VW);
+  if(cv._w!==w||cv._d!==d){cv.width=w*d;cv.height=h*d;cv.style.height=h+'px';cv._w=w;cv._d=d}
+  const x=cv.getContext('2d'),s=w/VW;x.setTransform(d*s,0,0,d*s,0,0);x.clearRect(0,0,VW,VH);x.lineCap='round';x.lineJoin='round';
+  x._fs=Math.max(15,11/s);return x}
+function label(x,t,px,py,al,col){x.fillStyle=col||C['ink-2'];x.font=`${x._fs}px "Bricolage Grotesque",sans-serif`;x.textAlign=al||'center';x.fillText(t,px,py)}
+function poly(x,pts,w,col){x.strokeStyle=col;x.lineWidth=w;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke()}
+function mkPath(pts){const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return{pts,L,len:L[L.length-1]}}
+function at(p,s){s=Math.max(0,Math.min(p.len,s));let i=1;while(i<p.L.length-1&&p.L[i]<s)i++;const a=p.pts[i-1],b=p.pts[i],t=(s-p.L[i-1])/((p.L[i]-p.L[i-1])||1);
+  return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,(a[2]??0)+((b[2]??0)-(a[2]??0))*t]}
+const vis=new Set();const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?vis.add(e.target.id):vis.delete(e.target.id)));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+
+/* ================= HTST pasteurizer ================= */
+const A=mkPath([[140,320],[200,320],[300,320],[420,320],[480,320],[600,320],[640,320],[640,140],[640,80],[680,80],[680,140],[720,140],[720,80],[760,80],[760,140],[800,140],[800,80],[840,80],[840,140],[880,140],[880,320]]);
+const B=mkPath([[880,320],[880,460],[420,460],[300,460],[240,460],[140,460],[110,460]]);
+const Cd=mkPath([[880,320],[950,320],[950,210],[100,210],[100,252]]);
+const HWL=mkPath([[505,282],[505,236],[575,236],[575,282]]),CWL=mkPath([[165,498],[165,528],[215,528],[215,498]]);
+const hwEl=document.getElementById('hw'),flEl=document.getElementById('fl'),pumpB=document.getElementById('pump');
+let pump=true,pz={},divert=false,rawLvl=.8,pastLvl=.25,impA=0,loopS=0;
+pumpB.onclick=()=>{pump=!pump;pumpB.setAttribute('aria-pressed',pump);pumpB.textContent=pump?'Pump running':'Pump stopped'};
+function pzCalc(){const HW=+hwEl.value,F=+flEl.value;const Th=HW-(1.5+2.5*F/100),Tf=Th-.5,Treg=4+.85*(Tf-4),Tpo=Tf-(Treg-4),hold=20*100/F;
+  divert=Tf<72||hold<15;pz={HW,F,Th,Tf,Treg,Tpo,hold};
+  const n=A.pts.length;[0,1,2].forEach(i=>A.pts[i][2]=4);A.pts[3][2]=A.pts[4][2]=Treg;[5,6,7].forEach(i=>A.pts[i][2]=Th);
+  for(let i=7;i<n;i++)A.pts[i][2]=Th+(Tf-Th)*(i-7)/(n-8);A.pts[n-1][2]=Tf;
+  [Tf,Tf,Tf,Tpo,Tpo,4,4].forEach((t,i)=>B.pts[i][2]=t);[Tf,Tf,Tf-1,Tf-3,Tf-3].forEach((t,i)=>Cd.pts[i][2]=t);
+  document.getElementById('hwOut').textContent=HW.toFixed(1)+' °C';document.getElementById('flOut').textContent=F+'%';
+  document.getElementById('pT').textContent=Tf.toFixed(1)+' °C';document.getElementById('pHold').textContent=hold.toFixed(1)+' s';
+  const st=document.getElementById('pStatus');
+  if(!pump){st.textContent='Pump stopped. Nothing moves, nothing gets pasteurized.';st.className='status bad'}
+  else if(Tf<72){st.textContent='Diverting: milk is only reaching '+Tf.toFixed(1)+' °C, below the 72 °C minimum. It goes back to the raw tank.';st.className='status bad'}
+  else if(hold<15){st.textContent='Diverting: at this flow rate the fastest milk spends only '+hold.toFixed(1)+' s in the holding tube, under the 15 s minimum.';st.className='status bad'}
+  else{st.textContent='Forward flow: '+Tf.toFixed(1)+' °C for '+hold.toFixed(1)+' s. Safe milk is heading to the cooler and the tank.';st.className='status'}}
+[hwEl,flEl].forEach(e=>e.oninput=pzCalc);pumpB.addEventListener('click',pzCalc);pzCalc();
+const PP=[];for(let i=0;i<150;i++){const onA=Math.random()<.62;PP.push(onA?{p:'A',s:Math.random()*A.len}:{p:'B',s:Math.random()*B.len})}
+function stepPast(dt){if(!pump)return;const v=110*pz.F/100;impA+=dt*pz.F/12;loopS+=dt*90;
+  for(const q of PP){q.s+=v*dt;const P=q.p==='A'?A:q.p==='B'?B:Cd;if(q.s>=P.len){if(q.p==='A'){q.p=divert?'C':'B';q.s-=A.len}else{q.p='A';q.s=0}}}
+  if(!divert){rawLvl-=dt*.012*pz.F/100;pastLvl+=dt*.012*pz.F/100}
+  if(rawLvl<.18)rawLvl=.85;if(pastLvl>.92)pastLvl=.12}
+function tank(x,X,Y,W,H,lvl,t,name){x.fillStyle=heat(t/90);x.globalAlpha=.55;x.fillRect(X,Y+H*(1-lvl),W,H*lvl);x.globalAlpha=1;
+  x.strokeStyle=C.ink;x.lineWidth=3;x.beginPath();x.moveTo(X,Y);x.lineTo(X,Y+H);x.lineTo(X+W,Y+H);x.lineTo(X+W,Y);x.stroke();label(x,name,X+W/2,Y-12)}
+function plates(x,X,Y,W,H){x.strokeStyle=C.rule;x.lineWidth=2;for(let px=X+10;px<X+W;px+=12){x.beginPath();x.moveTo(px,Y+6);x.lineTo(px,Y+H-6);x.stroke()}
+  x.strokeStyle=C.ink;x.lineWidth=3;x.strokeRect(X,Y,W,H)}
+function drawPast(){const x=view(document.getElementById('cPast'));const pipe=C.pipe;
+  poly(x,A.pts,12,pipe);poly(x,B.pts,12,pipe);x.setLineDash(divert?[]:[2,16]);poly(x,Cd.pts,12,pipe);x.setLineDash([]);
+  plates(x,300,282,120,218);plates(x,480,282,120,78);plates(x,140,422,100,76);
+  poly(x,HWL.pts,8,mix(C.pipe,C.chili,.35));poly(x,CWL.pts,8,mix(C.pipe,C.brine,.35));
+  for(let k=0;k<6;k++){const p=at(HWL,(loopS+k*HWL.len/6)%HWL.len);x.fillStyle=heat(pz.HW/90);x.beginPath();x.arc(p[0],p[1],4,0,7);x.fill();
+    const c=at(CWL,(loopS+k*CWL.len/6)%CWL.len);x.fillStyle=heat(2/90);x.beginPath();x.arc(c[0],c[1],4,0,7);x.fill()}
+  tank(x,60,252,80,96,rawLvl,4,'Raw milk');tank(x,30,412,80,96,pastLvl,4,'Pasteurized');
+  for(const q of PP){const P=q.p==='A'?A:q.p==='B'?B:Cd;const p=at(P,q.s);x.fillStyle=heat(p[2]/90);x.beginPath();x.arc(p[0],p[1],4.2,0,7);x.fill()}
+  x.fillStyle=C.surface;x.strokeStyle=C.ink;x.lineWidth=3;x.beginPath();x.arc(200,320,20,0,7);x.fill();x.stroke();
+  for(let k=0;k<3;k++){const a=impA+k*2.094;x.beginPath();x.moveTo(200,320);x.lineTo(200+15*Math.cos(a),320+15*Math.sin(a));x.stroke()}
+  x.fillStyle=divert?C.chili:C.pickle;x.beginPath();x.arc(880,320,17,0,7);x.fill();x.strokeStyle=C.ink;x.stroke();
+  x.strokeStyle=C.surface;x.lineWidth=4;x.beginPath();if(divert){x.moveTo(880,320);x.lineTo(897,320)}else{x.moveTo(880,320);x.lineTo(880,337)}x.stroke();
+  label(x,'Pump',200,365);label(x,'Regeneration',360,522);label(x,'Heating',540,384);label(x,'Hot water',540,224);
+  label(x,'Holding tube',740,62);label(x,divert?'Diverting':'Forward',880,362,'center',divert?C.chili:C.pickle);label(x,'Diversion valve',880,384);
+  label(x,'Cooling',190,412);label(x,'Return to raw tank',520,198)}
+
+/* ================= spray dryer ================= */
+const tinEl=document.getElementById('tin'),feedEl=document.getElementById('feed');let sp={},drops=[],deps=[],bin=0,spawnAcc=0,atomA=0,airS=0;
+document.getElementById('clean').onclick=()=>{deps=[]};
+function spCalc(){const Tin=+tinEl.value,feed=+feedEl.value,Tout=Math.max(45,Tin-1.2*feed),moist=Math.max(1,Math.min(15,3+(90-Tout)*.22));
+  sp={Tin,feed,Tout,moist,rate:Math.max(.2,.25+(Tout-50)*.02)};
+  document.getElementById('tinOut').textContent=Tin+' °C';document.getElementById('feedOut').textContent=feed+' L/h';
+  document.getElementById('sOut').textContent=Math.round(Tout)+' °C';document.getElementById('sMoist').textContent=moist.toFixed(1)+'%';
+  const st=document.getElementById('sStatus');
+  if(moist>5){st.textContent='Sticky powder: wet droplets are reaching the walls and building up. Raise the air temperature or cut the feed.';st.className='status bad'}
+  else if(Tout>105){st.textContent='Very hot outlet air: dry, but the powder risks scorching and dissolving poorly.';st.className='status bad'}
+  else{st.textContent='Free-flowing powder: droplets are dry well before they reach the walls.';st.className='status'}
+  const ap=AIR.pts;for(let i=0;i<ap.length;i++)ap[i][2]=i<3?Tin:i<7?Tin+(Tout-Tin)*(i-2)/4:Tout}
+const AIR=mkPath([[120,90],[380,90],[470,105],[430,180],[570,240],[440,290],[600,330],[765,330],[785,285],[828,305],[775,340],[822,372],[800,400],[800,250],[800,190],[960,190]]);
+[tinEl,feedEl].forEach(e=>e.oninput=spCalc);spCalc();
+const airP=Array.from({length:46},(_,i)=>i*AIR.len/46);
+function halfW(y){return y<360?120:120-(y-360)*.8333}
+function stepSpray(dt){atomA+=dt*20;airS+=dt*150;spawnAcc+=sp.feed*.9*dt;
+  while(spawnAcc>=1){spawnAcc--;const dir=Math.random()<.5?-1:1;drops.push({x:500+rnd(-6,6),y:80,vx:dir*rnd(50,230),vy:rnd(30,70),m:1,r0:rnd(4,7),f:rnd(.7,1.3)})}
+  for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.vx*=Math.pow(.18,dt);d.vy=Math.min(170,d.vy+150*dt);d.x+=d.vx*dt;d.y+=d.vy*dt;d.m=Math.max(.02,d.m-sp.rate*d.f*dt);
+    const rr=d.r0*(.45+.55*Math.cbrt(d.m)),hw=halfW(d.y);
+    if(Math.abs(d.x-500)>hw-rr){if(d.m>.3){deps.push({x:500+Math.sign(d.x-500)*(hw-rr*.6),y:d.y,r:rr});if(deps.length>420)deps.shift();drops.splice(i,1);continue}
+      d.x=500+Math.sign(d.x-500)*(hw-rr);d.vx=0}
+    if(d.y>=482){bin++;drops.splice(i,1)}}
+  document.getElementById('sBin').textContent=(bin*.004).toFixed(1)+' kg'}
+function drawSpray(){const x=view(document.getElementById('cSpray'));
+  poly(x,[[120,90],[380,90]],26,C.pipe);poly(x,[[620,330],[770,330]],20,C.pipe);poly(x,[[800,262],[800,190],[960,190]],16,C.pipe);
+  poly(x,[[930,45],[500,45],[500,64]],8,C.pipe);poly(x,[[500,500],[500,512]],10,C.pipe);poly(x,[[800,430],[800,470]],8,C.pipe);
+  x.fillStyle=C.surface;x.strokeStyle=C.ink;x.lineWidth=3;
+  x.beginPath();x.moveTo(380,60);x.lineTo(620,60);x.lineTo(620,360);x.lineTo(520,480);x.lineTo(520,500);x.lineTo(480,500);x.lineTo(480,480);x.lineTo(380,360);x.closePath();x.fill();x.stroke();
+  x.beginPath();x.moveTo(770,262);x.lineTo(830,262);x.lineTo(830,340);x.lineTo(808,430);x.lineTo(792,430);x.lineTo(770,340);x.closePath();x.fill();x.stroke();
+  x.strokeRect(930,20,50,50);x.fillStyle=C.cream;x.globalAlpha=.6;x.fillRect(931,38,48,31);x.globalAlpha=1;
+  for(let k=0;k<airP.length;k++){const p=at(AIR,(airP[k]+airS)%AIR.len);x.fillStyle=heat((p[2]-20)/200);x.globalAlpha=.45;x.beginPath();x.arc(p[0],p[1],3.2,0,7);x.fill()}x.globalAlpha=1;
+  for(const d of deps){x.fillStyle=mix(C.brine,C.turmeric,.35);x.beginPath();x.arc(d.x,d.y,d.r,0,7);x.fill()}
+  for(const d of drops){const rr=d.r0*(.45+.55*Math.cbrt(d.m));x.fillStyle=mix(C.brine,C.cream,1-d.m);x.beginPath();x.arc(d.x,d.y,rr,0,7);x.fill()}
+  x.fillStyle=C.ink;x.fillRect(484,64,32,8);x.strokeStyle=C.ink;x.lineWidth=2;
+  for(let k=0;k<4;k++){const a=atomA+k*1.571;x.beginPath();x.moveTo(500,68);x.lineTo(500+16*Math.cos(a),68+3*Math.sin(a));x.stroke()}
+  const lvl=(bin%600)/600;x.strokeStyle=C.ink;x.lineWidth=3;x.strokeRect(455,512,90,26);x.fillStyle=C.cream;x.fillRect(457,512+24*(1-lvl)+1,86,24*lvl);
+  label(x,'Hot air in, '+sp.Tin+' °C',230,72);label(x,'Concentrate',955,92);label(x,'Atomizer',660,74,'left');label(x,'Drying chamber',300,250,'center');
+  label(x,'Exhaust, '+Math.round(sp.Tout)+' °C',880,176);label(x,'Cyclone',870,320,'left');label(x,'Powder',600,530,'left')}
+
+/* ================= cream separator ================= */
+const rpmEl=document.getElementById('rpm'),mtEl=document.getElementById('mt');let cs={},parts=[],cAcc=0,rot=0,fatTot=0,fatLost=0;
+function csCalc(){const rpm=+rpmEl.value,T=+mtEl.value,w=rpm*2*Math.PI/60,G=w*w*.2/9.81;cs={rpm,T,G,k:60*Math.pow(rpm/5000,2)*Math.exp(.03*(T-50))};
+  document.getElementById('rpmOut').textContent=rpm.toLocaleString('en-US')+' rpm';document.getElementById('mtOut').textContent=T+' °C';
+  document.getElementById('gF').textContent=Math.round(G).toLocaleString('en-US')+' × g'}
+[rpmEl,mtEl].forEach(e=>e.oninput=()=>{csCalc();fatTot=fatLost=0});csCalc();
+function csStatus(){const loss=fatTot>20?fatLost/fatTot:null;
+  document.getElementById('lost').textContent=loss===null?'measuring…':Math.round(loss*100)+'%';
+  document.getElementById('skimFat').textContent=loss===null?'measuring…':(4*loss/.9).toFixed(2)+'%';
+  const st=document.getElementById('cStatus');if(loss===null){st.textContent='Collecting globules at the outlets…';st.className='status';return}
+  if(cs.T<35&&loss>.15){st.textContent='Cold milk is thick: globules drift too slowly and escape with the skim. Dairies separate warm, around 45–55 °C.';st.className='status bad'}
+  else if(loss>.15){st.textContent='Too slow: not enough force to pull the small globules inward before they leave the disc stack.';st.className='status bad'}
+  else{st.textContent='Clean separation: almost all the fat reaches the cream outlet.';st.className='status'}}
+setInterval(()=>{if(vis.has('cSep'))csStatus()},500);
+function goWay(p,dt,sp){const t=p.way[0];const dx=t[0]-p.ax,dy=t[1]-p.y,dd=Math.hypot(dx,dy);if(dd<sp*dt){p.ax=t[0];p.y=t[1];p.way.shift()}else{p.ax+=dx/dd*sp*dt;p.y+=dy/dd*sp*dt}}
+function stepSep(dt){rot+=dt*cs.rpm/3000;cAcc+=dt*38;
+  while(cAcc>=1){cAcc--;const fat=Math.random()<.4;parts.push({fat,d:rnd(.4,1.4),st:'feed',ax:500+rnd(-4,4),y:30})}
+  for(let i=parts.length-1;i>=0;i--){const p=parts[i];
+    if(p.st==='feed'){p.y+=150*dt;if(p.y>=420){p.st='stack';const sgn=Math.random()<.5?-1:1;p.r=sgn*rnd(100,140);p.ax=500+p.r}}
+    else if(p.st==='stack'){p.y-=55*dt;const sg=Math.sign(p.r);
+      if(p.fat)p.r-=sg*cs.k*p.d*p.d*dt;else p.r+=sg*cs.k*.25*dt;p.ax=500+p.r;
+      if(p.fat&&Math.abs(p.r)<55){p.st='out';p.way=[[500+sg*22,p.y],[500+sg*22,70],[545,58],[545,30],[720,30]];fatTot++}
+      else if(!p.fat&&Math.abs(p.r)>192){p.st='out';p.way=sg>0?[[692,p.y],[700,130],[760,100],[900,100]]:[[308,p.y],[300,130],[300,110]]}
+      else if(p.y<150){p.st='out';if(p.fat){fatTot++;fatLost++;p.lost=true}p.way=sg>0?[[692,150],[700,130],[760,100],[900,100]]:[[308,150],[300,130],[300,110]]}}
+    else{goWay(p,dt,190);if(!p.way.length){parts.splice(i,1)}}}}
+function drawSep(){const x=view(document.getElementById('cSep'));
+  poly(x,[[300,22],[500,22]],12,C.pipe);poly(x,[[545,64],[545,30],[720,30]],12,mix(C.pipe,C.cream,.4));poly(x,[[700,130],[760,100],[900,100]],12,mix(C.pipe,C.brine,.3));
+  x.fillStyle=C.surface;x.strokeStyle=C.ink;x.lineWidth=3.5;
+  const bowl=[[440,62],[300,132],[280,400],[330,452],[670,452],[720,400],[700,132],[560,62]];
+  x.beginPath();bowl.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fill();x.stroke();
+  x.strokeStyle=C.rule;x.lineWidth=3;for(let k=0;k<10;k++){const y0=150+k*25;x.beginPath();x.moveTo(450,y0);x.lineTo(310,y0+58);x.moveTo(550,y0);x.lineTo(690,y0+58);x.stroke()}
+  x.strokeStyle=C.ink;x.lineWidth=2.5;x.strokeRect(489,22,22,400);
+  for(let k=0;k<14;k++){const a=rot*2*Math.PI+k*2*Math.PI/14,s=Math.sin(a);if(s<0)continue;const px=500+205*Math.cos(a);x.globalAlpha=.25+.6*s;x.strokeStyle=C['ink-2'];x.lineWidth=3;x.beginPath();x.moveTo(px,462);x.lineTo(px,474);x.stroke()}x.globalAlpha=1;
+  x.strokeStyle=C.ink;x.lineWidth=3;x.beginPath();x.moveTo(470,452);x.lineTo(470,520);x.moveTo(530,452);x.lineTo(530,520);x.stroke();
+  for(const p of parts){x.fillStyle=p.fat?(p.lost?C.chili:C.cream):mix(C.brine,C.surface,.35);const r=p.fat?2.4+p.d*2.2:3;x.beginPath();x.arc(p.ax,p.y,r,0,7);x.fill()}
+  label(x,'Whole milk in',240,28,'right');label(x,'Cream',735,36,'left',C.ink);label(x,'Skim milk',915,106,'left',C.ink);
+  label(x,'Disc stack',230,300,'right');label(x,'Spinning bowl',500,500+24,'center');
+  x.fillStyle=C.cream;x.beginPath();x.arc(770,420,6,0,7);x.fill();label(x,'Fat globule',785,426,'left');
+  x.fillStyle=C.chili;x.beginPath();x.arc(770,450,6,0,7);x.fill();label(x,'Fat escaping to skim',785,456,'left');
+  x.fillStyle=mix(C.brine,C.surface,.35);x.beginPath();x.arc(770,480,6,0,7);x.fill();label(x,'Skim milk',785,486,'left')}
+
+/* ================= loop ================= */
+['cPast','cSpray','cSep'].forEach(id=>io.observe(document.getElementById(id)));
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(vis.has('cPast')){if(!paused)stepPast(dt);drawPast()}
+  if(vis.has('cSpray')){if(!paused)stepSpray(dt);drawSpray()}
+  if(vis.has('cSep')){if(!paused)stepSep(dt);drawSep()}
+  requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

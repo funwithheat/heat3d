@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cold Lab: an atlas of food preservation without heat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEEF3;--paper-2:#E2E5EC;--ink:#12152A;--ink-2:#4C5270;--rule:#C8CCDA;--violet:#5A46C8;--good:#2F7A3A;--bad:#B23A28;
+  --night:#0A0E24;--on-night:#EFE9DD;--on-night-2:#9AA1C4;
+  --serif:"Bodoni Moda","Didot","Bodoni 72",Georgia,"Times New Roman",serif;
+  --sans:"Hanken Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#090B18;--paper-2:#10132A;--ink:#ECE8DF;--ink-2:#A2A8C6;--rule:#232845;--violet:#AE9BFF;--good:#8FD07F;--bad:#FF8A70;--night:#05071A;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#090B18;--paper-2:#10132A;--ink:#ECE8DF;--ink-2:#A2A8C6;--rule:#232845;--violet:#AE9BFF;--good:#8FD07F;--bad:#FF8A70;--night:#05071A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--night)}
+canvas{max-width:100%}
+.wrap{max-width:1320px;margin:0 auto;padding:0 clamp(1rem,4vw,3rem)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--night);color:var(--on-night)}
+header.top .wrap{display:flex;align-items:center;gap:1.25rem;min-height:58px;flex-wrap:wrap;padding-top:.4rem;padding-bottom:.4rem}
+.mark{font-family:var(--serif);font-style:italic;font-size:1.45rem;margin-right:auto;white-space:nowrap;letter-spacing:-.01em}
+.mark small{font-family:var(--sans);font-style:normal;font-size:.8rem;color:var(--on-night-2);margin-left:.6rem}
+nav{display:flex;gap:.1rem;flex-wrap:wrap}
+nav button{font-family:var(--sans);font-size:.88rem;color:var(--on-night-2);background:none;border:0;padding:.45rem .7rem;cursor:pointer;min-height:36px;border-radius:6px}
+nav button:hover{color:var(--on-night)}
+nav button i{font-family:var(--serif);font-style:italic;color:#B9A9FF;margin-right:.35rem}
+#motion{border:1px solid #2E3560;border-radius:999px;color:var(--on-night);margin-left:.5rem}
+button:focus-visible,input:focus-visible{outline:2px solid #B9A9FF;outline-offset:2px}
+.hero{position:relative;background:var(--night);color:var(--on-night);height:clamp(30rem,82vh,48rem);overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .wrap{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:clamp(2.5rem,7vh,5rem);pointer-events:none}
+.hero h1{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(4.6rem,15vw,13rem);line-height:.8;letter-spacing:-.035em;margin:0 0 1.5rem;font-variation-settings:"opsz" 96}
+.hero p{font-family:var(--serif);font-size:clamp(1.2rem,2.2vw,1.65rem);line-height:1.35;max-width:26em;margin:0;color:var(--on-night)}
+.hero p span{display:block;font-family:var(--sans);font-size:.95rem;color:var(--on-night-2);margin-top:1rem;line-height:1.5;max-width:36em}
+.plate{padding:clamp(3.5rem,8vw,6.5rem) 0 clamp(2rem,5vw,3.5rem)}
+.plate + .plate{border-top:1px solid var(--rule)}
+.phead{display:grid;grid-template-columns:minmax(0,7rem) minmax(0,1fr);gap:1rem 2rem;align-items:end;margin-bottom:clamp(1.5rem,3vw,2.25rem)}
+.pnum{font-family:var(--serif);font-style:italic;font-size:clamp(3.5rem,7vw,6rem);line-height:.8;color:var(--violet);font-variation-settings:"opsz" 96}
+.pkind{font-family:var(--sans);font-weight:500;font-size:.92rem;color:var(--violet);margin:0 0 .4rem}
+.phead h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,4vw,3.3rem);line-height:1.04;letter-spacing:-.02em;margin:0;max-width:20em;font-variation-settings:"opsz" 72}
+@media (max-width:640px){.phead{grid-template-columns:minmax(0,1fr)}.pnum{font-size:3rem}}
+.stage{background:var(--night);border-radius:4px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(10,14,36,.55)}
+.stage canvas{display:block;width:100%}
+.fig{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--ink-2);margin:.8rem 0 0}
+.below{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(1.5rem,4vw,4rem);margin-top:clamp(1.5rem,3vw,2.5rem)}
+@media (max-width:900px){.below{grid-template-columns:minmax(0,1fr)}}
+.lede{font-family:var(--serif);font-size:clamp(1.15rem,1.6vw,1.32rem);line-height:1.55;margin:0;max-width:32em;font-variation-settings:"opsz" 18}
+.lede + .lede{margin-top:1rem}
+.instr{border-top:2px solid var(--ink);padding-top:1rem}
+.ctrl{margin-bottom:1.1rem}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem;color:var(--ink-2);margin-bottom:.35rem}
+.ctrl output{font-family:var(--serif);font-size:1.3rem;color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--ink-2)}
+input[type=range]::-moz-range-track{height:2px;background:var(--ink-2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);margin-top:-9px;cursor:grab}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);cursor:grab}
+.btn{font-family:var(--sans);font-size:.88rem;color:var(--ink);background:none;border:1px solid var(--ink-2);border-radius:999px;padding:.4rem .95rem;cursor:pointer;min-height:36px}
+.btn:hover{background:var(--paper-2)}
+.reads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.reads div{min-width:0}
+.reads b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.05;font-variant-numeric:lining-nums tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reads span{font-size:.82rem;color:var(--ink-2);line-height:1.3;display:block;margin-top:.25rem}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.25rem 0 .9rem}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.stage canvas{touch-action:pan-y;cursor:crosshair}
+.hint{font-family:var(--serif);font-style:italic;color:var(--violet)}
+.status{margin:1.25rem 0 0;font-size:.98rem;padding-left:.9rem;border-left:3px solid var(--good)}
+.status.bad{border-left-color:var(--bad)}
+.note{font-size:.88rem;color:var(--ink-2);margin:.9rem 0 0;max-width:40em}
+.colophon{background:var(--night);color:var(--on-night);padding:clamp(3rem,7vw,5.5rem) 0}
+.colophon h2{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(2rem,4vw,3rem);margin:0 0 1.5rem}
+.colophon ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:0 3rem}
+.colophon li{padding:.8rem 0;border-top:1px solid #262C52;color:var(--on-night-2)}
+.colophon li b{display:block;font-family:var(--serif);font-weight:400;font-size:1.3rem;color:var(--on-night)}
+.colophon p{margin:2.5rem 0 0;font-size:.9rem;color:var(--on-night-2);max-width:44em}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">Cold Lab<small>Pickle &amp; Python</small></div>
+  <nav aria-label="Plates">
+    <button data-go="hpp"><i>I</i>Pressure</button>
+    <button data-go="pef"><i>II</i>Electric pulses</button>
+    <button data-go="ultrasound"><i>III</i>Ultrasound</button>
+    <button data-go="uvc"><i>IV</i>Ultraviolet</button>
+    <button id="motion" aria-pressed="false">Pause motion</button>
+  </nav>
+</div></header>
+
+<main>
+<section class="hero" aria-label="Introduction">
+  <canvas id="cHero" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <h1>Cold Lab</h1>
+    <p>An atlas of food preservation without heat, drawn at the scale of molecules.<span>Four live plates. In each one, every molecule carries its own temperature, so you can watch energy arrive, spread and fade, and see how little of it ever becomes heat.</span></p>
+  </div>
+</section>
+
+<section class="plate" id="hpp"><div class="wrap">
+  <div class="phead"><div class="pnum" aria-hidden="true">I</div><div><p class="pkind">High pressure processing</p><h2>Six thousand atmospheres, and the vitamins don’t notice</h2></div></div>
+  <div class="stage"><canvas id="cH" aria-label="Water molecules coloured by their individual temperature, compressed from all sides around a bacterial cell whose lipid bilayer deforms and ruptures while a protein unfolds and a vitamin ring stays intact. Insets show the molecular speed distribution and the survival curve."></canvas></div>
+  <p class="fig">Plate I. Isostatic compression of a vegetative cell in water. Insets: Maxwell–Boltzmann speed distribution (bars, simulated; line, theory) and log survival over hold time. <span class="hint">Drag sideways across the chamber to set the pressure; hover to probe the local temperature.</span></p>
+  <div class="below">
+    <div>
+      <p class="lede">Pressure arrives everywhere at once, so a strawberry and the microbe on it are squeezed equally without being crushed. What gives way are the weak, non-covalent bonds that hold membranes and folded proteins in shape.</p>
+      <p class="lede">Vitamins, pigments and flavour molecules are held together by covalent bonds, far too strong for pressure alone. The only heat is a gentle warming from compression, about 3 °C for every 100 MPa, visible as the speed histogram drifts right.</p>
+    </div>
+    <div class="instr">
+      <div class="ctrl"><label for="pr">Pressure <output id="prOut"></output></label><input type="range" id="pr" min="0" max="600" step="10" value="0"></div>
+      <div class="row" role="group" aria-label="Organism"><button class="btn" id="hVeg" aria-pressed="true">Vegetative cell</button><button class="btn" id="hSpore" aria-pressed="false">Bacterial spore</button></div>
+      <div class="row"><button class="btn" id="hCycle">Run a full cycle</button><button class="btn" id="hReset">Restart the hold</button></div>
+      <div class="reads"><div><b id="hT"></b><span>Water temperature</span></div><div><b id="hHold"></b><span>Time held</span></div><div><b id="hLog"></b><span>Microbes destroyed</span></div></div>
+      <p class="status" id="hS"></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="plate" id="pef"><div class="wrap">
+  <div class="phead"><div class="pnum" aria-hidden="true">II</div><div><p class="pkind">Pulsed electric fields</p><h2>Lightning in microseconds, written on a membrane</h2></div></div>
+  <div class="stage"><canvas id="cP" aria-label="A cell between two electrodes. With each pulse, charge builds on the membrane, coloured by local voltage, and pores open at the poles; ions drift and collide, releasing small flickers of heat. Insets show the pulse train and membrane voltage around the cell."></canvas></div>
+  <p class="fig">Plate II. Electroporation of a 1 µm cell in orange juice. Membrane heads are coloured by local voltage. Insets: oscilloscope trace and transmembrane voltage against angle, with the 1 V threshold. <span class="hint">Drag either electrode to change the gap; click the stage to fire a pulse; hover the membrane to read its local voltage.</span></p>
+  <div class="below">
+    <div>
+      <p class="lede">Each pulse lasts about two millionths of a second. Ions rush toward the electrodes and pile up against the membrane, and the voltage across it follows Schwan’s equation: strongest at the two poles facing the plates, zero at the equator.</p>
+      <p class="lede">Past roughly one volt, the lipid layer tears open. The ions crashing through the juice along the way turn some of the pulse into heat, which is why industrial PEF lines need cooling between treatment chambers.</p>
+    </div>
+    <div class="instr">
+      <div class="ctrl"><label for="kv">Pulse voltage <output id="kvOut"></output></label><input type="range" id="kv" min="0" max="30" step="0.5" value="12"></div>
+      <div class="row" role="group" aria-label="Cell type"><button class="btn" id="pBac" aria-pressed="true">Bacterium, 1 µm</button><button class="btn" id="pYeast" aria-pressed="false">Yeast, 3 µm</button></div>
+      <div class="row"><button class="btn" id="pAuto" aria-pressed="true">Automatic pulses</button><button class="btn" id="pFire">Fire one pulse</button><button class="btn" id="pReset">New cell</button></div>
+      <div class="reads"><div><b id="pE"></b><span>Field strength</span></div><div><b id="pV"></b><span>Peak membrane voltage</span></div><div><b id="pT"></b><span>Juice, <em id="pQ"></em> per pulse</span></div></div>
+      <p class="status" id="pS"></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="plate" id="ultrasound"><div class="wrap">
+  <div class="phead"><div class="pnum" aria-hidden="true">III</div><div><p class="pkind">Power ultrasound</p><h2>Stars the size of a bacterium, lasting a millionth of a second</h2></div></div>
+  <div class="stage"><canvas id="cU" aria-label="Cavitation bubbles oscillate in sound waves and implode, heating nearby water molecules to thousands of kelvin; the hot molecules scatter and cool, and shockwaves shred nearby microbes. Insets show the molecular speed distribution with its hot tail and one bubble's radius over time."></canvas></div>
+  <p class="fig">Plate III. Transient cavitation in juice. Each molecule is coloured by its own temperature. Insets: speed distribution showing the hot tail after each collapse, and the radius history of a single bubble. <span class="hint">Click a bubble to collapse it, click empty liquid to seed a new one, and hover to read the local temperature.</span></p>
+  <div class="below">
+    <div>
+      <p class="lede">Sound stretches the liquid until tiny bubbles open, then squeezes them shut. Over many cycles they grow, until one compression crushes a bubble faster than its gas can escape.</p>
+      <p class="lede">For an instant, the gas inside reaches around 5,000 K. Watch the molecules nearest a collapse flare white, scatter, and hand their energy on to their neighbours. The heat spreads and vanishes within a few molecular diameters, which is why the juice as a whole barely warms.</p>
+    </div>
+    <div class="instr">
+      <div class="ctrl"><label for="amp">Ultrasound power <output id="ampOut"></output></label><input type="range" id="amp" min="0" max="100" step="1" value="65"></div>
+      <div class="row" role="group" aria-label="Frequency"><button class="btn" data-f="20" aria-pressed="true">20 kHz</button><button class="btn" data-f="40" aria-pressed="false">40 kHz</button><button class="btn" data-f="100" aria-pressed="false">100 kHz</button></div>
+      <div class="reads"><div><b id="uHot">5,000 K</b><span>Inside a collapse</span></div><div><b id="uC"></b><span>Collapses per second</span></div><div><b id="uT"></b><span>Bulk juice</span></div></div>
+      <p class="status" id="uS"></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="plate" id="uvc"><div class="wrap">
+  <div class="phead"><div class="pnum" aria-hidden="true">IV</div><div><p class="pkind">Ultraviolet C</p><h2>A photon at 254 nm, and two letters fused for good</h2></div></div>
+  <div class="stage"><canvas id="cV" aria-label="A rotating DNA double helix struck by UV photons; adjacent thymine bases fuse into glowing dimers that kink the helix. Insets show DNA absorbance against wavelength with the lamp line, and survival against dose."></canvas></div>
+  <p class="fig">Plate IV. Cyclobutane thymine dimers forming in bacterial DNA. Bases: A cyan, T violet, G green, C amber. Insets: DNA absorbance spectrum with the 254 nm mercury line, and survival against dose. <span class="hint">Move across the stage to aim the lamp and click to fire a burst of photons.</span></p>
+  <div class="below">
+    <div>
+      <p class="lede">DNA absorbs ultraviolet most strongly near 260 nm, and a low-pressure mercury lamp emits almost all its light at 254 nm. The match is nearly perfect.</p>
+      <p class="lede">When a photon lands on two thymines sitting side by side, their rings weld together. The kinked strand can no longer be copied, so the cell cannot divide. No heat is involved; the energy goes straight into a chemical bond.</p>
+    </div>
+    <div class="instr">
+      <div class="ctrl"><label for="uv">Lamp intensity <output id="uvOut"></output></label><input type="range" id="uv" min="0" max="100" step="1" value="45"></div>
+      <div class="row"><button class="btn" id="vRepair" aria-pressed="false">Visible-light repair</button><button class="btn" id="vBurst">Fire a burst</button><button class="btn" id="vReset">Fresh DNA</button></div>
+      <div class="reads"><div><b id="vD"></b><span>UV dose, mJ/cm²</span></div><div><b id="vN"></b><span>Thymine dimers</span></div><div><b id="vR">0</b><span>Dimers repaired</span></div></div>
+      <p class="status" id="vS"></p>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer class="colophon"><div class="wrap">
+  <h2>Plates in preparation</h2>
+  <ul>
+    <li><b>Cold plasma</b>A storm of reactive oxygen on a leaf of spinach</li>
+    <li><b>Irradiation</b>Gamma photons and the free radicals they leave behind</li>
+    <li><b>Ozone</b>Oxidising a cell wall, one bond at a time</li>
+    <li><b>Ohmic heating</b>When the food itself becomes the resistor</li>
+  </ul>
+  <p>Cold Lab is part of Food Studio by Pickle &amp; Python. The models are simplified to show cause and effect at the molecular scale; values are typical of published processing conditions and are illustrative, not prescriptive.</p>
+</div></footer>
+
+<script>
+(function(){
+const K={cyan:'#6FD3E3',amber:'#F4B860',coral:'#FF7A5C',violet:'#A08BFF',leaf:'#A8D672',bone:'#EFE9DD',mist:'#8A93B8',white:'#FFF7EA'};
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+function mix(a,b,t){t=Math.max(0,Math.min(1,t));const p=rgb(a),q=rgb(b);return'#'+p.map((v,i)=>Math.round(v+(q[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+const PAL=Array.from({length:48},(_,i)=>{const s=i/47;return s<.3?mix(K.cyan,K.amber,s/.3):s<.65?mix(K.amber,K.coral,(s-.3)/.35):mix(K.coral,K.white,(s-.65)/.35)});
+function tq(Tk){let s=Tk<=320?(Tk-288)/32*.3:Tk<=900?.3+(Tk-320)/580*.35:.65+(Tk-900)/4100*.35;return PAL[Math.max(0,Math.min(47,Math.round(s*47)))]}
+const spr={};function glow(c){if(spr[c])return spr[c];const cv=document.createElement('canvas');cv.width=cv.height=32;const g=cv.getContext('2d');
+  const gr=g.createRadialGradient(16,16,0,16,16,16);gr.addColorStop(0,c);gr.addColorStop(.22,c+'DD');gr.addColorStop(.55,c+'38');gr.addColorStop(1,c+'00');g.fillStyle=gr;g.fillRect(0,0,32,32);return spr[c]=cv}
+function dot(x,X,Y,c,r){x.drawImage(glow(c),X-r*2,Y-r*2,r*4,r*4)}
+const rnd=(a,b)=>a+Math.random()*(b-a),$=id=>document.getElementById(id),rayl=()=>Math.sqrt(-2*Math.log(1-Math.random()*.999)),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const nightCol=()=>getComputedStyle(document.documentElement).getPropertyValue('--night').trim()||'#0A0E24';
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let paused=reduce;
+const mBtn=$('motion');const syncM=()=>{mBtn.setAttribute('aria-pressed',paused?'true':'false');mBtn.textContent=paused?'Play motion':'Pause motion'};syncM();mBtn.onclick=()=>{paused=!paused;syncM()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>$(b.dataset.go).scrollIntoView({behavior:reduce?'auto':'smooth'}));
+const hsh=location.hash.slice(1);if(['hpp','pef','ultrasound','uvc'].includes(hsh))setTimeout(()=>$(hsh).scrollIntoView(),80);
+const VW=1000,VH=580;let NIGHT=nightCol();matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>NIGHT=nightCol());
+function view(cv,fade){const d=devicePixelRatio||1,w=cv.clientWidth,h=Math.round(w*VH/VW);
+  if(cv._w!==w||cv._d!==d){cv.width=w*d;cv.height=h*d;cv.style.height=h+'px';cv._w=w;cv._d=d;fade=1}
+  const x=cv.getContext('2d'),s=w/VW;x.setTransform(d*s,0,0,d*s,0,0);x.globalCompositeOperation='source-over';x.globalAlpha=fade;x.fillStyle=NIGHT;x.fillRect(0,0,VW,VH);x.globalAlpha=1;
+  x.lineCap='round';x.lineJoin='round';x._fs=Math.max(14,10.5/s);return x}
+function ital(x,t,px,py,al,col,sz){x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle=col||K.bone;x.font=`italic 400 ${x._fs*(sz||1.08)}px "Bodoni Moda",Georgia,serif`;x.textAlign=al||'left';x.fillText(t,px,py)}
+function sans(x,t,px,py,al,col,sz){x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle=col||K.mist;x.font=`500 ${x._fs*(sz||.82)}px "Hanken Grotesk",sans-serif`;x.textAlign=al||'left';x.fillText(t,px,py)}
+function lead(x,x1,y1,x2,y2,t,al){x.globalCompositeOperation='source-over';x.strokeStyle=K.bone;x.globalAlpha=.55;x.lineWidth=1;x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();
+  x.globalAlpha=1;x.fillStyle=K.bone;x.beginPath();x.arc(x1,y1,2.5,0,7);x.fill();ital(x,t,x2+(al==='right'?-6:6),y2+5,al)}
+function inset(x,X,Y,W,H,title){x.globalCompositeOperation='source-over';x.globalAlpha=.78;x.fillStyle=NIGHT;x.fillRect(X,Y,W,H);x.globalAlpha=.35;x.strokeStyle=K.mist;x.lineWidth=1;x.strokeRect(X+.5,Y+.5,W-1,H-1);x.globalAlpha=1;ital(x,title,X+10,Y+20,'left',K.bone,.95)}
+function hint(x,t){ital(x,t,16,VH-16,'left',K.mist,.9)}
+function thermo(x,TC,lo,hi){const X=966,Y=70,Hh=210,t=clamp((TC-lo)/(hi-lo),0,1);x.globalCompositeOperation='source-over';
+  x.strokeStyle=K.mist;x.globalAlpha=.6;x.lineWidth=1.2;x.beginPath();x.moveTo(X-6,Y);x.lineTo(X-6,Y+Hh);x.moveTo(X+6,Y);x.lineTo(X+6,Y+Hh);x.stroke();
+  for(let k=0;k<=6;k++){x.beginPath();x.moveTo(X+6,Y+Hh*k/6);x.lineTo(X+11,Y+Hh*k/6);x.stroke()}x.globalAlpha=1;
+  const col=tq(TC+273.15);x.fillStyle=col;x.fillRect(X-3,Y+Hh*(1-t),6,Hh*t+4);x.beginPath();x.arc(X,Y+Hh+12,11,0,7);x.fill();
+  x.globalCompositeOperation='lighter';dot(x,X,Y+Hh+12,col,10);ital(x,TC.toFixed(1)+' °C',X+4,Y-14,'center',K.bone,.95)}
+function gasStep(g,dt,Tb,sc,bx0,by0,bx1,by1){for(const m of g){if(Math.random()<dt*2.2){m.a=rnd(0,6.283);m.ray=rayl()}m.e+=(Tb-m.e)*Math.min(1,dt*1.6);
+  const v=sc*Math.sqrt(m.e/293)*m.ray;m.x+=Math.cos(m.a)*v*dt;m.y+=Math.sin(m.a)*v*dt;
+  if(m.x<bx0){m.x=bx0;m.a=Math.PI-m.a}if(m.x>bx1){m.x=bx1;m.a=Math.PI-m.a}if(m.y<by0){m.y=by0;m.a=-m.a}if(m.y>by1){m.y=by1;m.a=-m.a}}}
+function histo(x,g,Tb,X,Y,W,H){inset(x,X,Y,W,H,'Molecular speeds');const n=20,max=3.6,bw=max/n,c=new Array(n).fill(0);
+  for(const m of g){const v=Math.sqrt(m.e/293)*m.ray;c[Math.min(n-1,Math.floor(v/bw))]++}
+  const s=Math.sqrt(Tb/293),pdf=v=>v/(s*s)*Math.exp(-v*v/(2*s*s))*g.length*bw;const pk=Math.max(...c,pdf(s)),px0=X+12,py0=Y+H-22,pw=W-24,ph=H-52;
+  for(let i=0;i<n;i++){const h=c[i]/pk*ph,v=(i+.5)*bw;x.fillStyle=tq(293*v*v);x.globalAlpha=.85;x.fillRect(px0+i*pw/n+1,py0-h,pw/n-2,h)}x.globalAlpha=1;
+  x.strokeStyle=K.bone;x.lineWidth=1.3;x.beginPath();for(let k=0;k<=60;k++){const v=k/60*max,yy=py0-pdf(v)/pk*ph;k?x.lineTo(px0+k/60*pw,yy):x.moveTo(px0,yy)}x.stroke();
+  x.globalAlpha=.4;x.strokeStyle=K.mist;x.beginPath();x.moveTo(px0,py0+.5);x.lineTo(px0+pw,py0+.5);x.stroke();x.globalAlpha=1;sans(x,'slow',px0,py0+16);sans(x,'fast',px0+pw,py0+16,'right')}
+function probe(x,p,pts){if(!p.in||p.down)return;let n=0,e=0;for(const q of pts){const d=Math.hypot(q[0]-p.x,q[1]-p.y);if(d<46){n++;e+=q[2]}}
+  x.globalCompositeOperation='source-over';x.strokeStyle=K.bone;x.globalAlpha=.7;x.lineWidth=1;x.setLineDash([3,4]);x.beginPath();x.arc(p.x,p.y,46,0,7);x.stroke();x.setLineDash([]);x.globalAlpha=1;
+  if(n){const T=e/n;const al=p.x>760?'right':'left',ox=al==='right'?-54:54;ital(x,Math.round(T)+' K',p.x+ox,p.y-6,al,tq(T),1.1);sans(x,n+' molecules in the probe',p.x+ox,p.y+14,al,K.mist)}}
+function ptr(cv){const p={x:-1,y:-1,in:false,down:false,sx:0};const pos=e=>{const r=cv.getBoundingClientRect();p.x=(e.clientX-r.left)/r.width*VW;p.y=(e.clientY-r.top)/r.height*VH};
+  cv.addEventListener('pointermove',e=>{const ox=p.x,oy=p.y;pos(e);p.in=true;if(p.down&&p.onDrag)p.onDrag(p.x-ox,p.y-oy);if(p.onHover)p.onHover()});
+  cv.addEventListener('pointerdown',e=>{pos(e);p.in=true;p.down=true;p.sx=p.x;p.sy=p.y;if(e.pointerType==='mouse')try{cv.setPointerCapture(e.pointerId)}catch(_){};if(p.onDown)p.onDown()});
+  cv.addEventListener('pointerup',e=>{pos(e);const click=Math.hypot(p.x-p.sx,p.y-p.sy)<7;p.down=false;if(p.onUp)p.onUp(click)});
+  cv.addEventListener('pointerleave',()=>{p.in=false});cv.addEventListener('pointercancel',()=>{p.down=false});return p}
+function toggleGroup(btns,on){btns.forEach(b=>b.setAttribute('aria-pressed',b===on?'true':'false'))}
+const vis=new Set();const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?vis.add(e.target.id):vis.delete(e.target.id)),{rootMargin:'80px'});
+
+/* ===== hero ===== */
+const hc=$('cHero');const HP=Array.from({length:900},()=>({x:Math.random(),y:Math.random(),l:rnd(0,1),c:[K.cyan,K.violet,K.amber,K.coral,K.bone][Math.floor(Math.random()*5)]}));let ht=0,hm={x:-1,y:-1};
+hc.addEventListener('pointermove',e=>{const r=hc.getBoundingClientRect();hm.x=(e.clientX-r.left)/r.width;hm.y=(e.clientY-r.top)/r.height});hc.addEventListener('pointerleave',()=>{hm.x=-1});
+function heroFrame(dt){const d=devicePixelRatio||1,w=hc.clientWidth,h=hc.clientHeight;if(hc._w!==w||hc._h!==h){hc.width=w*d;hc.height=h*d;hc._w=w;hc._h=h}
+  const x=hc.getContext('2d');x.setTransform(d,0,0,d,0,0);x.globalCompositeOperation='source-over';x.globalAlpha=.07;x.fillStyle=NIGHT;x.fillRect(0,0,w,h);x.globalAlpha=1;
+  x.globalCompositeOperation='lighter';ht+=dt;
+  for(const p of HP){const X=p.x*w,Y=p.y*h;let a=Math.sin(X*.0023+ht*.08)*2.1+Math.cos(Y*.0031-ht*.06)*2.1+Math.sin((X+Y)*.0011)*1.2,sp=.018;
+    if(hm.x>=0){const dx=p.x-hm.x,dy=(p.y-hm.y)*h/w,dd=Math.hypot(dx,dy);if(dd<.14){a=Math.atan2(dy,dx)+1.3;sp=.05*(1-dd/.14)+.018}}
+    p.x+=Math.cos(a)*dt*sp;p.y+=Math.sin(a)*dt*sp*w/h;p.l-=dt*.07;
+    if(p.l<0||p.x<0||p.x>1||p.y<0||p.y>1){p.x=Math.random();p.y=Math.random();p.l=rnd(.5,1)}
+    x.globalAlpha=Math.min(1,p.l*1.4)*.7;x.fillStyle=p.c;x.fillRect(X,Y,1.6,1.6)}x.globalAlpha=1}
+if(reduce){for(let i=0;i<400;i++)heroFrame(1/30)}
+
+/* ===== I. HPP ===== */
+const prEl=$('pr');const H={P:0,TC:20,hold:0,log:0,hist:[[0,0]],t:0,spore:false,cyc:-1};
+const gH=Array.from({length:230},()=>({x:rnd(-1,1),y:rnd(-1,1),a:rnd(0,6.28),e:293,ray:rayl()}));
+let mem,prot;
+function hNew(){mem=Array.from({length:60},(_,i)=>({a:i/60*6.2832,weak:Math.random()<.33,off:0}));
+  let px=0,py=0;prot=Array.from({length:16},(_,i)=>{const f=[px,py];px+=Math.cos(i*1.95)*9;py+=Math.sin(i*1.95)*9;return{f,u:[-100+i*13.5,Math.sin(i*.85)*15]}});H.hold=0;H.log=0;H.hist=[[0,0]]}
+hNew();$('hReset').onclick=()=>{H.cyc=-1;hNew()};
+function setP(v){const old=H.P;H.P=clamp(Math.round(v/10)*10,0,600);prEl.value=H.P;H.TC=20+.03*H.P;$('prOut').textContent=H.P+' MPa';
+  const dT=.03*(H.P-old);if(dT)for(const m of gH)m.e+=dT}
+prEl.oninput=()=>{H.cyc=-1;setP(+prEl.value)};setP(0);
+const hb=[$('hVeg'),$('hSpore')];hb[0].onclick=()=>{H.spore=false;toggleGroup(hb,hb[0]);hNew()};hb[1].onclick=()=>{H.spore=true;toggleGroup(hb,hb[1]);hNew()};
+$('hCycle').onclick=()=>{hNew();H.cyc=0};
+const pH=ptr($('cH'));let hAcc=0;pH.onDrag=dx=>{H.cyc=-1;hAcc+=dx*1.6;if(Math.abs(hAcc)>=10){setP(H.P+Math.trunc(hAcc/10)*10);hAcc%=10}};
+function hPhase(){const t=H.cyc;return t<0?'':t<2.5?'come-up':t<9.5?'hold':t<10.7?'release':'done'}
+function hStep(dt){H.t+=dt;
+  if(H.cyc>=0){H.cyc+=dt;const t=H.cyc;setP(t<2.5?600*t/2.5:t<9.5?600:t<10.7?600*(1-(t-9.5)/1.2):0);if(t>12)H.cyc=-1}
+  gasStep(gH,dt,H.TC+273.15,.42,-1,-1,1,1);
+  if(H.hold<360){H.hold+=dt*12;const r=Math.max(0,(H.P-250)/350)*1.3*(H.spore?.04:1);H.log=Math.min(7,H.log+r*dt*12/60);const L=H.hist[H.hist.length-1];if(H.hold-L[0]>4)H.hist.push([H.hold,H.log])}
+  for(const b of mem){const tg=!H.spore&&H.P>450&&b.weak?44*(H.P-450)/150:0;b.off+=(tg-b.off)*Math.min(1,dt*2)}}
+function hDraw(){const x=view($('cH'),.5),s=1-.15*H.P/600,cx=575,cy=300,hw=275*s,hh=220*s;
+  const pts=gH.map(m=>[cx+m.x*hw,cy+m.y*hh,m.e]);
+  x.globalCompositeOperation='lighter';for(const q of pts)dot(x,q[0],q[1],tq(q[2]),3);
+  x.globalCompositeOperation='source-over';x.strokeStyle=pH.down?K.violet:K.mist;x.globalAlpha=.7;x.lineWidth=pH.down?2:1.2;x.strokeRect(cx-hw-10,cy-hh-10,hw*2+20,hh*2+20);x.globalAlpha=1;
+  const L=10+52*H.P/600;
+  if(H.P>0){x.strokeStyle=K.violet;x.lineWidth=2.2;const ar=(x0,y0,dx,dy)=>{const ex=x0+dx*L,ey=y0+dy*L;x.beginPath();x.moveTo(x0,y0);x.lineTo(ex,ey);x.moveTo(ex,ey);x.lineTo(ex-dx*9-dy*6,ey-dy*9-dx*6);x.moveTo(ex,ey);x.lineTo(ex-dx*9+dy*6,ey-dy*9+dx*6);x.stroke()};
+    const pul=Math.sin(H.t*6)*3;for(const f of[-.66,-.22,.22,.66]){ar(cx+f*hw,cy-hh-16-L+pul,0,1);ar(cx+f*hw,cy+hh+16+L-pul,0,-1)}for(const f of[-.5,0,.5]){ar(cx-hw-16-L+pul,cy+f*hh,1,0);ar(cx+hw+16+L-pul,cy+f*hh,-1,0)}}
+  const R=100*s,dist=H.P>300?(H.P-300)/300*(H.spore?.25:1):0;
+  if(H.spore){for(const [rr,col,n] of[[R+28,K.amber,70],[R+16,K.bone,64]]){x.globalCompositeOperation='lighter';for(let i=0;i<n;i++){const a=i/n*6.2832+H.t*.05;dot(x,cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,col,3.4)}}}
+  for(const b of mem){const wob=1+.11*dist*Math.sin(3*b.a+H.t*2.2),ro=R*wob+b.off,ri=(R-16)*wob+b.off*.7,al=Math.max(0,1-b.off/44),ca=Math.cos(b.a),sa=Math.sin(b.a);
+    x.globalCompositeOperation='source-over';x.globalAlpha=al*.5;x.strokeStyle=K.bone;x.lineWidth=1;
+    for(const dd of[-.018,.018]){const c2=Math.cos(b.a+dd),s2=Math.sin(b.a+dd);x.beginPath();x.moveTo(cx+c2*(ro-3),cy+s2*(ro-3));x.lineTo(cx+c2*(ro-8),cy+s2*(ro-8));x.moveTo(cx+c2*(ri+3),cy+s2*(ri+3));x.lineTo(cx+c2*(ri+8),cy+s2*(ri+8));x.stroke()}
+    x.globalCompositeOperation='lighter';x.globalAlpha=al;dot(x,cx+ca*ro,cy+sa*ro,K.leaf,4.5);dot(x,cx+ca*ri,cy+sa*ri,K.leaf,3.8);x.globalAlpha=1}
+  const u=clamp((H.P-200)/300,0,1)*(H.spore?.35:1),pc=mix(K.bone,K.coral,u);
+  const pp=prot.map(p=>[cx-6+(p.f[0]+(p.u[0]-p.f[0])*u)*s,cy+(p.f[1]+(p.u[1]-p.f[1])*u)*s]);
+  x.globalCompositeOperation='source-over';x.strokeStyle=pc;x.lineWidth=1.6;x.beginPath();pp.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke();
+  x.globalCompositeOperation='lighter';pp.forEach(p=>dot(x,p[0],p[1],pc,4));
+  const vx=cx+hw-70,vy=cy-hh+62;x.globalCompositeOperation='source-over';x.strokeStyle=K.leaf;x.lineWidth=1.6;x.beginPath();
+  for(let i=0;i<=6;i++){const a=i/6*6.2832+.5236;i?x.lineTo(vx+20*Math.cos(a),vy+20*Math.sin(a)):x.moveTo(vx+20*Math.cos(a),vy+20*Math.sin(a))}x.stroke();
+  x.beginPath();x.moveTo(vx+20*Math.cos(.5236),vy+20*Math.sin(.5236));x.lineTo(vx+34,vy+22);x.moveTo(vx-17,vy-10);x.lineTo(vx-30,vy-20);x.stroke();
+  x.globalCompositeOperation='lighter';for(let i=0;i<6;i++){const a=i/6*6.2832+.5236;dot(x,vx+20*Math.cos(a),vy+20*Math.sin(a),K.leaf,3.4)}
+  lead(x,vx,vy+22,vx-30,vy+64,'vitamin C, bonds intact','right');
+  if(H.spore)lead(x,cx-Math.cos(.8)*(R+28),cy-Math.sin(.8)*(R+28),cx-R-80,cy-R-46,'spore coat, cross-linked','right');
+  else lead(x,cx-Math.cos(.8)*R,cy-Math.sin(.8)*R,cx-R-70,cy-R-36,'phospholipid bilayer','right');
+  lead(x,pp[8][0],pp[8][1]+4,cx+20,cy+R+46,u>.5?'protein, unfolded':'protein, folded');
+  const ph=hPhase();if(ph)ital(x,ph==='done'?'cycle complete':ph,cx,cy-hh-30-L-6,'center',K.violet,1.15);
+  histo(x,gH,H.TC+273.15,14,14,196,150);
+  inset(x,14,180,196,140,'Survivors, log N/N₀');const X0=26,Y0=212,W0=172,H0=90;
+  x.strokeStyle=K.mist;x.globalAlpha=.4;x.lineWidth=1;x.beginPath();x.moveTo(X0,Y0);x.lineTo(X0,Y0+H0);x.lineTo(X0+W0,Y0+H0);x.stroke();x.globalAlpha=1;
+  x.strokeStyle=K.coral;x.lineWidth=1.8;x.beginPath();H.hist.forEach(([t,l],i)=>{const px=X0+t/360*W0,py=Y0+l/7*H0;i?x.lineTo(px,py):x.moveTo(px,py)});x.lineTo(X0+H.hold/360*W0,Y0+H.log/7*H0);x.stroke();
+  x.globalCompositeOperation='lighter';dot(x,X0+H.hold/360*W0,Y0+H.log/7*H0,K.coral,5);sans(x,'0',X0,Y0+H0+16);sans(x,'6 min',X0+W0,Y0+H0+16,'right');sans(x,'−7',X0-4,Y0+H0,'right');
+  thermo(x,H.TC,15,45);probe(x,pH,pts);hint(x,'drag sideways to squeeze');
+  $('hT').textContent=H.TC.toFixed(1)+' °C';$('hHold').textContent=Math.floor(H.hold/60)+':'+String(Math.floor(H.hold%60)).padStart(2,'0');$('hLog').textContent=H.log<.05?'0 log':H.log.toFixed(1)+' log';
+  const st=$('hS');
+  if(H.spore){st.textContent=H.P<400?'A bacterial spore: dehydrated core, thick cross-linked coat. Try full pressure.':'Even at '+H.P+' MPa the spore barely changes. Destroying spores needs pressure combined with heat, so HPP foods are kept cold.';st.className='status bad'}
+  else if(H.P<200){st.textContent='Below about 200 MPa the cell barely notices. Drag across the chamber or raise the pressure.';st.className='status bad'}
+  else if(H.P<400){st.textContent='Proteins loosen and the bilayer strains, but most microbes survive a hold at this pressure.';st.className='status bad'}
+  else{st.textContent='The bilayer is tearing. Vegetative microbes die within minutes at '+H.P+' MPa, and the water is only '+(H.TC-20).toFixed(0)+' °C warmer.';st.className='status'}}
+
+/* ===== II. PEF ===== */
+const kvEl=$('kv');const Pf={kv:12,xl:96,xr:854,r:1,auto:true,clk:0,on:false,man:0,TC:20,lethal:false,fl:0,scope:[],drag:null};let beads,ions,sparks=[];
+const Ef=()=>Pf.kv/((Pf.xr-Pf.xl)/758);
+function pNew(){beads=Array.from({length:96},(_,i)=>({a:i/96*6.2832,pore:0,q:0}));
+  ions=[...Array.from({length:56},()=>({in:true,r:rnd(0,.85),a:rnd(0,6.283),life:1})),...Array.from({length:70},()=>({in:false,x:rnd(120,830),y:rnd(150,540),life:1,vx:0,vy:0}))];Pf.lethal=false;Pf.TC=20}
+pNew();$('pReset').onclick=pNew;
+function pCalc(){Pf.kv=+kvEl.value;const E=Ef();$('kvOut').textContent=Pf.kv.toFixed(1)+' kV';$('pE').textContent=E.toFixed(1)+' kV/cm';$('pV').textContent=(.15*E*Pf.r).toFixed(2)+' V';$('pQ').textContent='+'+(.00239*E*E).toFixed(2)+' °C'}
+kvEl.oninput=pCalc;pCalc();
+const pb=[$('pBac'),$('pYeast')];pb[0].onclick=()=>{Pf.r=1;toggleGroup(pb,pb[0]);pNew();pCalc()};pb[1].onclick=()=>{Pf.r=3;toggleGroup(pb,pb[1]);pNew();pCalc()};
+const fire=()=>{Pf.man=.1};$('pFire').onclick=fire;
+const pa=$('pAuto');pa.onclick=()=>{Pf.auto=!Pf.auto;pa.setAttribute('aria-pressed',Pf.auto);pa.textContent=Pf.auto?'Automatic pulses':'Manual pulses'};
+const PC={x:475,y:345,ry:.8};const cR=()=>Pf.r===1?140:175;
+const pP=ptr($('cP'));
+pP.onDown=()=>{Pf.drag=Math.abs(pP.x-Pf.xl)<26&&pP.y>130?'l':Math.abs(pP.x-Pf.xr)<26&&pP.y>130?'r':null};
+pP.onDrag=dx=>{if(Pf.drag==='l')Pf.xl=clamp(Pf.xl+dx,40,PC.x-cR()-34);if(Pf.drag==='r')Pf.xr=clamp(Pf.xr+dx,PC.x+cR()+34,905);if(Pf.drag)pCalc()};
+pP.onUp=click=>{if(click&&!Pf.drag)fire();Pf.drag=null};
+pP.onHover=()=>{$('cP').style.cursor=(Math.abs(pP.x-Pf.xl)<26||Math.abs(pP.x-Pf.xr)<26)&&pP.y>130?'ew-resize':'pointer'};
+function pStep(dt){Pf.clk+=dt;const was=Pf.on;Pf.man=Math.max(0,Pf.man-dt);Pf.on=Pf.kv>0&&((Pf.auto&&Pf.clk%.8<.1)||Pf.man>0);
+  const E=Ef();if(Pf.on&&!was){Pf.TC+=.00239*E*E;Pf.fl=1}
+  Pf.TC+=(20-Pf.TC)*dt*.3;Pf.fl=Math.max(0,Pf.fl-dt*4);const tm=.15*E*Pf.r;if(tm>2&&Pf.on)Pf.lethal=true;const R=cR();
+  for(const b of beads){const v=tm*Math.abs(Math.cos(b.a));if(Pf.on){b.q+=(v-b.q)*Math.min(1,dt*30);if(v>1)b.pore=Math.max(b.pore,Math.min(1,(v-1)/1.2))}else b.q*=Math.exp(-dt*5);if(!Pf.lethal)b.pore*=Math.exp(-dt*.6)}
+  const L=Pf.xl+16,Rr=Pf.xr-16;
+  for(const i of ions){if(i.in){i.r+=rnd(-.5,.5)*dt*1.5;i.a+=rnd(-.5,.5)*dt*1.5;if(i.r<0)i.r=-i.r;
+      if(i.r>.93){const k=Math.round(((i.a%6.2832+6.2832)%6.2832)/6.2832*96)%96;if(beads[k].pore>.35){i.in=false;i.esc=true;i.x=PC.x+Math.cos(i.a)*R;i.y=PC.y+Math.sin(i.a)*R*PC.ry;i.vx=Math.cos(i.a)*rnd(25,60);i.vy=Math.sin(i.a)*rnd(25,60);i.life=1}else i.r=.9}}
+    else{i.x+=(i.vx+rnd(-20,20))*dt+(Pf.on?E*9*dt:0);i.y+=(i.vy+rnd(-20,20))*dt;i.vx*=.98;i.vy*=.98;
+      if(i.esc){i.life-=dt*.22;if(i.life<=0){i.in=true;i.esc=false;i.r=rnd(0,.6);i.a=rnd(0,6.283)}}
+      if(i.x>Rr)i.x=L;if(i.x<L)i.x=Rr;if(i.y<140)i.y=540;if(i.y>545)i.y=145;
+      if(!i.esc){const dx=(i.x-PC.x)/R,dy=(i.y-PC.y)/(R*PC.ry);if(dx*dx+dy*dy<1.1){const a=Math.atan2(dy,dx);i.x=PC.x+Math.cos(a)*R*1.06;i.y=PC.y+Math.sin(a)*R*PC.ry*1.06}}
+      if(Pf.on&&Math.random()<dt*E*E*.012)sparks.push({x:i.x,y:i.y,age:0})}}
+  sparks.forEach(s=>s.age+=dt);sparks=sparks.filter(s=>s.age<.5);
+  Pf.scope.push([Pf.on?1:0,beads[0].q]);if(Pf.scope.length>200)Pf.scope.shift()}
+function pDraw(){const x=view($('cP'),1),cx=PC.x,cy=PC.y,ry=PC.ry,R=cR(),E=Ef(),tm=.15*E*Pf.r;
+  x.globalCompositeOperation='lighter';x.setLineDash([2,12]);x.lineDashOffset=-Pf.clk*500;
+  for(let y=150;y<=545;y+=22){x.strokeStyle=K.violet;x.globalAlpha=Pf.on?.5:.07;x.lineWidth=Pf.on?1.6:1;x.beginPath();x.moveTo(Pf.xl+16,y);x.lineTo(Pf.xr-16,y);x.stroke()}x.setLineDash([]);x.globalAlpha=1;
+  x.globalCompositeOperation='source-over';for(const [ex,s] of[[Pf.xl,'l'],[Pf.xr,'r']]){const act=Pf.drag===s;x.fillStyle=Pf.on?mix(K.violet,K.white,.3):act?'#4A5290':'#2A3158';x.fillRect(ex-8,140,16,410);
+    x.strokeStyle=K.mist;x.globalAlpha=.6;x.lineWidth=1;for(let k=-1;k<=1;k++){x.beginPath();x.moveTo(ex-3+k*3,330);x.lineTo(ex-3+k*3,360);x.stroke()}x.globalAlpha=1}
+  if(Pf.fl>0){x.globalCompositeOperation='lighter';x.globalAlpha=Pf.fl*.55;for(const ex of[Pf.xl,Pf.xr])x.drawImage(glow(K.violet),ex-60,100,120,480);x.globalAlpha=1}
+  ital(x,'+',Pf.xl,132,'center',K.bone,1.3);ital(x,'−',Pf.xr,132,'center',K.bone,1.3);
+  x.globalCompositeOperation='source-over';x.strokeStyle=K.mist;x.globalAlpha=.55;x.lineWidth=1;x.beginPath();x.moveTo(Pf.xl,562);x.lineTo(Pf.xr,562);x.moveTo(Pf.xl,556);x.lineTo(Pf.xl,568);x.moveTo(Pf.xr,556);x.lineTo(Pf.xr,568);x.stroke();x.globalAlpha=1;
+  ital(x,((Pf.xr-Pf.xl)/758).toFixed(2)+' cm gap, E = '+E.toFixed(1)+' kV/cm',(Pf.xl+Pf.xr)/2,552,'center',K.bone,.95);
+  x.globalCompositeOperation='lighter';
+  for(const i of ions){if(i.in){dot(x,cx+Math.cos(i.a)*i.r*R*.93,cy+Math.sin(i.a)*i.r*R*ry*.9,K.amber,3.2)}else{x.globalAlpha=i.esc?Math.max(0,i.life):.75;dot(x,i.x,i.y,i.esc?K.amber:K.cyan,3);x.globalAlpha=1}}
+  for(const s of sparks){x.globalAlpha=1-s.age/.5;dot(x,s.x,s.y,K.white,2+6*s.age)}x.globalAlpha=1;
+  for(const b of beads){const ca=Math.cos(b.a),sa=Math.sin(b.a),gp=b.pore,col=mix(K.leaf,K.coral,b.q/3),ro=R+gp*12,ri=R-14+gp*4;
+    x.globalCompositeOperation='source-over';x.globalAlpha=(1-gp*.85)*.45;x.strokeStyle=K.bone;x.lineWidth=1;x.beginPath();x.moveTo(cx+ca*(ro-3),cy+sa*(ro-3)*ry);x.lineTo(cx+ca*(ro-8),cy+sa*(ro-8)*ry);x.moveTo(cx+ca*(ri+3),cy+sa*(ri+3)*ry);x.lineTo(cx+ca*(ri+8),cy+sa*(ri+8)*ry);x.stroke();
+    x.globalCompositeOperation='lighter';x.globalAlpha=1-gp*.85;dot(x,cx+ca*ro,cy+sa*ro*ry,col,4.2);dot(x,cx+ca*ri,cy+sa*ri*ry,col,3.4);
+    if(gp>.35){x.globalAlpha=gp*.5;dot(x,cx+ca*R,cy+sa*R*ry,K.violet,11)}x.globalAlpha=1}
+  if(pP.in&&!pP.down){const dx=(pP.x-cx)/R,dy=(pP.y-cy)/(R*ry),rr=Math.hypot(dx,dy);if(Math.abs(rr-1)<.15){const a=Math.atan2(dy,dx),v=tm*Math.abs(Math.cos(a)),mx=cx+Math.cos(a)*R,my=cy+Math.sin(a)*R*ry;
+      x.globalCompositeOperation='lighter';dot(x,mx,my,v>1?K.coral:K.cyan,10);const al=Math.cos(a)>0?'left':'right';
+      ital(x,v.toFixed(2)+' V across the membrane',mx+(al==='left'?24:-24),my-8,al,v>1?K.coral:K.bone,1.05);sans(x,'angle '+Math.round(((a*180/Math.PI)+360)%360)+'°, '+(v>1?'above':'below')+' the 1 V threshold',mx+(al==='left'?24:-24),my+12,al)}}
+  else{lead(x,cx+R*.97,cy-14,cx+R+30,cy-80,'pole: highest voltage');lead(x,cx,cy-R*ry-2,cx+60,cy-R*ry-40,'equator: no voltage')}
+  inset(x,118,12,240,108,'Oscilloscope');const sx=128,sy=40,sw=220,sh=66;
+  x.strokeStyle=K.mist;x.globalAlpha=.35;x.setLineDash([3,4]);x.beginPath();x.moveTo(sx,sy+sh-sh/3);x.lineTo(sx+sw,sy+sh-sh/3);x.stroke();x.setLineDash([]);x.globalAlpha=1;
+  x.lineWidth=1.5;x.strokeStyle=K.violet;x.beginPath();Pf.scope.forEach(([o],i)=>{const px=sx+i/200*sw,py=sy+sh-o*sh*.9;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+  x.strokeStyle=K.coral;x.beginPath();Pf.scope.forEach(([,q],i)=>{const px=sx+i/200*sw,py=sy+sh-Math.min(1,q/3)*sh;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+  sans(x,'pulse',sx+sw,sy-2,'right',K.violet);sans(x,'1 V',sx+sw,sy+sh-sh/3-4,'right');
+  inset(x,600,12,240,108,'Membrane voltage by angle');const ax=610,ay=40,aw=220,ah=66;
+  x.strokeStyle=K.mist;x.globalAlpha=.35;x.setLineDash([3,4]);x.beginPath();x.moveTo(ax,ay+ah-ah/6);x.lineTo(ax+aw,ay+ah-ah/6);x.stroke();x.setLineDash([]);x.globalAlpha=1;
+  x.lineWidth=1.6;x.strokeStyle=K.coral;x.beginPath();for(let k=0;k<=72;k++){const th=k/72*6.2832,v=tm*Math.abs(Math.cos(th)),py=ay+ah-Math.min(6,v)/6*ah;k?x.lineTo(ax+k/72*aw,py):x.moveTo(ax,py)}x.stroke();
+  sans(x,'0°',ax,ay+ah+14);sans(x,'360°',ax+aw,ay+ah+14,'right');sans(x,'1 V',ax-4,ay+ah-ah/6+4,'right');
+  thermo(x,Pf.TC,15,45);hint(x,Pf.auto?'drag an electrode; click to fire an extra pulse':'manual mode: click the stage to fire');
+  $('pT').textContent=Pf.TC.toFixed(1)+' °C';const st=$('pS');
+  if(tm<1){st.textContent='Below the 1 V threshold: charge gathers on the membrane, but nothing opens. Raise the voltage or close the gap.';st.className='status bad'}
+  else if(!Pf.lethal){st.textContent='Reversible electroporation: pores open, ions slip out, then the membrane reseals. The cell survives.';st.className='status bad'}
+  else{st.textContent='Irreversible: the pores can’t reseal and the cell bleeds out its contents.'+(Pf.r===3?' Bigger cells hit the threshold at lower fields, so yeast dies before bacteria.':'');st.className='status'}}
+
+/* ===== III. Ultrasound ===== */
+const ampEl=$('amp');const FQ={20:{maxR:30,kick:4700,hot:'5,000 K',g:6.5},40:{maxR:21,kick:3500,hot:'3,800 K',g:8},100:{maxR:13,kick:2200,hot:'2,500 K',g:10}};
+const U={A:.65,f:20,t:0,TC:20,cols:[],trace:[]};let flashes=[],frags=[];
+const gU=Array.from({length:300},()=>({x:rnd(20,940),y:rnd(20,500),a:rnd(0,6.28),e:293,ray:rayl()}));
+const nb=(X,Y)=>({x:X??rnd(260,820),y:Y??rnd(150,440),R0:rnd(4,8),ph:rnd(0,6.28),col:-1});const bubbles=Array.from({length:8},()=>nb());
+const nm=()=>({x:rnd(240,880),y:rnd(140,460),a:rnd(0,3.14),vx:rnd(-14,14),vy:rnd(-10,10),dead:false});let microbes=Array.from({length:9},nm);
+function uCalc(){U.A=+ampEl.value/100;$('ampOut').textContent=Math.round(U.A*100)+'%'}ampEl.oninput=uCalc;uCalc();
+const fb=[...document.querySelectorAll('#ultrasound [data-f]')];fb.forEach(b=>b.onclick=()=>{U.f=+b.dataset.f;toggleGroup(fb,b);$('uHot').textContent=FQ[U.f].hot});
+const pU=ptr($('cU'));
+pU.onUp=click=>{if(!click)return;let hit=null;for(const b of bubbles){if(b.col<0&&Math.hypot(b.x-pU.x,b.y-pU.y)<Math.max(14,b.R0*1.4))hit=b}
+  if(hit){hit.col=0}else{bubbles.shift();bubbles.push(nb(clamp(pU.x,40,920),clamp(pU.y,40,490)))}};
+pU.onHover=()=>{let on=false;for(const b of bubbles)if(Math.hypot(b.x-pU.x,b.y-pU.y)<Math.max(14,b.R0*1.4))on=true;$('cU').style.cursor=on?'pointer':'crosshair'};
+function uStep(dt){U.t+=dt;const A=U.A,F=FQ[U.f];U.TC+=dt*A*.45-dt*(U.TC-20)*.022;
+  bubbles.forEach(b=>{if(b.col>=0){b.col+=dt;if(b.col>.12){flashes.push({x:b.x,y:b.y,age:0,s:b.R0/30});U.cols.push(U.t);
+        const kick=F.kick*clamp(b.R0/F.maxR,.35,1.1);for(const m of gU){const d=Math.hypot(m.x-b.x,m.y-b.y);if(d<120){m.e=Math.max(m.e,293+kick*Math.exp(-d/26));m.a=Math.atan2(m.y-b.y,m.x-b.x);m.ray=rayl()+.8}}
+        Object.assign(b,nb())}return}
+    if(A>.2)b.R0+=dt*A*F.g;if(b.R0>F.maxR&&A>.2)b.col=0;b.ph+=dt*2*Math.PI*2.6*(U.f/20)**.4});
+  const b0=bubbles[bubbles.length-1];U.trace.push(b0.col>=0?b0.R0*Math.max(.04,1-Math.pow(b0.col/.12,2)):b0.R0*(1+.35*A*Math.sin(b0.ph)));if(U.trace.length>240)U.trace.shift();
+  gasStep(gU,dt,U.TC+273.15,55,20,20,940,500);
+  for(const f of flashes){f.age+=dt;const ring=f.age*420*(.5+f.s);for(const m of microbes)if(!m.dead&&Math.hypot(m.x-f.x,m.y-f.y)<Math.min(ring,125*(.5+f.s))){m.dead=true;for(let k=0;k<8;k++)frags.push({x:m.x,y:m.y,vx:rnd(-90,90),vy:rnd(-90,90),life:1})}}
+  flashes=flashes.filter(f=>f.age<.75);U.cols=U.cols.filter(t=>U.t-t<2);
+  for(const m of microbes){m.x+=m.vx*dt;m.y+=m.vy*dt;m.a+=dt*.3;if(m.x<230||m.x>900)m.vx*=-1;if(m.y<130||m.y>480)m.vy*=-1}
+  microbes=microbes.map(m=>m.dead&&Math.random()<dt*.22?nm():m);
+  frags.forEach(f=>{f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.97;f.vy*=.97;f.life-=dt*.45});frags=frags.filter(f=>f.life>0)}
+function uDraw(){const x=view($('cU'),.38),A=U.A;
+  x.globalCompositeOperation='lighter';const kw=.04*(U.f/20)**.5;for(let y=0;y<520;y+=8){const w=Math.sin(y*kw+U.t*8);x.globalAlpha=Math.max(0,w)*A*.07;x.fillStyle=K.violet;x.fillRect(0,y,VW,8)}x.globalAlpha=1;
+  for(const m of gU)dot(x,m.x,m.y,tq(m.e),m.e>900?3.6:2.4);
+  for(const m of microbes){if(m.dead)continue;x.globalCompositeOperation='source-over';x.save();x.translate(m.x,m.y);x.rotate(m.a);x.strokeStyle=K.leaf;x.globalAlpha=.9;x.lineWidth=10;x.beginPath();x.moveTo(-13,0);x.lineTo(13,0);x.stroke();
+    x.strokeStyle=NIGHT;x.lineWidth=1;x.globalAlpha=.6;x.beginPath();x.moveTo(-10,0);x.lineTo(10,0);x.stroke();x.restore();x.globalAlpha=1}
+  x.globalCompositeOperation='lighter';for(const f of frags){x.globalAlpha=f.life;dot(x,f.x,f.y,K.leaf,2.6)}x.globalAlpha=1;
+  for(const b of bubbles){let R=b.R0*(1+.35*A*Math.sin(b.ph));if(b.col>=0)R=b.R0*Math.max(.04,1-Math.pow(b.col/.12,2));
+    const near=pU.in&&Math.hypot(b.x-pU.x,b.y-pU.y)<Math.max(14,b.R0*1.4);
+    x.globalCompositeOperation='source-over';x.strokeStyle=near?K.white:K.cyan;x.globalAlpha=.85;x.lineWidth=near?2:1.4;x.beginPath();x.arc(b.x,b.y,Math.max(1,R),0,7);x.stroke();
+    x.globalAlpha=.25;x.beginPath();x.arc(b.x-R*.35,b.y-R*.35,Math.max(1,R*.25),0,7);x.stroke();x.globalAlpha=1}
+  x.globalCompositeOperation='lighter';
+  for(const f of flashes){const k=1-f.age/.75,s=.5+f.s;x.globalAlpha=k;dot(x,f.x,f.y,K.white,(8+20*(1-k))*s);dot(x,f.x,f.y,K.amber,(22+36*(1-k))*s);
+    x.globalCompositeOperation='source-over';x.strokeStyle=K.coral;x.globalAlpha=k*.7;x.lineWidth=1.5;x.beginPath();x.arc(f.x,f.y,f.age*420*s,0,7);x.stroke();x.globalCompositeOperation='lighter'}x.globalAlpha=1;
+  const lf=flashes[flashes.length-1];if(lf&&lf.age<.5)lead(x,lf.x+6,lf.y-6,lf.x+46,lf.y-50,FQ[U.f].hot.replace(',',',')+' for under 1 µs');
+  x.globalCompositeOperation='source-over';x.fillStyle='#2A3158';x.fillRect(420,535,160,45);x.fillStyle=A>0?K.violet:'#2A3158';x.fillRect(440,526,120,10);ital(x,'transducer, '+U.f+' kHz',592,560,'left',K.mist,.9);
+  histo(x,gU,U.TC+273.15,14,14,196,150);
+  inset(x,700,14,240,120,'Newest bubble’s radius');const tx=710,ty=44,tw=220,th=74;
+  x.strokeStyle=K.violet;x.globalAlpha=.35;x.lineWidth=1;x.beginPath();for(let k=0;k<=110;k++){const yy=ty+th/2+Math.sin(k*.27*(U.f/20)**.5+U.t*16)*th*.12*A;k?x.lineTo(tx+k/110*tw,yy):x.moveTo(tx,yy)}x.stroke();x.globalAlpha=1;
+  x.strokeStyle=K.cyan;x.lineWidth=1.6;x.beginPath();U.trace.forEach((r,i)=>{const px=tx+i/240*tw,py=ty+th-Math.min(1,r/44)*th;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+  sans(x,'grows over many cycles, then collapses',tx,ty+th+16,'left');
+  thermo(x,U.TC,15,45);probe(x,pU,gU.map(m=>[m.x,m.y,m.e]));hint(x,'click a bubble to collapse it');
+  $('uC').textContent=(U.cols.length/2).toFixed(1);$('uT').textContent=U.TC.toFixed(1)+' °C';const st=$('uS');
+  if(A<=.2){st.textContent='Stable cavitation: bubbles breathe with the sound but never implode. Click one to force a collapse.';st.className='status bad'}
+  else if(U.f===100){st.textContent='At 100 kHz bubbles have less time to grow, so collapses are smaller and gentler. Food processing favours 20 to 40 kHz.';st.className='status bad'}
+  else{st.textContent='Transient cavitation: each implosion flashes hot and shreds nearby microbes, yet the juice itself stays near room temperature.';st.className='status'}}
+
+/* ===== IV. UV-C ===== */
+const uvEl=$('uv');const V={I:.45,ph:0,dose:0,lx:500,t:0,repair:false,fixed:0};let seq,dimers,photons=[],vsp=[],enz=null;
+const BC={A:K.cyan,T:K.violet,G:K.leaf,C:K.amber},PAIR={A:'T',T:'A',G:'C',C:'G'};
+function vNew(){seq=Array.from({length:37},()=>'ATGC'[Math.floor(Math.random()*4)]);for(const i of[4,11,18,25,31])seq[i]=seq[i+1]='T';dimers=new Set();V.dose=0;V.fixed=0;enz=null}
+vNew();$('vReset').onclick=vNew;
+function vCalc(){V.I=+uvEl.value/100;$('uvOut').textContent=Math.round(V.I*100)+'%'}uvEl.oninput=vCalc;vCalc();
+const vr=$('vRepair');vr.onclick=()=>{V.repair=!V.repair;vr.setAttribute('aria-pressed',V.repair)};
+const burst=X=>{for(let k=0;k<26;k++)photons.push({x:clamp(X+rnd(-34,34),70,930),y:rnd(-90,0)});V.dose+=.6};
+$('vBurst').onclick=()=>burst(V.lx);
+const pV=ptr($('cV'));pV.onUp=click=>{if(click)burst(pV.x)};
+const BX=i=>78+i*23,KK=.27;
+function kink(i){let k=0;for(const d of dimers){const z=i-(d+.5);k+=-24*Math.exp(-z*z/3)}return k}
+const strand=(i,o)=>355+kink(i)+72*Math.sin(KK*i+V.ph+o);
+function vStep(dt){V.t+=dt;V.ph+=dt*1.1;V.dose+=V.I*dt*1.6;const tgt=pV.in?clamp(pV.x,90,910):500+330*Math.sin(V.t*.35);V.lx+=(tgt-V.lx)*Math.min(1,dt*5);
+  if(Math.random()<V.I*dt*16)photons.push({x:clamp(V.lx+rnd(-110,110),70,930),y:rnd(-20,0)});
+  for(const p of photons){p.y+=440*dt;const i=Math.round((p.x-78)/23);if(i>=0&&i<seq.length&&p.y>Math.min(strand(i,0),strand(i,Math.PI))-4){p.hit=true;
+      const j=seq[i]==='T'&&seq[i+1]==='T'?i:seq[i]==='T'&&seq[i-1]==='T'?i-1:-1;
+      if(j>=0&&!dimers.has(j)&&Math.random()<.5){dimers.add(j);vsp.push({x:BX(j+.5),y:strand(j,0),age:0,big:1})}else vsp.push({x:p.x,y:p.y,age:0,big:0})}if(p.y>VH)p.hit=true}
+  photons=photons.filter(p=>!p.hit);vsp.forEach(s=>s.age+=dt);vsp=vsp.filter(s=>s.age<(s.big?1.4:.35));
+  if(V.repair&&!enz&&dimers.size){const d=[...dimers][0];enz={x:rnd(100,900),y:560,d,t:0,at:false}}
+  if(enz){if(!dimers.has(enz.d)){enz=null}else{const tx=BX(enz.d+.5),ty=(strand(enz.d,0)+strand(enz.d,Math.PI))/2;if(!enz.at){const dx=tx-enz.x,dy=ty-enz.y,dd=Math.hypot(dx,dy);if(dd<4)enz.at=true;else{enz.x+=dx/dd*Math.min(dd,170*dt);enz.y+=dy/dd*Math.min(dd,170*dt)}}
+    else{enz.x=tx;enz.y=ty;enz.t+=dt;if(enz.t>1.1){dimers.delete(enz.d);V.fixed++;vsp.push({x:tx,y:ty,age:0,big:1,fix:1});enz=null}}}}}
+function vDraw(){const x=view($('cV'),.42);
+  x.globalCompositeOperation='lighter';x.globalAlpha=.06+V.I*.1;x.drawImage(glow(K.violet),V.lx-260,-200,520,520);x.globalAlpha=1;
+  if(V.repair){x.globalAlpha=.07;x.drawImage(glow(K.cyan),-200,300,1400,500);x.globalAlpha=1}
+  x.globalCompositeOperation='source-over';x.fillStyle='#2A3158';x.fillRect(V.lx-70,0,140,12);x.fillStyle=V.I>0?K.violet:'#2A3158';x.fillRect(V.lx-60,12,120,4);
+  for(let i=0;i<seq.length;i++){const y1=strand(i,0),y2=strand(i,Math.PI),dep=Math.cos(KK*i+V.ph),X=BX(i),mid=(y1+y2)/2;
+    x.globalCompositeOperation='source-over';x.globalAlpha=.3+.5*(dep*.5+.5);x.lineWidth=4.5;x.strokeStyle=BC[seq[i]];x.beginPath();x.moveTo(X,y1);x.lineTo(X,mid-1.5);x.stroke();
+    x.strokeStyle=BC[PAIR[seq[i]]];x.beginPath();x.moveTo(X,mid+1.5);x.lineTo(X,y2);x.stroke()}x.globalAlpha=1;
+  for(const o of[0,Math.PI]){x.globalCompositeOperation='source-over';x.strokeStyle=K.bone;x.globalAlpha=.35;x.lineWidth=1.2;x.beginPath();for(let k=0;k<=360;k++){const i=k/360*(seq.length-1);const yy=strand(i,o);k?x.lineTo(BX(i),yy):x.moveTo(BX(i),yy)}x.stroke();x.globalAlpha=1;
+    x.globalCompositeOperation='lighter';for(let i=0;i<seq.length;i++){const dep=Math.cos(KK*i+V.ph+o)*.5+.5;x.globalAlpha=.35+.65*dep;dot(x,BX(i),strand(i,o),K.white,3+2.2*dep)}}x.globalAlpha=1;
+  for(const d of dimers){const X1=BX(d),X2=BX(d+1),m1=(strand(d,0)+strand(d,Math.PI))/2,m2=(strand(d+1,0)+strand(d+1,Math.PI))/2;
+    x.globalCompositeOperation='source-over';x.strokeStyle=K.coral;x.lineWidth=3.5;x.beginPath();x.moveTo(X1,m1);x.lineTo(X2,m2);x.stroke();x.globalCompositeOperation='lighter';dot(x,(X1+X2)/2,(m1+m2)/2,K.coral,7)}
+  if(enz){x.globalCompositeOperation='lighter';for(let k=0;k<6;k++){const a=k/6*6.283+V.t*2;dot(x,enz.x+Math.cos(a)*10,enz.y+Math.sin(a)*8,K.cyan,6)}if(enz.at){x.globalAlpha=.5+.5*Math.sin(enz.t*20);dot(x,enz.x,enz.y,K.white,10);x.globalAlpha=1}
+    lead(x,enz.x-8,enz.y+10,enz.x-50,enz.y+60,'photolyase, repairing','right')}
+  for(const p of photons){x.globalCompositeOperation='lighter';x.strokeStyle=K.violet;x.lineWidth=1.8;x.globalAlpha=.9;x.beginPath();for(let k=0;k<=14;k++){const yy=p.y-k*4,xx=p.x+Math.sin(yy*.38)*3.5;k?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.stroke();x.globalAlpha=1;dot(x,p.x,p.y,K.violet,3.5)}
+  for(const s of vsp){const k=1-s.age/(s.big?1.4:.35);x.globalAlpha=k;dot(x,s.x,s.y,s.fix?K.cyan:s.big?K.coral:K.violet,s.big?8+20*(1-k):5)}x.globalAlpha=1;
+  if(dimers.size&&!enz){const d=[...dimers][dimers.size-1];lead(x,BX(d+.5),(strand(d,0)+strand(d,Math.PI))/2,BX(d+.5)+30,strand(d,0)-58,'thymine dimer')}
+  inset(x,14,14,230,124,'DNA absorbance');const sx=26,sy=44,sw=206,sh=66,nmx=w=>sx+(w-220)/100*sw;
+  x.strokeStyle=K.bone;x.lineWidth=1.5;x.beginPath();for(let k=0;k<=100;k++){const w=220+k,a=.25*Math.exp(-Math.pow((w-205)/12,2))+Math.exp(-Math.pow((w-260)/17,2))*.95+.02;const py=sy+sh-Math.min(1,a)*sh;k?x.lineTo(nmx(w),py):x.moveTo(nmx(w),py)}x.stroke();
+  x.strokeStyle=K.violet;x.lineWidth=2;x.beginPath();x.moveTo(nmx(254),sy-2);x.lineTo(nmx(254),sy+sh);x.stroke();x.globalCompositeOperation='lighter';dot(x,nmx(254),sy,K.violet,6);
+  sans(x,'220',sx,sy+sh+15);sans(x,'320 nm',sx+sw,sy+sh+15,'right');sans(x,'254',nmx(254)+6,sy+10,'left',K.violet);
+  inset(x,700,14,240,124,'Survivors against dose');const vx=712,vy=44,vw=214,vh=66,maxD=30;
+  x.strokeStyle=K.mist;x.globalAlpha=.4;x.lineWidth=1;x.beginPath();x.moveTo(vx,vy);x.lineTo(vx,vy+vh);x.lineTo(vx+vw,vy+vh);x.stroke();x.globalAlpha=1;
+  x.strokeStyle=K.coral;x.globalAlpha=.4;x.beginPath();x.moveTo(vx,vy);x.lineTo(vx+vw,vy+vh*Math.min(1,maxD/4/7));x.stroke();x.globalAlpha=1;
+  const cd=Math.min(maxD,V.dose);x.strokeStyle=K.coral;x.lineWidth=1.8;x.beginPath();x.moveTo(vx,vy);x.lineTo(vx+cd/maxD*vw,vy+vh*Math.min(1,cd/4/7));x.stroke();
+  x.globalCompositeOperation='lighter';dot(x,vx+cd/maxD*vw,vy+vh*Math.min(1,cd/4/7),K.coral,5);sans(x,'0',vx,vy+vh+15);sans(x,maxD+' mJ/cm²',vx+vw,vy+vh+15,'right');
+  ital(x,'mercury lamp, 254 nm',V.lx,36,'center',K.violet,.95);thermo(x,20,15,45);hint(x,'move to aim the lamp, click for a burst');
+  $('vD').textContent=V.dose.toFixed(1);$('vN').textContent=dimers.size;$('vR').textContent=V.fixed;const st=$('vS');
+  if(V.repair&&V.fixed){st.textContent='Photoreactivation: under visible light, the enzyme photolyase splits dimers back apart. That’s why UV-treated water and juice are kept in the dark afterwards.';st.className='status bad'}
+  else if(!dimers.size){st.textContent='DNA intact so far. Aim the lamp over a T–T pair, the neighbouring violet bases, and fire a burst.';st.className='status bad'}
+  else{st.textContent=dimers.size+' dimer'+(dimers.size>1?'s':'')+' formed. Each kink stalls the copying machinery, so the cell can’t divide.';st.className='status'}}
+
+/* ===== loop ===== */
+['cHero','cH','cP','cU','cV'].forEach(id=>io.observe($(id)));
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(vis.has('cHero')&&!paused)heroFrame(dt);
+  if(vis.has('cH')){if(!paused)hStep(dt);hDraw()}
+  if(vis.has('cP')){if(!paused)pStep(dt);pDraw()}
+  if(vis.has('cU')){if(!paused)uStep(dt);uDraw()}
+  if(vis.has('cV')){if(!paused)vStep(dt);vDraw()}
+  requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>
