@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The dairy plant, exploded: an interactive 3D pasteurisation line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEEF0;--paper-2:#E1E4E8;--ink:#181B21;--ink-2:#545B67;--rule:#CBD0D6;--ember:#C9481A;--ice:#23799B;--stage:#12151B;
+  --thermal:linear-gradient(90deg,#1E2B55,#2A78A8,#7ACFC5,#F3D27A,#EE7B30,#C22B2D);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;--sans:"Schibsted Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0E1014;--paper-2:#161920;--ink:#E9E6E0;--ink-2:#9AA1AC;--rule:#272B33;--ember:#F07A3E;--ice:#5CB8D6;--stage:#090B0F;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0E1014;--paper-2:#161920;--ink:#E9E6E0;--ink-2:#9AA1AC;--rule:#272B33;--ember:#F07A3E;--ice:#5CB8D6;--stage:#090B0F;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 68px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.02rem;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#0B0D11}
+canvas{max-width:100%}
+.wrap{max-width:1360px;margin:0 auto;padding:0 clamp(1rem,3.5vw,3rem)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:#0B0D11;color:#E9E6E0}
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--thermal)}
+header.top .wrap{display:flex;align-items:center;gap:1rem;min-height:56px;flex-wrap:wrap;padding-top:.35rem;padding-bottom:.45rem}
+.mark{font-family:var(--serif);font-style:italic;font-size:1.3rem;margin-right:auto;white-space:nowrap}
+.mark small{font-family:var(--sans);font-style:normal;font-size:.78rem;color:#8E95A1;margin-left:.6rem}
+nav{display:flex;flex-wrap:wrap;gap:.1rem}
+nav button{font-family:var(--sans);font-size:.84rem;color:#9AA1AC;background:none;border:0;padding:.4rem .6rem;border-radius:6px;cursor:pointer;min-height:36px}
+nav button:hover{color:#fff}
+nav button i{font-family:var(--serif);font-style:italic;color:#F3B07A;margin-right:.3rem}
+#motion{border:1px solid #333944;border-radius:999px;color:#E9E6E0;margin-left:.4rem}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #F3B07A;outline-offset:2px}
+.hero{position:relative;height:clamp(32rem,88vh,52rem);background:#0B0D11;color:#EDE9E2;overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.hero .copy{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
+.hero .copy .wrap{padding-bottom:clamp(2rem,6vh,4.5rem)}
+.hero h1{font-family:var(--serif);font-weight:300;font-size:clamp(3.6rem,10.5vw,9.5rem);line-height:.86;letter-spacing:-.035em;margin:0 0 1.2rem;max-width:9ch}
+.hero h1 em{font-style:italic;font-weight:300}
+.hero p{font-family:var(--serif);font-size:clamp(1.15rem,2vw,1.5rem);line-height:1.35;max-width:30em;margin:0 0 1.1rem;color:#D9D4CB}
+.hero .tools{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;pointer-events:auto}
+.hero .tools span{font-size:.85rem;color:#9AA1AC;margin-right:.3rem}
+.hero .credit{font-size:.82rem;color:#8E95A1;margin-top:1rem;max-width:44em}
+.hero .credit a{color:#C9CED6}
+.pill{font-family:var(--sans);font-size:.86rem;color:inherit;background:none;border:1px solid currentColor;border-radius:999px;padding:.38rem .9rem;cursor:pointer;min-height:36px;opacity:.75}
+.pill:hover{opacity:1}
+.pill[aria-pressed="true"]{opacity:1;background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.hero .pill[aria-pressed="true"]{background:#EDE9E2;color:#0B0D11;border-color:#EDE9E2}
+.ch{padding:clamp(3.5rem,8vw,7rem) 0 clamp(2rem,5vw,4rem);border-top:1px solid var(--rule)}
+.ch:first-of-type{border-top:0}
+.chgrid{display:grid;grid-template-columns:minmax(0,25rem) minmax(0,1fr);gap:clamp(1.5rem,4vw,4rem);align-items:start}
+@media (max-width:980px){.chgrid{grid-template-columns:minmax(0,1fr)}}
+.text{position:sticky;top:90px}
+@media (max-width:980px){.text{position:static}}
+.num{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(3.4rem,6vw,5.2rem);line-height:.8;color:var(--ember);margin:0 0 .6rem}
+.kind{font-weight:500;font-size:.88rem;color:var(--ink-2);margin:0 0 .3rem}
+.ch h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 1.1rem}
+.prose p{font-family:var(--serif);font-size:1.16rem;line-height:1.55;margin:0 0 .9rem}
+.eq{border-left:2px solid var(--ember);padding:.4rem 0 .4rem 1rem;margin:1.25rem 0;font-family:var(--serif);font-size:1.2rem}
+.eq .law{font-style:italic;font-size:1.35rem}
+.eq .live{display:block;font-family:var(--sans);font-size:.9rem;color:var(--ink-2);margin-top:.35rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.eq + .eq{margin-top:-.5rem}
+.eq.dim{opacity:.35}
+.stage{position:relative;background:var(--stage);border-radius:6px;overflow:hidden}
+.stage canvas{display:block;width:100%;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.lbl{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--serif);font-style:italic;font-size:15px;color:#EDE8DE;white-space:nowrap;padding:0 0 0 8px;margin-top:-10px;border-left:1px solid rgba(237,232,222,.55);transition:opacity .3s;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.lbl.r{transform-origin:right}
+.stage .tip{position:absolute;right:12px;bottom:10px;font-family:var(--serif);font-style:italic;font-size:14px;color:#8E95A1;pointer-events:none}
+.scale{position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#B8BEC8;pointer-events:none}
+.scale i{display:block;width:120px;height:6px;border-radius:3px;background:var(--thermal)}
+.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:1rem 2rem;margin-top:1.25rem}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--ink-2);margin-bottom:.25rem;gap:.5rem}
+.ctrl output{font-family:var(--serif);font-size:1.2rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.group{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.group .gl{font-size:.86rem;color:var(--ink-2);width:100%}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--thermal);border-radius:2px}
+input[type=range]::-moz-range-track{height:3px;background:var(--thermal);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);margin-top:-8px;cursor:grab}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);cursor:grab}
+.reads{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:1rem;margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.reads b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.reads span{display:block;font-size:.8rem;color:var(--ink-2);margin-top:.25rem;line-height:1.3}
+.share{display:flex;height:34px;margin-top:1.2rem;border-radius:4px;overflow:hidden;font-size:.78rem;color:#fff}
+.share div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;transition:flex-basis .3s;min-width:0}
+.chart{display:block;width:100%;margin-top:1.2rem}
+.insight{margin:1.2rem 0 0;padding-left:.9rem;border-left:3px solid var(--ice);font-size:.98rem}
+.end{background:#0B0D11;color:#E9E6E0;padding:clamp(3rem,7vw,5rem) 0}
+.end h2{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2rem,4vw,3rem);margin:0 0 1rem}
+.end p{max-width:46em;color:#AEB4BE;margin:0 0 .8rem}
+.end a{color:#E9E6E0}
+.btnrow{display:flex;flex-wrap:wrap;gap:.4rem}
+.note{font-size:.84rem;color:var(--ink-2);margin:.8rem 0 0;max-width:44em}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;font-size:.82rem;color:var(--ink-2);margin-top:.6rem}
+.legend span::before{content:"";display:inline-block;width:.8rem;height:.25rem;border-radius:2px;margin-right:.35rem;vertical-align:middle;background:var(--c)}
+.intro{background:#0B0D11;color:#EDE9E2;padding:clamp(2.5rem,6vw,4.5rem) 0 clamp(1.5rem,3vw,2.5rem)}
+.intro h1{font-family:var(--serif);font-weight:300;font-size:clamp(3rem,8vw,7rem);line-height:.9;letter-spacing:-.035em;margin:0 0 1rem}
+.intro h1 em{font-style:italic}
+.intro p{font-family:var(--serif);font-size:clamp(1.1rem,1.8vw,1.4rem);max-width:40em;color:#D9D4CB;margin:0}
+.plantwrap{background:#0B0D11;padding:0 0 clamp(2rem,4vw,3rem)}
+.plant{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,25rem);gap:1.25rem;align-items:start}
+@media (max-width:1050px){.plant{grid-template-columns:minmax(0,1fr)}}
+.plant .stage{border-radius:6px}
+.plant .stage canvas{cursor:pointer}
+.plant .stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(5,6,9,.55) 100%)}
+.plant .lbl{font-size:13px;transition:opacity .4s,font-size .3s,color .3s;color:#C9CED6}
+.plant .lbl.on{font-size:17px;color:#FFE2C4;border-left-color:#F07A3E}
+#info .swap{animation:swapin .45s cubic-bezier(.2,.7,.2,1)}
+@keyframes swapin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#info .swap{animation:none}}
+#info{background:#13161D;color:#E9E6E0;border-radius:6px;padding:1.25rem 1.35rem 1.4rem;border-top:3px solid #F07A3E;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow:auto}
+@media (max-width:1050px){#info{position:static;max-height:none}}
+#info .k{font-size:.8rem;color:#9AA1AC;margin:0 0 .2rem}
+#info h3{font-family:var(--serif);font-weight:400;font-size:1.9rem;line-height:1.05;margin:0 0 .7rem}
+#info p{font-family:var(--serif);font-size:1.05rem;line-height:1.5;margin:0 0 .8rem;color:#D9D4CB}
+#info .eq{border-left-color:#F07A3E;font-size:1.08rem;margin:.9rem 0}
+#info .eq .live{color:#AEB4BE}
+#info .lay{display:flex;flex-wrap:wrap;gap:.35rem;margin:.6rem 0 .2rem}
+#info .lay span{font-size:.76rem;border:1px solid #333944;border-radius:999px;padding:.15rem .6rem;color:#C9CED6}
+#info .hint{font-family:var(--serif);font-style:italic;color:#8E95A1;font-size:.95rem}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:1px;background:#262A33;border-radius:6px;overflow:hidden;margin-top:1rem}
+.kpis div{background:#13161D;padding:.7rem .9rem;color:#E9E6E0}
+.kpis b{display:block;font-family:var(--serif);font-weight:400;font-size:1.55rem;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpis span{font-size:.74rem;color:#9AA1AC}
+.kpis .div{color:#FF8A70}.kpis .fwd{color:#8FD07F}
+.ctl{background:#0B0D11;color:#E9E6E0;padding:0 0 clamp(2.5rem,5vw,4rem)}
+.ctl .panel{margin-top:0}
+.ctl .ctrl label{color:#9AA1AC}.ctl .ctrl output{color:#E9E6E0}
+.ctl input[type=range]::-webkit-slider-thumb{background:#0B0D11;border-color:#E9E6E0}
+.ctl input[type=range]::-moz-range-thumb{background:#0B0D11;border-color:#E9E6E0}
+.ctl .pill{color:#E9E6E0}.ctl .pill[aria-pressed="true"]{background:#E9E6E0;color:#0B0D11;border-color:#E9E6E0}
+.ctl canvas.chart{background:#13161D;border-radius:6px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">The dairy plant, exploded<small>Pickle &amp; Python</small></div>
+  <nav aria-label="Page"><button data-go="plant">Plant</button><button data-go="controls">Controls</button><button id="motion" aria-pressed="false">Pause motion</button></nav>
+</div></header>
+<main>
+<section class="intro"><div class="wrap">
+  <h1>The dairy plant, <em>exploded</em></h1>
+  <p>A complete HTST pasteurisation line, running live: raw milk silo to filled pouch. Hover over any machine and it comes apart layer by layer to show what happens inside, with the mathematics computed from the plant’s current state. Click to lock a machine, drag to turn the plant.</p>
+</div></section>
+
+<section class="plantwrap" id="plant"><div class="wrap plant">
+  <div>
+    <div class="stage"><canvas id="cP" aria-label="3D model of a dairy pasteurisation plant: silo, balance tank, pump, plate heat exchanger, separator, homogeniser, holding tube, flow diversion valve, storage tank, filler and utilities, with milk flowing through pipes coloured by temperature"></canvas><div class="scale">4 °C<i></i>80 °C</div><div class="tip">hover to explode, click to lock, drag to turn</div></div>
+    <div class="kpis">
+      <div><b id="kQ"></b><span>Milk flow</span></div><div><b id="kT"></b><span>Holding temperature</span></div><div><b id="kH"></b><span>Holding time</span></div>
+      <div><b id="kL"></b><span>Pathogen reduction</span></div><div><b id="kV"></b><span>Diversion valve</span></div><div><b id="kR"></b><span>Heat recovered</span></div><div><b id="kP"></b><span>Pouches per hour</span></div>
+    </div>
+  </div>
+  <aside id="info" aria-live="polite"></aside>
+</div></section>
+
+<section class="ctl" id="controls"><div class="wrap">
+  <div class="panel">
+    <div class="ctrl"><label for="q">Milk flow <output id="qOut"></output></label><input type="range" id="q" min="4000" max="20000" step="250" value="10000"></div>
+    <div class="ctrl"><label for="hw">Hot water to the heating section <output id="hwOut"></output></label><input type="range" id="hw" min="68" max="88" step="0.5" value="76.5"></div>
+    <div class="ctrl"><label for="rg">Regeneration efficiency <output id="rgOut"></output></label><input type="range" id="rg" min="60" max="95" step="1" value="90"></div>
+    <div class="ctrl"><label for="hp">Homogenising pressure <output id="hpOut"></output></label><input type="range" id="hp" min="0" max="250" step="5" value="180"></div>
+    <div class="ctrl"><label for="fat">Standardise fat to <output id="fatOut"></output></label><input type="range" id="fat" min="0.5" max="4" step="0.1" value="3"></div>
+    <div class="group"><span class="gl">View</span><button class="pill" id="xall" aria-pressed="false">Explode everything</button><button class="pill" id="tour" aria-pressed="false">Guided tour</button><button class="pill" id="home">Overview</button></div>
+    <div class="group"><span class="gl">Faults</span><button class="pill" id="fHot">Hot water drops to 71 °C</button><button class="pill" id="fFlow">Flow surges to 18,000 L/h</button><button class="pill" id="fReset">Restore normal</button></div>
+  </div>
+  <canvas class="chart" id="uT" height="250" aria-label="Milk temperature at each stage of the process"></canvas>
+  <p class="note" style="color:#9AA1AC">Process values follow textbook HTST practice: 72 °C for at least 15 s, regenerative heat recovery, two-stage homogenisation and a flow diversion valve. Microbial values use an illustrative D₇₂ = 2.4 s and z = 4.4 °C for a heat-resistant target organism. Equipment proportions are simplified for clarity.</p>
+</div></section>
+</main>
+<footer class="end"><div class="wrap"><h2>From cow to carton, in one loop.</h2><p>Every number on this page is computed from the plant’s live state: energy balances, regeneration, Stokes settling in the separator, homogeniser gap velocity and heating, Reynolds number and fastest-particle holding time, D- and z-value lethality, pump power and refrigeration duty. Built by Pickle &amp; Python.</p></div></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+const fmt=(v,d=0)=>Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const W3=v=>Math.abs(v)>=1e4?fmt(v/1000,1)+' kW':fmt(v,Math.abs(v)<10?1:0)+' W';
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let paused=reduce;
+const mBtn=$('motion');const syncM=()=>{mBtn.setAttribute('aria-pressed',paused?'true':'false');mBtn.textContent=paused?'Play motion':'Pause motion'};syncM();mBtn.onclick=()=>{paused=!paused;syncM()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>$(b.dataset.go).scrollIntoView({behavior:reduce?'auto':'smooth'}));
+const H0=location.hash.slice(1);if(['plant'].includes(H0))setTimeout(()=>$(H0).scrollIntoView(),120);
+function pills(sel,cb){const bs=[...document.querySelectorAll(sel)];bs.forEach(b=>b.addEventListener('click',()=>{bs.forEach(o=>o.setAttribute('aria-pressed',o===b?'true':'false'));cb(b)}));return bs}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+if(typeof THREE==='undefined'){document.querySelectorAll('.stage').forEach(s=>{s.insertAdjacentHTML('beforeend','<p style="color:#ccc;padding:2rem">The 3D library could not load. Check your connection and reload.</p>')});return}
+
+/* ---------- colour map and helpers ---------- */
+const CM=['#1E2B55','#2A78A8','#7ACFC5','#F3D27A','#EE7B30','#C22B2D'].map(h=>new THREE.Color(h));
+function tcol(t,out){t=clamp(t,0,1)*5;const i=Math.min(4,Math.floor(t));return out.copy(CM[i]).lerp(CM[i+1],t-i)}
+const _c=new THREE.Color();
+function sprTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);
+  gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,255,255,.8)');gr.addColorStop(.6,'rgba(255,255,255,.18)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
+const SPR=sprTex();
+function cloud(n,size){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3),3));
+  const m=new THREE.PointsMaterial({size,map:SPR,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});const p=new THREE.Points(g,m);p.frustumCulled=false;return p}
+function setPt(p,i,x,y,z,t,bright){const a=p.geometry.attributes;a.position.setXYZ(i,x,y,z);tcol(t,_c);const b=bright==null?1:bright;a.color.setXYZ(i,_c.r*b,_c.g*b,_c.b*b)}
+function flush(p){p.geometry.attributes.position.needsUpdate=true;p.geometry.attributes.color.needsUpdate=true}
+function colorize(geo,fn){const p=geo.attributes.position;let c=geo.attributes.color;if(!c){c=new THREE.BufferAttribute(new Float32Array(p.count*3),3);geo.setAttribute('color',c)}
+  for(let i=0;i<p.count;i++){tcol(fn(p.getX(i),p.getY(i),p.getZ(i)),_c);c.setXYZ(i,_c.r,_c.g,_c.b)}c.needsUpdate=true}
+const heatMat=o=>new THREE.MeshStandardMaterial(Object.assign({vertexColors:true,roughness:.55,metalness:.08},o||{}));
+const glass=(op,col)=>new THREE.MeshStandardMaterial({color:col||0x9fb6c8,transparent:true,opacity:op,roughness:.15,metalness:.1,depthWrite:false,side:THREE.DoubleSide});
+function dispose(o){o.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material&&c.material!==SHARED)(Array.isArray(c.material)?c.material:[c.material]).forEach(m=>m.dispose())})}
+const SHARED=null;
+function line(pts,col,op){const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op==null?1:op}))}
+
+/* ---------- stages ---------- */
+const stages=[];const io=new IntersectionObserver(es=>es.forEach(e=>{const S=stages.find(s=>s.cv===e.target);if(S)S.vis=e.isIntersecting}),{rootMargin:'120px'});
+function stage(id,o){const cv=$(id),wrap=cv.parentElement;const r=new THREE.WebGLRenderer({canvas:cv,antialias:true});r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  const sc=new THREE.Scene();sc.background=new THREE.Color(cssv('--stage')||'#12151B');const cm=new THREE.PerspectiveCamera(o.fov||36,1.6,.1,300);
+  sc.add(new THREE.AmbientLight(0xffffff,.78));const dl=new THREE.DirectionalLight(0xffffff,.55);dl.position.set(5,9,7);sc.add(dl);const rl=new THREE.DirectionalLight(0x8fb0ff,.3);rl.position.set(-7,3,-6);sc.add(rl);
+  const S={cv,wrap,r,sc,cm,ratio:o.ratio||.62,base:o.yaw||.6,yaw:o.yaw||.6,pitch:o.pitch||.3,dist:o.dist||10,tg:new THREE.Vector3(...(o.target||[0,0,0])),fill:!!o.fill,orbit:o.orbit!==false,auto:true,idle:0,clock:0,labels:[],vis:false,update:null};
+  if(S.orbit){let down=false,lx=0,ly=0,mouse=false;
+    cv.addEventListener('pointerdown',e=>{down=true;lx=e.clientX;ly=e.clientY;mouse=e.pointerType==='mouse';if(mouse)try{cv.setPointerCapture(e.pointerId)}catch(_){};S.idle=0;S.auto=false});
+    cv.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;S.yaw-=dx*.008;if(mouse)S.pitch=clamp(S.pitch+dy*.006,-.2,1.35);S.idle=0});
+    ['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{down=false}))}
+  stages.push(S);io.observe(cv);return S}
+function label(S,text,pos,right){const el=document.createElement('div');el.className='lbl';el.textContent=text;if(right){el.style.borderLeft='0';el.style.borderRight='1px solid rgba(237,232,222,.55)';el.style.padding='0 8px 0 0'}
+  S.wrap.appendChild(el);const L={el,pos:new THREE.Vector3(...pos),show:true,right};S.labels.push(L);return L}
+const _v=new THREE.Vector3();
+function draw(S,dt){const w=S.cv.clientWidth;let h=S.fill?S.wrap.clientHeight:Math.round(w*(window.innerWidth<700?Math.min(1,S.ratio*1.45):S.ratio));
+  if(S._w!==w||S._h!==h){S.r.setSize(w,h,false);if(!S.fill)S.cv.style.height=h+'px';S.cm.aspect=w/h;S.cm.updateProjectionMatrix();S._w=w;S._h=h}
+  S.clock+=dt;S.idle+=dt;if(!S.auto&&S.idle>7)S.auto=true;
+  if(S.auto&&S.orbit&&!paused)S.yaw+=(S.base+.32*Math.sin(S.clock*.22)-S.yaw)*Math.min(1,dt*.6);
+  const cp=Math.cos(S.pitch);S.cm.position.set(S.tg.x+S.dist*cp*Math.sin(S.yaw),S.tg.y+S.dist*Math.sin(S.pitch),S.tg.z+S.dist*cp*Math.cos(S.yaw));S.cm.lookAt(S.tg);
+  S.r.render(S.sc,S.cm);
+  for(const L of S.labels){_v.copy(L.pos).project(S.cm);const ok=L.show&&_v.z<1&&Math.abs(_v.x)<1.05&&Math.abs(_v.y)<1.05;L.el.style.opacity=ok?(L.dim?.38:1):0;L.el.classList.toggle('on',!L.dim);
+    const px=(_v.x*.5+.5)*w,py=(-_v.y*.5+.5)*h;L.el.style.transform=L.right?`translate(calc(${px}px - 100%),${py}px)`:`translate(${px}px,${py}px)`}}
+function chart(id){const cv=$(id);const d=window.devicePixelRatio||1,w=cv.clientWidth,h=+cv.getAttribute('height');if(cv._w!==w||cv._d!==d){cv.width=w*d;cv.height=h*d;cv.style.height=h+'px';cv._w=w;cv._d=d}
+  const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);return[x,w,h]}
+const CK={ink:()=>cssv('--ink'),ink2:()=>cssv('--ink-2'),rule:()=>cssv('--rule')};
+const hex=t=>'#'+tcol(t,_c).getHexString();
+
+/* ================= process model ================= */
+const PR={Q:10000,Thw:76.5,R:.9,P:180,fat:3};const X={};
+const RHO=1030,CP=3930,D72=2.4,Z=4.4,Lht=25,DI=.051,Traw=4,FAT0=4.2,CREAM=40;
+function solve(){const m=PR.Q/3600*RHO/1000;// kg/s
+  const Th=PR.Thw-(1.5+3*PR.Q/20000),Tf=Th-.3,Treg=Traw+PR.R*(Tf-Traw),dTh=PR.P*1e5/(RHO*CP),Tin=Treg+dTh,Tret=Tf-(Treg-Traw);
+  const A=Math.PI*DI*DI/4,v=PR.Q/3.6e6/A,mu=6e-4,Re=RHO*v*DI/mu,k=Re<2100?2:Re<4000?1.6:1.22,hold=Lht/(k*v);
+  const D=D72*Math.pow(10,(72-Tf)/Z),logr=hold/D,PU=hold*Math.pow(10,(Tf-72)/Z)/15,div=Tf<72||hold<15;
+  const Qr=m*CP*(Treg-Traw),Qh=m*CP*Math.max(0,Th-Tin),Qc=m*CP*Math.max(0,Tret-Traw),Qhom=m*CP*dTh,save=Qr/(Qr+Qh+Qhom+1e-9);
+  const H=10+25*Math.pow(PR.Q/10000,2),Pp=RHO*9.81*PR.Q/3.6e6*H/.65;
+  const om=6500*2*Math.PI/60,r=.15,G=om*om*r/9.81,vs=Math.pow(3e-6,2)*115*om*om*r/(18*8e-4);
+  const creamF=Math.max(0,(FAT0-PR.fat)/(CREAM-PR.fat));const vg=Math.sqrt(2*PR.P*1e5/RHO),d50=PR.P>0?Math.min(3.5,13.5*Math.pow(PR.P,-.6)):3.5;
+  Object.assign(X,{m,Th,Tf,Treg,dTh,Tin,Tret,v,Re,k,hold,D,logr,PU,div,Qr,Qh,Qc,save,H,Pp,G,vs,creamF,vg,d50,steam:Qh/2.1e6*3600,comp:Qc/3.2});}
+solve();
+const TN=T=>(T-4)/76;
+/* ================= scene ================= */
+const S=stage('cP',{ratio:.62,yaw:.62,pitch:.5,dist:34,target:[0,1.2,0],fov:38});S.base=.62;
+S.sc.add(new THREE.HemisphereLight(0xdfe8ff,0x20242c,.5));
+S.r.toneMapping=THREE.ACESFilmicToneMapping;S.r.toneMappingExposure=1.12;S.r.shadowMap.enabled=true;S.r.shadowMap.type=THREE.PCFSoftShadowMap;
+S.sc.fog=new THREE.FogExp2(0x0F1217,.014);
+const key=new THREE.DirectionalLight(0xfff1de,.85);key.position.set(-10,22,14);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-26,right:26,top:16,bottom:-16,near:1,far:70});key.shadow.bias=-.0005;key.shadow.radius=4;S.sc.add(key);
+const rim=new THREE.DirectionalLight(0x7fa8ff,.45);rim.position.set(12,8,-16);S.sc.add(rim);
+const sweep=new THREE.PointLight(0xffb27a,1.1,16,2);sweep.position.set(0,5,4);S.sc.add(sweep);
+const spot=new THREE.SpotLight(0xffd2a8,0,22,.42,.55,1.6);spot.position.set(0,12,0);S.sc.add(spot);S.sc.add(spot.target);
+const grid=new THREE.GridHelper(48,48,0x2b313c,0x1c2028);grid.position.y=0;S.sc.add(grid);
+const fc=document.createElement('canvas');fc.width=fc.height=512;{const g=fc.getContext('2d');const gr=g.createRadialGradient(256,256,20,256,256,256);gr.addColorStop(0,'#2a2f3a');gr.addColorStop(.6,'#161a21');gr.addColorStop(1,'#0f1217');g.fillStyle=gr;g.fillRect(0,0,512,512)}
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(70,40),new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(fc),roughness:.55,metalness:.25}));floor.rotation.x=-Math.PI/2;floor.position.y=-.01;floor.receiveShadow=true;S.sc.add(floor);
+grid.material.transparent=true;grid.material.opacity=.35;
+const M={steel:new THREE.MeshStandardMaterial({color:0xb9c2cf,metalness:.55,roughness:.28}),dark:new THREE.MeshStandardMaterial({color:0x4a5260,metalness:.5,roughness:.4}),
+  blue:new THREE.MeshStandardMaterial({color:0x2f5e8e,metalness:.3,roughness:.45}),foam:new THREE.MeshStandardMaterial({color:0xd9c27a,roughness:.9}),
+  inner:new THREE.MeshStandardMaterial({color:0x9aa6b5,metalness:.5,roughness:.3,transparent:true,opacity:.55,side:THREE.DoubleSide}),
+  milk:new THREE.MeshStandardMaterial({color:0xf3efe4,roughness:.4,transparent:true,opacity:.85}),rubber:new THREE.MeshStandardMaterial({color:0x1c1f24,roughness:.8}),
+  glassM:new THREE.MeshStandardMaterial({color:0xbfd8e8,transparent:true,opacity:.18,roughness:.1,depthWrite:false,side:THREE.DoubleSide})};
+const box=(w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m),cyl=(rt,rb,h,m,seg,open)=>new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||32,1,!!open),m);
+const units=[];const hits=[];
+function unit(name,pos,build,info,focus){const g=new THREE.Group();g.position.set(...pos);S.sc.add(g);const U={name,g,layers:[],e:0,te:0,info,focus:focus||9,t:0,fx:null};
+  U.L=(obj,dir,dist,nm)=>{obj.userData.base=obj.position.clone();U.layers.push({obj,dir:new THREE.Vector3(...dir).normalize(),dist,nm});g.add(obj);return obj};build(U,g);
+  const b=new THREE.Box3().setFromObject(g),sz=b.getSize(new THREE.Vector3()),c=b.getCenter(new THREE.Vector3());const hb=new THREE.Mesh(new THREE.BoxGeometry(sz.x+.4,sz.y+.4,sz.z+.4),new THREE.MeshBasicMaterial({visible:false}));hb.position.copy(c);hb.userData.u=U;S.sc.add(hb);hits.push(hb);
+  U.center=c;U.top=new THREE.Vector3(c.x,b.max.y+.6,c.z);U.lbl=label(S,name,[U.top.x,U.top.y,U.top.z]);units.push(U);return U}
+const easeOut=x=>1-Math.pow(1-x,3),easeBack=x=>{const c=1.4;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};let CLK=0;
+const leadM=new THREE.LineDashedMaterial({color:0xF3B07A,dashSize:.12,gapSize:.1,transparent:true,opacity:0});
+function applyExplode(U){const n=U.layers.length,st=.1,opening=U.te>U.e;let k=0;
+  for(const l of U.layers){const loc=clamp(U.e*(1+st*(n-1))-st*(opening?k:(n-1-k)),0,1),ee=loc<=0?0:opening?easeBack(loc):easeOut(loc);
+    l.obj.position.copy(l.obj.userData.base).addScaledVector(l.dir,l.dist*ee);if(l.dist>0)l.obj.position.y+=Math.sin(CLK*1.6+k)*.035*ee;
+    if(l.dist>.3){if(!l.ln){const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]);l.ln=new THREE.Line(g,leadM.clone());U.g.add(l.ln)}
+      const p=l.ln.geometry.attributes.position;p.setXYZ(0,l.obj.userData.base.x,l.obj.userData.base.y,l.obj.userData.base.z);p.setXYZ(1,l.obj.position.x,l.obj.position.y,l.obj.position.z);p.needsUpdate=true;l.ln.computeLineDistances();l.ln.material.opacity=ee*.55;l.ln.visible=ee>.02}k++}
+  if(U.fx)U.fx(easeOut(clamp(U.e,0,1)))}
+function tank(U,r,h,nm){const legs=new THREE.Group();for(let i=0;i<4;i++){const a=i*Math.PI/2+.785;const l=cyl(.07,.07,1,M.dark,8);l.position.set(Math.cos(a)*r*.8,.5,Math.sin(a)*r*.8);legs.add(l)}U.g.add(legs);
+  const inner=cyl(r,r,h,M.inner,40,true);inner.position.y=1+h/2;U.L(inner,[0,1,0],0,'inner shell');
+  const milk=cyl(r-.05,r-.05,h*.75,M.milk.clone(),40);milk.position.y=1+h*.375;U.L(milk,[0,1,0],0,nm||'milk');
+  const ag=new THREE.Group();const sh=cyl(.05,.05,h+.6,M.steel,8);sh.position.y=h/2;ag.add(sh);for(const y of[.4,h*.45]){const bl=box(r*1.2,.06,.22,M.steel);bl.position.y=y;ag.add(bl)}const mot=cyl(.25,.25,.5,M.blue,20);mot.position.y=h+.55;ag.add(mot);ag.position.y=1.05;U.L(ag,[0,1,0],h*.55,'agitator');
+  const ins=new THREE.Group();const ic=cyl(r+.12,r+.12,h,M.foam,40,true);ic.position.y=1+h/2;ins.add(ic);U.L(ins,[0,1,0],h*.75,'polyurethane insulation');
+  const cl=new THREE.Group();const cc=cyl(r+.18,r+.18,h,M.steel,48,true);cc.position.y=1+h/2;cl.add(cc);const dome=new THREE.Mesh(new THREE.SphereGeometry(r+.18,40,16,0,Math.PI*2,0,Math.PI/2),M.steel);dome.scale.y=.35;dome.position.y=1+h;cl.add(dome);
+  const bot=new THREE.Mesh(new THREE.SphereGeometry(r+.18,40,12,0,Math.PI*2,Math.PI/2,Math.PI/2),M.steel);bot.scale.y=.25;bot.position.y=1;cl.add(bot);U.L(cl,[0,1,0],h*1.15,'stainless cladding');
+  U.milk=milk;U.ag=ag}
+
+/* ================= units ================= */
+const f1=v=>fmt(v,1),f0=v=>fmt(v,0),kW=w=>fmt(w/1000,w<1e4?1:0)+' kW';
+const silo=unit('Raw milk silo',[-17,0,-3],U=>tank(U,1.5,5.5,'raw milk, 4 °C'),()=>{const A=2*Math.PI*1.68*5.5+Math.PI*1.68*1.68,q=.35*A*26,mass=30000,rate=q/(mass*CP)*3600;
+  return{k:'Reception and storage',t:'Raw milk silo',p:'Milk arrives from the farm and waits here, chilled to 4 °C and gently stirred so cream doesn’t rise. Thick polyurethane between two stainless skins keeps the summer heat out; cold slows bacteria but never stops them.',
+  eq:[['q = UA(T<sub>air</sub> − T<sub>milk</sub>)',`0.35 × ${f0(A)} m² × (30 − 4) = ${f0(q)} W heat leak`],['dT/dt = q / mc<sub>p</sub>',`${(rate).toFixed(3)} °C per hour, so ${f0(1/rate)} h to warm by 1 °C`],['N = N<sub>0</sub> · 2<sup>t/g</sup>',`psychrotrophs at 4 °C, generation time ≈ 10 h: ${fmt(Math.pow(2,2.4),1)}× more bacteria after 24 h`]]}},11);
+const bal=unit('Balance tank',[-12.5,0,1.5],U=>{const legs=cyl(.06,.06,1,M.dark,8);legs.position.y=.5;U.g.add(legs);const body=cyl(.6,.6,1.2,M.inner,32,true);body.position.y=1.6;U.L(body,[0,1,0],0,'tank body');
+  const cone=cyl(.6,.15,.4,M.steel,32,true);cone.position.y=.8;U.g.add(cone);const milk=cyl(.55,.55,.8,M.milk,32);milk.position.y=1.4;U.L(milk,[0,1,0],0,'milk at constant level');
+  const fl=new THREE.Mesh(new THREE.SphereGeometry(.18,20,14),M.dark);fl.position.y=1.85;U.L(fl,[0,1,0],1.1,'float valve');const lid=cyl(.65,.65,.08,M.steel,32);lid.position.y=2.25;U.L(lid,[0,1,0],1.8,'lid');U.fl=fl},
+  ()=>({k:'Flow control',t:'Balance tank',p:'A float valve keeps the milk at a constant level, so the pump always sees the same suction head and the flow stays steady. Diverted milk returns here to go round again.',
+  eq:[['Q = A · v̄',`${fmt(PR.Q)} L/h through a 51 mm line: v̄ = ${f1(X.v)} m/s`],['diverted flow',X.div?`all ${fmt(PR.Q)} L/h is coming back from the diversion valve`:'none: the plant is in forward flow']]}),6);
+const pump=unit('Feed pump',[-10,0,1.5],U=>{const base=box(1.8,.3,.8,M.dark);base.position.y=.15;U.g.add(base);const mot=cyl(.35,.35,1,M.blue,24);mot.rotation.z=Math.PI/2;mot.position.set(-.5,.65,0);U.L(mot,[-1,0,0],1.2,'electric motor');
+  const cas=cyl(.45,.45,.35,M.steel,32);cas.rotation.z=Math.PI/2;cas.position.set(.35,.7,0);U.L(cas,[0,0,0],0,'volute casing');
+  const imp=new THREE.Group();for(let i=0;i<6;i++){const b=box(.04,.36,.08,M.steel);b.rotation.x=i*Math.PI/3;b.position.y=0;imp.add(b)}const hub=cyl(.1,.1,.1,M.dark,16);hub.rotation.z=Math.PI/2;imp.add(hub);imp.position.set(.4,.7,0);U.L(imp,[1,0,0],.75,'impeller');
+  const cov=cyl(.46,.46,.06,M.steel,32);cov.rotation.z=Math.PI/2;cov.position.set(.56,.7,0);U.L(cov,[1,0,0],1.4,'front cover');U.imp=imp},
+  ()=>({k:'Pumping',t:'Centrifugal feed pump',p:'The spinning impeller flings milk outward into the volute, converting speed into pressure to push it through the heat exchanger, holding tube and valves.',
+  eq:[['P = ρgQH / η',`1030 × 9.81 × ${fmt(PR.Q/3.6e6,4)} × ${f1(X.H)} m / 0.65 = ${kW(X.Pp)}`],['affinity laws: Q ∝ N, H ∝ N², P ∝ N³','double the speed and the motor needs eight times the power']]}),6);
+const phe=unit('Plate heat exchanger',[-3,0,1.5],U=>{const NP=30;const fixed=box(.25,2.6,1.4,M.blue);fixed.position.set(-3.3,1.5,0);U.g.add(fixed);
+  const top=box(7,.12,.2,M.steel);top.position.set(0,2.85,0);U.L(top,[0,1,0],.9,'carrying bar');const bot=box(7,.12,.2,M.steel);bot.position.set(0,.2,0);U.g.add(bot);
+  const post=box(.2,2.8,.3,M.dark);post.position.set(3.4,1.4,0);U.g.add(post);U.plates=[];
+  for(let i=0;i<NP;i++){const sec=i<14?'reg':i<20?'heat':'cool';const mat=new THREE.MeshStandardMaterial({color:0xffffff,metalness:.35,roughness:.35});const p=new THREE.Mesh(new THREE.BoxGeometry(.05,2.3,1.15),mat);
+    const x=-3.0+i*.19+(i>=14?.25:0)+(i>=20?.25:0);p.position.set(x,1.5,0);U.L(p,[1,0,0],(i+1)*.13,i===0?'corrugated plates and gaskets':null);p.userData.sec=sec;p.userData.i=i;U.plates.push(p)}
+  for(const x of[-.35,.95]){const c=box(.12,2.5,1.3,M.dark);c.position.set(x+.1,1.5,0);U.L(c,[1,0,0],x<0?2.1:2.9,'connector plate')}
+  const press=box(.25,2.6,1.4,M.blue);press.position.set(3.05,1.5,0);U.L(press,[1,0,0],4.2,'pressure plate');
+  for(const [y,z] of[[2.6,.62],[2.6,-.62],[.45,.62],[.45,-.62]]){const b=cyl(.04,.04,6.8,M.steel,8);b.rotation.z=Math.PI/2;b.position.set(0,y,z);U.L(b,[0,0,Math.sign(z)],.5,null)}},
+  ()=>({k:'Heating and cooling',t:'Plate heat exchanger',p:'Thin corrugated steel plates, sealed by gaskets, make alternating channels: milk on one side, the heating or cooling medium on the other. Three sections share one frame. In regeneration, hot pasteurised milk pre-warms cold raw milk, recovering most of the energy.',
+  eq:[['R = (T<sub>reg</sub> − T<sub>raw</sub>) / (T<sub>past</sub> − T<sub>raw</sub>)',`regeneration ${f0(PR.R*100)}%: raw milk 4 → ${f1(X.Treg)} °C, saving ${kW(X.Qr)}`],
+  ['Q = ṁ c<sub>p</sub> ΔT',`heating section: ${f1(X.Tin)} → ${f1(X.Th)} °C needs ${kW(X.Qh)}; cooling: ${f1(X.Tret)} → 4 °C removes ${kW(X.Qc)}`],['Q = UA ΔT<sub>lm</sub>','thin plates and turbulent corrugations give U of 3,000 to 6,000 W/m²·K']],lay:['regeneration plates','heating plates','cooling plates']}),12);
+const sep=unit('Separator',[-4,0,-5],U=>{const base=cyl(.7,.9,1,M.blue,32);base.position.y=.5;U.g.add(base);const bowlB=cyl(.75,.35,.6,M.steel,40);bowlB.position.y=1.3;U.L(bowlB,[0,1,0],0,'bowl');
+  U.discs=[];for(let i=0;i<9;i++){const d=cyl(.18,.62,.18,new THREE.MeshStandardMaterial({color:0xd5dbe3,metalness:.5,roughness:.3,side:THREE.DoubleSide}),40,true);d.position.y=1.65+i*.07;U.L(d,[0,1,0],.22*(i+1),i===0?'disc stack':null);U.discs.push(d)}
+  const bowlT=cyl(.25,.75,.7,M.steel,40);bowlT.position.y=2.15;U.L(bowlT,[0,1,0],2.6,'bowl hood');const hood=new THREE.Mesh(new THREE.SphereGeometry(.95,32,16,0,Math.PI*2,0,Math.PI/2),M.inner);hood.position.y=1.6;U.L(hood,[0,1,0],3.6,'frame hood');
+  const dist=cyl(.08,.12,1.4,M.dark,12);dist.position.y=2.1;U.L(dist,[0,1,0],.4,'distributor')},
+  ()=>({k:'Separation and standardisation',t:'Disc-stack separator',p:'At about 7,000 g, lighter fat globules drift inward between the conical discs and leave as cream; denser skim milk is thrown outward. Cream is then metered back to hit the target fat exactly.',
+  eq:[['v = d²(ρ<sub>s</sub> − ρ<sub>f</sub>) ω²r / 18μ',`3 µm globule at 6,500 rpm: ${f1(X.vs*1000)} mm/s, ${fmt(X.G)} × gravity`],['cream fraction = (f<sub>raw</sub> − f<sub>target</sub>) / (f<sub>cream</sub> − f<sub>target</sub>)',`(4.2 − ${f1(PR.fat)}) / (40 − ${f1(PR.fat)}) = ${f1(X.creamF*100)}% removed as 40% cream, ${fmt(PR.Q*X.creamF)} L/h`]]}),8);
+const hom=unit('Homogeniser',[2,0,-5],U=>{const body=box(2.2,1,1.2,M.blue);body.position.y=.8;U.g.add(body);const lid=box(2.2,.15,1.2,M.steel);lid.position.y=1.38;U.L(lid,[0,1,0],1,'crankcase cover');
+  U.pis=[];for(let i=0;i<3;i++){const p=cyl(.09,.09,1,M.steel,16);p.rotation.x=Math.PI/2;p.position.set(-.5+i*.5,.9,.6);U.L(p,[0,0,1],1.1,i===0?'three plungers':null);U.pis.push(p)}
+  const head=box(.7,.8,.9,M.steel);head.position.set(1.45,1.2,0);U.L(head,[1,0,0],1.4,'valve block');const seat=cyl(.22,.22,.18,M.dark,32);seat.rotation.z=Math.PI/2;seat.position.set(1.9,1.2,0);U.L(seat,[1,0,0],.7,'valve seat');
+  const gap=new THREE.Mesh(new THREE.TorusGeometry(.24,.025,10,40),new THREE.MeshStandardMaterial({color:0xffb070,emissive:0xff7a3c,emissiveIntensity:0}));gap.rotation.y=Math.PI/2;gap.position.set(2.02,1.2,0);U.L(gap,[1,0,0],.95,'gap, about 0.1 mm');
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.32,.05,10,40),M.dark);ring.rotation.y=Math.PI/2;ring.position.set(2.1,1.2,0);U.L(ring,[1,0,0],1.25,'impact ring');U.gap=gap;
+  U.fx=e=>{gap.material.emissiveIntensity=e*(.4+.6*Math.min(1,PR.P/200))}},
+  ()=>({k:'Homogenisation',t:'Homogeniser',p:'Three plungers force milk through a gap about a tenth of a millimetre wide. The jet tears fat globules apart, so cream no longer rises. All that pressure becomes a little heat.',
+  eq:[['v = √(2ΔP/ρ)',`√(2 × ${fmt(PR.P)}×10⁵ / 1030) = ${f0(X.vg)} m/s through the gap`],['d ≈ 13.5 P<sup>−0.6</sup> µm',`fat globules shrink from 3.5 µm to about ${fmt(X.d50,2)} µm; creaming slows ${f0(Math.pow(3.5/X.d50,2))}×`],['ΔT = ΔP / ρc<sub>p</sub>',`${fmt(PR.P)} bar warms the milk by ${f1(X.dTh)} °C`]]}),8);
+const holdU=unit('Holding tube',[7.5,0,1.5],U=>{const pts=[];for(let i=0;i<5;i++){const z=-1.2+i*.6,A=new THREE.Vector3(-1.6,1.6,z),B=new THREE.Vector3(1.6,1.6,z);i%2?pts.push(B,A):pts.push(A,B)}
+  const path=new THREE.CurvePath();for(let i=0;i<pts.length-1;i++)path.add(new THREE.LineCurve3(pts[i],pts[i+1]));const tube=new THREE.Mesh(new THREE.TubeGeometry(path,200,.09,12,false),M.steel.clone());U.L(tube,[0,0,0],0,'serpentine tube, 25 m');U.tube=tube;
+  const rack=box(3.6,.08,3,M.dark);rack.position.y=1.45;U.g.add(rack);for(const [x,z] of[[-1.7,-1.4],[1.7,-1.4],[-1.7,1.4],[1.7,1.4]]){const l=cyl(.05,.05,1.45,M.dark,8);l.position.set(x,.72,z);U.g.add(l)}
+  const lens=new THREE.Group();const ringM=new THREE.Mesh(new THREE.TorusGeometry(1,.06,12,64),M.steel);lens.add(ringM);const disc=new THREE.Mesh(new THREE.CircleGeometry(1,64),new THREE.MeshBasicMaterial({color:0x2a78a8,transparent:true,opacity:.18,side:THREE.DoubleSide}));lens.add(disc);
+  U.arrows=[];for(let i=-4;i<=4;i++){const a=new THREE.ArrowHelper(new THREE.Vector3(0,0,1),new THREE.Vector3(0,i*.22,0),1,0xF3B07A,.15,.1);lens.add(a);U.arrows.push([a,i*.22])}
+  lens.position.set(0,1.6,0);lens.scale.setScalar(.01);U.L(lens,[0,1,0],2.4,'velocity profile');U.lens=lens;
+  U.fx=e=>{lens.scale.setScalar(.01+e);lens.visible=e>.02;tube.material.transparent=true;tube.material.opacity=1-e*.6;const vmax=X.k;U.arrows.forEach(([a,y])=>{const r=Math.abs(y)/1;const u=X.Re<2100?2*(1-r*r):1.224*Math.pow(Math.max(.01,1-r),1/7);a.setLength(.15+u*.6,.12,.08)})}},
+  ()=>({k:'Holding',t:'Holding tube',p:'The milk travels 25 metres of pipe while staying at pasteurising temperature. Not every drop moves at the same speed: the centre is fastest, so the tube is sized for the fastest particle, not the average.',
+  eq:[['Re = ρv̄D / μ',`1030 × ${f1(X.v)} × 0.051 / 0.0006 = ${fmt(X.Re)} (${X.Re<2100?'laminar, v_max = 2 v̄':'turbulent, v_max ≈ 1.22 v̄'})`],['t = L / v<sub>max</sub>',`25 / (${fmt(X.k,2)} × ${f1(X.v)}) = ${f1(X.hold)} s (minimum 15 s)`],['log N₀/N = t / D<sub>T</sub>,  D<sub>T</sub> = D<sub>72</sub> · 10<sup>(72 − T)/z</sup>',`D at ${f1(X.Tf)} °C = ${fmt(X.D,2)} s → ${f1(X.logr)} log reduction`]]}),8);
+const fdv=unit('Flow diversion valve',[11,0,1.5],U=>{const body=new THREE.Mesh(new THREE.SphereGeometry(.4,24,16),M.steel);body.position.y=1;U.L(body,[0,0,0],0,'valve body');
+  for(const [x,y,z,rx,rz] of[[-.55,1,0,0,Math.PI/2],[0,1,.55,Math.PI/2,0],[0,.45,0,0,0]]){const p=cyl(.12,.12,.5,M.steel,16);p.position.set(x,y,z);p.rotation.set(rx,0,rz);U.g.add(p)}
+  const plug=cyl(.2,.2,.25,M.dark,20);plug.position.y=1;U.L(plug,[0,-1,0],.55,'plug');const bon=cyl(.3,.3,.3,M.steel,24);bon.position.y=1.5;U.L(bon,[0,1,0],.7,'bonnet');
+  const act=cyl(.32,.32,.7,M.blue,24);act.position.y=2;U.L(act,[0,1,0],1.4,'pneumatic actuator');const lamp=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),new THREE.MeshStandardMaterial({color:0x8fd07f,emissive:0x2f8a2a,emissiveIntensity:1}));lamp.position.set(0,2.45,0);U.L(lamp,[0,1,0],1.4,'status lamp');U.lamp=lamp},
+  ()=>({k:'Safety',t:'Flow diversion valve',p:'The last line of defence. A recorder checks the milk temperature at the end of the holding tube; if it is ever below 72 °C, or the flow is too fast for 15 seconds of holding, the valve snaps over and sends the milk back to the balance tank.',
+  eq:[['forward if T ≥ 72 °C and t ≥ 15 s',X.div?`DIVERTING: ${f1(X.Tf)} °C for ${f1(X.hold)} s`:`FORWARD: ${f1(X.Tf)} °C for ${f1(X.hold)} s`],['PU = t · 10<sup>(T − 72)/z</sup> / 15',`${fmt(X.PU,2)} pasteurisation units (1.00 = exactly 72 °C for 15 s)`]]}),6);
+const past=unit('Pasteurised milk tank',[15,0,-3],U=>tank(U,1.3,5,'pasteurised milk, 4 °C'),()=>({k:'Storage',t:'Pasteurised milk tank',p:'Cooled straight back to 4 °C, the milk waits for the filler. The tank is built like the raw silo, but kept strictly separate to avoid recontaminating safe milk.',
+  eq:[['Q<sub>cool</sub> = ṁ c<sub>p</sub> (T<sub>in</sub> − 4)',`cooling section removed ${kW(X.Qc)} before the milk arrived`],['fill time = V / Q',`${fmt(25000)} L tank fills in ${f1(25000/PR.Q)} h at this flow`]]}),11);
+const fill=unit('Pouch filler',[17,0,4],U=>{const cab=box(2.2,1.2,1.4,M.steel);cab.position.y=.6;U.g.add(cab);const hood=box(2.2,1.2,1.4,M.glassM);hood.position.y=1.8;U.L(hood,[0,1,0],1.6,'clean-air hood');
+  U.noz=[];for(let i=0;i<4;i++){const n=cyl(.06,.03,.5,M.dark,12);n.position.set(-.75+i*.5,1.9,0);U.L(n,[0,1,0],.8,i===0?'filling nozzles':null);U.noz.push(n)}
+  const conv=box(4.5,.12,.5,M.dark);conv.position.set(.6,1.25,.95);U.g.add(conv);U.packs=[];for(let i=0;i<8;i++){const p=box(.3,.42,.2,new THREE.MeshStandardMaterial({color:0xf2f2f2,roughness:.6}));p.position.set(-1.4+i*.55,1.52,.95);U.g.add(p);U.packs.push(p)}},
+  ()=>({k:'Packaging',t:'Pouch filler',p:'Pasteurised milk is dosed into 1-litre pouches under a filtered-air hood, sealed and coded. The filler sets the rhythm the whole plant has to keep up with.',
+  eq:[['packs per hour = Q / V<sub>pack</sub>',X.div?'0 right now: milk is being diverted':`${fmt(PR.Q)} / 1 L = ${fmt(PR.Q)} pouches per hour, ${f0(PR.Q/60)} per minute`]]}),7);
+const hws=unit('Hot water set',[-1,0,7],U=>{const t=cyl(.6,.6,2,M.inner,32,true);t.rotation.z=Math.PI/2;t.position.y=1;U.L(t,[0,0,0],0,'water drum');const sh=cyl(.65,.65,2,M.steel,32,true);sh.rotation.z=Math.PI/2;sh.position.y=1;U.L(sh,[0,1,0],1.6,'insulated shell');
+  const inj=cyl(.12,.12,.8,M.dark,12);inj.position.set(.4,1.7,0);U.L(inj,[0,1,0],.9,'steam injector');const leg=box(1.6,.4,.8,M.dark);leg.position.y=.2;U.g.add(leg)},
+  ()=>({k:'Utility',t:'Hot water set',p:'Steam is injected into a closed loop of water, which then heats the milk in the heating section. Using hot water rather than steam directly gives gentle, even heating that doesn’t burn milk onto the plates.',
+  eq:[['ṁ<sub>steam</sub> = Q<sub>h</sub> / h<sub>fg</sub>',`${kW(X.Qh)} / 2,100 kJ/kg = ${f0(X.steam)} kg steam per hour`],['T<sub>hw</sub> − T<sub>milk</sub>',`${f1(PR.Thw)} − ${f1(X.Th)} = ${f1(PR.Thw-X.Th)} °C approach`]]}),7);
+const chl=unit('Ice-water chiller',[4,0,7],U=>{const b=box(2,1.4,1.2,M.blue);b.position.y=.7;U.g.add(b);const cov=box(2.02,.12,1.22,M.steel);cov.position.y=1.46;U.L(cov,[0,1,0],1.3,'service cover');
+  const comp=cyl(.25,.25,.6,M.dark,20);comp.position.set(-.5,1.1,0);U.L(comp,[0,1,0],.8,'compressor');const coil=new THREE.Mesh(new THREE.TorusKnotGeometry(.25,.05,80,8,3,5),M.steel);coil.position.set(.5,1.1,0);U.L(coil,[0,1,0],1,'evaporator coil');U.coil=coil},
+  ()=>({k:'Utility',t:'Ice-water chiller',p:'A refrigeration cycle makes water at about 1 °C, which flows through the cooling section to bring pasteurised milk back to 4 °C.',
+  eq:[['W = Q<sub>c</sub> / COP',`${kW(X.Qc)} / 3.2 = ${kW(X.comp)} of compressor power`]]}),7);
+
+/* ================= pipes and milk ================= */
+function nodesA(){return[[-15.3,.7,-3,4],[-12.5,.7,-3,4],[-12.5,.7,1.5,4],[-10,.7,1.5,4],[-6.6,.7,1.5,4],[-3.6,.7,1.5,X.Treg],[-3.6,.7,-3,X.Treg],[-4,.9,-5,X.Treg],[2,.9,-5,X.Treg],[2,.9,-2,X.Tin],[-3.1,2.2,-2,X.Tin],[-3.1,2.2,1.5,X.Tin],[-2,2.2,1.5,X.Th],[5.9,1.6,.3,X.Th],[9.1,1.6,.3,X.Th-.06],[9.1,1.6,.9,X.Th-.08],[5.9,1.6,.9,X.Th-.12],[5.9,1.6,1.5,X.Th-.14],[9.1,1.6,1.5,X.Th-.18],[9.1,1.6,2.1,X.Th-.2],[5.9,1.6,2.1,X.Th-.24],[5.9,1.6,2.7,X.Th-.26],[9.1,1.6,2.7,X.Tf],[11,1.6,2.7,X.Tf],[11,1,1.5,X.Tf]]}
+function nodesB(){return[[11,1,1.5,X.Tf],[11,1,3.3,X.Tf],[-3.6,1.2,3.3,X.Tf],[-3.6,1.2,1.5,X.Tf],[-6,1.2,1.5,X.Tret],[-6,1.2,3.9,X.Tret],[-1.9,1.2,3.9,X.Tret],[-1.9,1.2,1.5,X.Tret],[.1,1.2,1.5,4],[.1,.4,-.8,4],[13.6,.4,-.8,4],[13.6,.7,-3,4],[15,.6,-1.5,4],[15,.6,4,4],[16,1.6,4,4]]}
+function nodesC(){return[[11,1,1.5,X.Tf],[11,3.3,1.5,X.Tf],[-12.5,3.3,1.5,X.Tf-1.5],[-12.5,2.1,1.5,X.Tf-2]]}
+function mkPath(n){const L=[0];for(let i=1;i<n.length;i++)L.push(L[i-1]+Math.hypot(n[i][0]-n[i-1][0],n[i][1]-n[i-1][1],n[i][2]-n[i-1][2]));return{n,L,len:L[L.length-1]}}
+function at(p,s){s=clamp(s,0,p.len);let i=1;while(i<p.L.length-1&&p.L[i]<s)i++;const a=p.n[i-1],b=p.n[i],t=(s-p.L[i-1])/((p.L[i]-p.L[i-1])||1);return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,a[3]+(b[3]-a[3])*t]}
+let PA,PB,PC;function paths(){PA=mkPath(nodesA());PB=mkPath(nodesB());PC=mkPath(nodesC())}paths();
+const pipeM=new THREE.MeshStandardMaterial({color:0xa9b4c2,metalness:.6,roughness:.3,transparent:true,opacity:.28,depthWrite:false});
+function pipe(n,r){const cp=new THREE.CurvePath();for(let i=0;i<n.length-1;i++)cp.add(new THREE.LineCurve3(new THREE.Vector3(...n[i]),new THREE.Vector3(...n[i+1])));const m=new THREE.Mesh(new THREE.TubeGeometry(cp,Math.max(20,n.length*12),r||.075,10,false),pipeM);S.sc.add(m);return m}
+pipe(PA.n);pipe(PB.n);const divPipe=pipe(PC.n);
+const UH=mkPath([[-1,1.6,7],[-1,1.9,4.6],[-2.6,1.9,2.4],[-2.6,1.1,2.4],[-1.4,1.1,4.6],[-1.4,1.1,7]]),UC=mkPath([[4,1.2,7],[4,1.2,5],[-.9,1,2.4],[-.9,.6,2.4],[3.4,.6,5],[3.4,1,7]]);
+pipe(UH.n,.05);pipe(UC.n,.05);
+const NPA=620,milk=cloud(NPA,.22),halo=cloud(NPA,.85);halo.material.opacity=.32;S.sc.add(halo,milk);const MP=Array.from({length:NPA},(_,i)=>{const r=Math.random();return r<.55?{p:'A',s:Math.random()*PA.len}:{p:'B',s:Math.random()*PB.len}});
+const util=cloud(120,.26);S.sc.add(util);const UP=Array.from({length:120},(_,i)=>({p:i<60?UH:UC,s:Math.random()*(i<60?UH.len:UC.len)}));
+const steam=cloud(160,.9);steam.material.opacity=.5;S.sc.add(steam);const STP=Array.from({length:160},(_,i)=>({src:i%3,l:Math.random(),x:0,y:0,z:0,vx:0,vz:0}));
+const mist=cloud(140,1.1);mist.material.opacity=.35;S.sc.add(mist);const MST=Array.from({length:140},()=>({l:Math.random(),x:0,y:0,z:0,t:Math.random()<.55?0:1}));
+const ring=new THREE.Mesh(new THREE.RingGeometry(1,1.12,72),new THREE.MeshBasicMaterial({color:0xF07A3E,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.03;S.sc.add(ring);
+const ring2=ring.clone();ring2.material=ring.material.clone();S.sc.add(ring2);
+S.sc.traverse(o=>{if(o.isMesh&&o!==floor&&o.material&&!o.material.transparent){o.castShadow=true;o.receiveShadow=true}});
+/* ================= interaction ================= */
+let hov=null,sel=null,xall=false,tour=false,tourT=0,tourI=0;const ray=new THREE.Raycaster(),nd=new THREE.Vector2();let dn=null;
+S.cv.addEventListener('pointermove',e=>{const r=S.cv.getBoundingClientRect();nd.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(nd,S.cm);const h=ray.intersectObjects(hits)[0];hov=h?h.object.userData.u:null});
+S.cv.addEventListener('pointerleave',()=>{hov=null});S.cv.addEventListener('pointerdown',e=>{dn=[e.clientX,e.clientY]});
+S.cv.addEventListener('pointerup',e=>{if(!dn)return;const moved=Math.hypot(e.clientX-dn[0],e.clientY-dn[1]);dn=null;if(moved<6){const r=S.cv.getBoundingClientRect();nd.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(nd,S.cm);const h=ray.intersectObjects(hits)[0];const u=h?h.object.userData.u:null;sel=(u&&u!==sel)?u:null;setTour(false);renderInfo(true)}});
+function setTour(v){tour=v;$('tour').setAttribute('aria-pressed',v);$('tour').textContent=v?'Stop the tour':'Guided tour';if(v){tourI=0;tourT=0;sel=units[0]}}
+$('tour').onclick=()=>setTour(!tour);$('home').onclick=()=>{sel=null;setTour(false);renderInfo(true)};
+const xb=$('xall');xb.onclick=()=>{xall=!xall;xb.setAttribute('aria-pressed',xall);xb.textContent=xall?'Reassemble':'Explode everything'};
+/* ================= controls ================= */
+const DEF={q:10000,hw:76.5,rg:90,hp:180,fat:3};
+function readCtl(){PR.Q=+$('q').value;PR.Thw=+$('hw').value;PR.R=+$('rg').value/100;PR.P=+$('hp').value;PR.fat=+$('fat').value;solve();paths();
+  $('qOut').textContent=fmt(PR.Q)+' L/h';$('hwOut').textContent=f1(PR.Thw)+' °C';$('rgOut').textContent=f0(PR.R*100)+'%';$('hpOut').textContent=f0(PR.P)+' bar';$('fatOut').textContent=f1(PR.fat)+'%';kpis();drawChart();renderInfo(true)}
+['q','hw','rg','hp','fat'].forEach(id=>$(id).oninput=readCtl);
+const setv=o=>{for(const k in o)$(k).value=o[k];readCtl()};$('fHot').onclick=()=>setv({hw:72.5});$('fFlow').onclick=()=>setv({q:18000});$('fReset').onclick=()=>setv(DEF);
+function kpis(){$('kQ').textContent=fmt(PR.Q)+' L/h';$('kT').textContent=f1(X.Tf)+' °C';$('kH').textContent=f1(X.hold)+' s';$('kL').textContent=f1(X.logr)+' log';
+  const v=$('kV');v.textContent=X.div?'Diverting':'Forward';v.className=X.div?'div':'fwd';$('kR').textContent=f0(X.save*100)+'%';$('kP').textContent=X.div?'0':fmt(PR.Q)}
+function overview(){return{k:'Whole plant',t:'An HTST pasteurisation line',p:'Raw milk at 4 °C is warmed by outgoing milk, separated and standardised, homogenised, heated to above 72 °C, held for at least 15 seconds, checked by the diversion valve, cooled again by incoming milk and chilled water, stored and packed. Hover over any machine to open it up.',
+  eq:[['energy recovered = Q<sub>reg</sub> / (Q<sub>reg</sub> + Q<sub>heat</sub>)',`${kW(X.Qr)} recovered vs ${kW(X.Qh)} from hot water: ${f0(X.save*100)}% of the heating comes free`],['ṁ = ρQ',`${fmt(PR.Q)} L/h of milk = ${fmt(X.m,2)} kg/s`],['log reduction = t / D<sub>T</sub>',`${f1(X.hold)} s at ${f1(X.Tf)} °C → ${f1(X.logr)} log, ${X.logr>=5?'a safe margin':'below the 5-log target'}`]],lay:null}}
+let lastHTML='',infoT=0;
+function renderInfo(force){const U=sel||hov;const d=U?U.info():overview();const lays=U?(d.lay||[]).concat(U.layers.filter(l=>l.nm).map(l=>l.nm)):[];
+  const html=`<p class="k">${d.k}${sel?' · locked':''}</p><h3>${d.t}</h3><p>${d.p}</p>${d.eq.map(([a,b])=>`<div class="eq"><span class="law">${a}</span><span class="live">${b}</span></div>`).join('')}${lays.length?`<p class="k" style="margin-top:1rem">Layers you can see</p><div class="lay">${lays.map(l=>`<span>${l}</span>`).join('')}</div>`:''}<p class="hint">${sel?'Click empty space or Overview to release.':U?'Click to lock this machine and fly in.':'Hover over a machine to explode it.'}</p>`;
+  if(force||html!==lastHTML){const key=(U?U.name:'all')+(sel?'L':'');const changed=key!==renderInfo.k;renderInfo.k=key;$('info').innerHTML=`<div class="${changed?'swap':''}">${html}</div>`;lastHTML=html}}
+function drawChart(){const[x,w,h]=chart('uT');const st=[['silo',4],['regen in',4],['regen out',X.Treg],['separator',X.Treg],['homogeniser',X.Tin],['heater',X.Th],['holding',X.Tf],['regen (hot)',X.Tret],['cooler',4],['tank',4]];
+  const L=50,R=20,T=24,B=40,fx=i=>L+i/(st.length-1)*(w-L-R),fy=v=>h-B-(v-0)/90*(h-T-B);x.font='12px "Schibsted Grotesk",sans-serif';
+  for(const v of[0,30,60,72,90]){x.strokeStyle=v===72?'#F07A3E':'#262A33';x.setLineDash(v===72?[4,4]:[]);x.beginPath();x.moveTo(L,fy(v));x.lineTo(w-R,fy(v));x.stroke();x.setLineDash([]);x.fillStyle=v===72?'#F07A3E':'#9AA1AC';x.textAlign='right';x.fillText(v+(v===72?' °C legal minimum':' °C'),v===72?w-R:L-6,fy(v)-(v===72?4:-4))}
+  x.lineWidth=3;for(let i=0;i<st.length-1;i++){const g=x.createLinearGradient(fx(i),0,fx(i+1),0);g.addColorStop(0,hex(TN(st[i][1])));g.addColorStop(1,hex(TN(st[i+1][1])));x.strokeStyle=g;x.beginPath();x.moveTo(fx(i),fy(st[i][1]));x.lineTo(fx(i+1),fy(st[i+1][1]));x.stroke()}
+  st.forEach(([n,v],i)=>{x.fillStyle=hex(TN(v));x.beginPath();x.arc(fx(i),fy(v),5,0,7);x.fill();x.fillStyle='#C9CED6';x.textAlign='center';x.fillText(n,fx(i),h-B+16);x.fillStyle='#E9E6E0';x.fillText(f1(v)+'°',fx(i),fy(v)-10)})}
+window.addEventListener('resize',drawChart);
+/* ================= animate ================= */
+const OV={tg:new THREE.Vector3(0,1.2,0),d:34};let tt=0;S.dist=70;S.pitch=1.05;S.yaw=-.4;let intro=reduce?0:1;if(reduce){S.dist=34;S.pitch=.5;S.yaw=.62}
+S.update=dt=>{tt+=dt;
+  if(intro>0){intro=Math.max(0,intro-dt/4.5);const k=1-Math.pow(intro,3);S.pitch=1.05+(.5-1.05)*k;S.yaw=-.4+(.62+.4)*k;S.idle=0;S.auto=false}
+  if(tour){tourT+=dt;if(tourT>8){tourT=0;tourI=(tourI+1)%units.length;sel=units[tourI]}}
+  const tg=sel?sel.center:OV.tg,dd=sel?sel.focus:OV.d;S.tg.lerp(tg,Math.min(1,dt*2));S.dist+=(dd-S.dist)*Math.min(1,dt*2);if(sel){S.idle=0;S.auto=false}
+  for(const U of units){U.te=(xall||U===sel||U===hov)?1:0;U.e+=(U.te-U.e)*Math.min(1,dt*3.5);applyExplode(U);let up=0;for(const l of U.layers)up=Math.max(up,l.dir.y*l.dist);U.lbl.pos.set(U.top.x,U.top.y+U.e*up*U.e,U.top.z)}
+  if(pump.imp)pump.imp.rotation.x+=dt*PR.Q/600;sep.discs.forEach(d=>d.rotation.y+=dt*6);[silo,past].forEach(U=>U.ag.rotation.y+=dt*.8);
+  hom.pis.forEach((p,i)=>p.position.z+=.12*Math.sin(tt*7+i*2.094));bal.fl.position.y+=.03*Math.sin(tt*2);chl.coil.rotation.y+=dt*.6;
+  fdv.lamp.material.color.set(X.div?0xff6a50:0x8fd07f);fdv.lamp.material.emissive.set(X.div?0x8a2a1a:0x2f8a2a);
+  phe.plates.forEach(p=>{const i=p.userData.i;let T=p.userData.sec==='reg'?(i%2?X.Tf-(X.Tf-X.Tret)*(i/13):4+(X.Treg-4)*(i/13)):p.userData.sec==='heat'?(i%2?PR.Thw:X.Th):(i%2?1:X.Tret-(X.Tret-4)*((i-20)/9));tcol(TN(T),_c);p.material.color.copy(_c)});
+  if(!X.div)fill.packs.forEach(p=>{p.position.x+=dt*PR.Q/9000;if(p.position.x>2.8)p.position.x-=4.4});
+  divPipe.material=pipeM;const v=2.4*PR.Q/10000;
+  for(let i=0;i<NPA;i++){const q=MP[i];q.s+=v*dt;const P=q.p==='A'?PA:q.p==='B'?PB:PC;if(q.s>=P.len){if(q.p==='A'){q.p=X.div?'C':'B';q.s-=PA.len}else{q.p='A';q.s=0}}
+    const pt=at(q.p==='A'?PA:q.p==='B'?PB:PC,q.s),pulse=.55+.45*Math.pow(.5+.5*Math.sin(q.s*1.8-tt*5),3);setPt(milk,i,pt[0],pt[1],pt[2],TN(pt[3]),.7+.5*pulse);setPt(halo,i,pt[0],pt[1],pt[2],TN(pt[3]),.45*pulse)}flush(milk);flush(halo);
+  for(let i=0;i<UP.length;i++){const q=UP[i];q.s+=dt*1.6;if(q.s>q.p.len)q.s-=q.p.len;const pt=at(q.p,q.s);setPt(util,i,pt[0],pt[1],pt[2],q.p===UH?TN(PR.Thw):TN(1),.6)}flush(util);
+  CLK=tt;sweep.position.set(Math.sin(tt*.18)*18,5.5,4+Math.cos(tt*.13)*5);
+  const focusU=sel||hov;for(const U of units)U.lbl.dim=!!focusU&&U!==focusU;
+  if(focusU){const sz=Math.max(2.2,Math.hypot(focusU.center.x-focusU.top.x,0)+2.4);ring.position.x=focusU.center.x;ring.position.z=focusU.center.z;const s=1.6+focusU.focus*.18;ring.scale.setScalar(s+.08*Math.sin(tt*3));ring.material.opacity+=(.75-ring.material.opacity)*Math.min(1,dt*4);
+    const ph=(tt*.6)%1;ring2.position.copy(ring.position);ring2.scale.setScalar(s*(1+ph*.8));ring2.material.opacity=(1-ph)*.45;
+    spot.target.position.copy(focusU.center);spot.position.set(focusU.center.x+2,focusU.center.y+11,focusU.center.z+3);spot.intensity+=(2.2-spot.intensity)*Math.min(1,dt*3)}
+  else{ring.material.opacity*=Math.pow(.02,dt);ring2.material.opacity*=Math.pow(.02,dt);spot.intensity*=Math.pow(.05,dt)}
+  const srcs=[[-1.1,2.1,7,PR.Thw],[7.5,1.8,1.5,X.Tf],[-2.6,2.9,1.5,X.Th]];
+  for(let i=0;i<STP.length;i++){const p=STP[i];p.l-=dt*.35;if(p.l<=0){const s=srcs[p.src];p.x=s[0]+rnd(-.4,.4);p.y=s[1];p.z=s[2]+rnd(-.4,.4);p.vx=rnd(-.15,.15);p.vz=rnd(-.15,.15);p.l=1}
+    p.y+=dt*(.5+(1-p.l)*.4);p.x+=p.vx*dt;p.z+=p.vz*dt;const a=Math.sin(p.l*Math.PI);setPt(steam,i,p.x,p.y,p.z,.62,a*.22)}flush(steam);
+  for(let i=0;i<MST.length;i++){const p=MST[i];p.l-=dt*.18;const T=p.t?past:silo,r=p.t?1.5:1.7;if(p.l<=0){const an=rnd(0,6.283);p.x=T.g.position.x+Math.cos(an)*r;p.z=T.g.position.z+Math.sin(an)*r;p.y=rnd(1.2,4.5);p.l=1}
+    p.y-=dt*.25;if(p.y<.1)p.y=.1;const a=Math.sin(p.l*Math.PI);setPt(mist,i,p.x,p.y,p.z,.2,a*.18)}flush(mist);
+  infoT+=dt;if(infoT>.35){infoT=0;renderInfo(false)}};
+readCtl();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{window.dispatchEvent(new Event('resize'))});
+S.sc.background=new THREE.Color('#0F1217');
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const St of stages){if(!St.vis)continue;if(!paused&&St.update)St.update(dt);draw(St,paused?0:dt)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>
