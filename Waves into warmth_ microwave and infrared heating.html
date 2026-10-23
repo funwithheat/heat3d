@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Waves into warmth: microwave and infrared heating, from food layers down to molecules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEEF0;--paper-2:#E1E4E8;--ink:#181B21;--ink-2:#545B67;--rule:#CBD0D6;--ember:#C9481A;--ice:#23799B;--stage:#12151B;
+  --thermal:linear-gradient(90deg,#1E2B55,#2A78A8,#7ACFC5,#F3D27A,#EE7B30,#C22B2D);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;--sans:"Schibsted Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0E1014;--paper-2:#161920;--ink:#E9E6E0;--ink-2:#9AA1AC;--rule:#272B33;--ember:#F07A3E;--ice:#5CB8D6;--stage:#090B0F;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0E1014;--paper-2:#161920;--ink:#E9E6E0;--ink-2:#9AA1AC;--rule:#272B33;--ember:#F07A3E;--ice:#5CB8D6;--stage:#090B0F;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 68px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.02rem;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#0B0D11}
+canvas{max-width:100%}
+.wrap{max-width:1360px;margin:0 auto;padding:0 clamp(1rem,3.5vw,3rem)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:#0B0D11;color:#E9E6E0}
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--thermal)}
+header.top .wrap{display:flex;align-items:center;gap:1rem;min-height:56px;flex-wrap:wrap;padding-top:.35rem;padding-bottom:.45rem}
+.mark{font-family:var(--serif);font-style:italic;font-size:1.3rem;margin-right:auto;white-space:nowrap}
+.mark small{font-family:var(--sans);font-style:normal;font-size:.78rem;color:#8E95A1;margin-left:.6rem}
+nav{display:flex;flex-wrap:wrap;gap:.1rem}
+nav button{font-family:var(--sans);font-size:.84rem;color:#9AA1AC;background:none;border:0;padding:.4rem .6rem;border-radius:6px;cursor:pointer;min-height:36px}
+nav button:hover{color:#fff}
+nav button i{font-family:var(--serif);font-style:italic;color:#F3B07A;margin-right:.3rem}
+#motion{border:1px solid #333944;border-radius:999px;color:#E9E6E0;margin-left:.4rem}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #F3B07A;outline-offset:2px}
+.hero{position:relative;height:clamp(32rem,88vh,52rem);background:#0B0D11;color:#EDE9E2;overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.hero .copy{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
+.hero .copy .wrap{padding-bottom:clamp(2rem,6vh,4.5rem)}
+.hero h1{font-family:var(--serif);font-weight:300;font-size:clamp(3.6rem,10.5vw,9.5rem);line-height:.86;letter-spacing:-.035em;margin:0 0 1.2rem;max-width:9ch}
+.hero h1 em{font-style:italic;font-weight:300}
+.hero p{font-family:var(--serif);font-size:clamp(1.15rem,2vw,1.5rem);line-height:1.35;max-width:30em;margin:0 0 1.1rem;color:#D9D4CB}
+.hero .tools{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;pointer-events:auto}
+.hero .tools span{font-size:.85rem;color:#9AA1AC;margin-right:.3rem}
+.hero .credit{font-size:.82rem;color:#8E95A1;margin-top:1rem;max-width:44em}
+.hero .credit a{color:#C9CED6}
+.pill{font-family:var(--sans);font-size:.86rem;color:inherit;background:none;border:1px solid currentColor;border-radius:999px;padding:.38rem .9rem;cursor:pointer;min-height:36px;opacity:.75}
+.pill:hover{opacity:1}
+.pill[aria-pressed="true"]{opacity:1;background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.hero .pill[aria-pressed="true"]{background:#EDE9E2;color:#0B0D11;border-color:#EDE9E2}
+.ch{padding:clamp(3.5rem,8vw,7rem) 0 clamp(2rem,5vw,4rem);border-top:1px solid var(--rule)}
+.ch:first-of-type{border-top:0}
+.chgrid{display:grid;grid-template-columns:minmax(0,25rem) minmax(0,1fr);gap:clamp(1.5rem,4vw,4rem);align-items:start}
+@media (max-width:980px){.chgrid{grid-template-columns:minmax(0,1fr)}}
+.text{position:sticky;top:90px}
+@media (max-width:980px){.text{position:static}}
+.num{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(3.4rem,6vw,5.2rem);line-height:.8;color:var(--ember);margin:0 0 .6rem}
+.kind{font-weight:500;font-size:.88rem;color:var(--ink-2);margin:0 0 .3rem}
+.ch h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 1.1rem}
+.prose p{font-family:var(--serif);font-size:1.16rem;line-height:1.55;margin:0 0 .9rem}
+.eq{border-left:2px solid var(--ember);padding:.4rem 0 .4rem 1rem;margin:1.25rem 0;font-family:var(--serif);font-size:1.2rem}
+.eq .law{font-style:italic;font-size:1.35rem}
+.eq .live{display:block;font-family:var(--sans);font-size:.9rem;color:var(--ink-2);margin-top:.35rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.eq + .eq{margin-top:-.5rem}
+.eq.dim{opacity:.35}
+.stage{position:relative;background:var(--stage);border-radius:6px;overflow:hidden}
+.stage canvas{display:block;width:100%;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.lbl{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--serif);font-style:italic;font-size:15px;color:#EDE8DE;white-space:nowrap;padding:0 0 0 8px;margin-top:-10px;border-left:1px solid rgba(237,232,222,.55);transition:opacity .3s;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.lbl.r{transform-origin:right}
+.stage .tip{position:absolute;right:12px;bottom:10px;font-family:var(--serif);font-style:italic;font-size:14px;color:#8E95A1;pointer-events:none}
+.scale{position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#B8BEC8;pointer-events:none}
+.scale i{display:block;width:120px;height:6px;border-radius:3px;background:var(--thermal)}
+.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:1rem 2rem;margin-top:1.25rem}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--ink-2);margin-bottom:.25rem;gap:.5rem}
+.ctrl output{font-family:var(--serif);font-size:1.2rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.group{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.group .gl{font-size:.86rem;color:var(--ink-2);width:100%}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--thermal);border-radius:2px}
+input[type=range]::-moz-range-track{height:3px;background:var(--thermal);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);margin-top:-8px;cursor:grab}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);cursor:grab}
+.reads{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:1rem;margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.reads b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.reads span{display:block;font-size:.8rem;color:var(--ink-2);margin-top:.25rem;line-height:1.3}
+.share{display:flex;height:34px;margin-top:1.2rem;border-radius:4px;overflow:hidden;font-size:.78rem;color:#fff}
+.share div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;transition:flex-basis .3s;min-width:0}
+.chart{display:block;width:100%;margin-top:1.2rem}
+.insight{margin:1.2rem 0 0;padding-left:.9rem;border-left:3px solid var(--ice);font-size:.98rem}
+.end{background:#0B0D11;color:#E9E6E0;padding:clamp(3rem,7vw,5rem) 0}
+.end h2{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2rem,4vw,3rem);margin:0 0 1rem}
+.end p{max-width:46em;color:#AEB4BE;margin:0 0 .8rem}
+.end a{color:#E9E6E0}
+.btnrow{display:flex;flex-wrap:wrap;gap:.4rem}
+.note{font-size:.84rem;color:var(--ink-2);margin:.8rem 0 0;max-width:44em}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;font-size:.82rem;color:var(--ink-2);margin-top:.6rem}
+.legend span::before{content:"";display:inline-block;width:.8rem;height:.25rem;border-radius:2px;margin-right:.35rem;vertical-align:middle;background:var(--c)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">Waves into warmth<small>Pickle &amp; Python</small></div>
+  <nav aria-label="Chapters">
+    <button data-go="spectrum"><i>I</i>Penetration</button>
+    <button data-go="dipoles"><i>II</i>Dipoles</button>
+    <button data-go="ions"><i>III</i>Ions</button>
+    <button data-go="infrared"><i>IV</i>Infrared</button>
+    <button data-go="layers"><i>V</i>Layers</button>
+    <button data-go="cavity"><i>VI</i>The oven</button>
+    <button id="motion" aria-pressed="false">Pause motion</button>
+  </nav>
+</div></header>
+
+<main>
+<section class="hero" aria-label="Introduction">
+  <canvas id="cHero" aria-label="A field of water molecules twisting to follow a passing electromagnetic wave; your pointer sets the wave’s frequency"></canvas>
+  <div class="copy"><div class="wrap">
+    <h1>Waves into <em>warmth</em></h1>
+    <p>How microwaves and infrared turn light into heat, followed from the slab of food down to a single water molecule. Move across the field to change the wave.</p>
+    <p class="credit">Six live models: penetration depth, dipolar rotation and Debye relaxation, ionic conduction, molecular vibration and Planck emission, heating profiles through the layers of a food, and standing waves inside an oven. Dielectric and optical properties are typical published values, rounded; molecular motion is exaggerated so you can see it.</p>
+  </div></div>
+</section>
+
+<section class="ch" id="spectrum"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">I</p><p class="kind">The spectrum and penetration depth</p>
+    <h2>How far each wave gets in</h2>
+    <div class="prose">
+      <p>Microwaves and infrared are both light, but their wavelengths differ ten-thousandfold, and that decides where the energy lands. A microwave’s field reaches centimetres into wet food before half its power is gone. Infrared is swallowed in the outermost fraction of a millimetre.</p>
+      <p>Neither carries enough energy per photon to break a chemical bond. All they can do is make molecules move, and moving molecules are heat.</p>
+    </div>
+    <div class="eq"><span class="law">P(z) = P<sub>0</sub> e<sup>−z/d<sub>p</sub></sup></span><span class="live" id="l1a"></span></div>
+    <div class="eq" id="e1mw"><span class="law">d<sub>p</sub> = 1 / (2α),  α = (2πf/c) √[ε′/2 (√(1 + tan²δ) − 1)]</span><span class="live" id="l1b"></span></div>
+    <div class="eq"><span class="law">E<sub>photon</sub> = hc/λ</span><span class="live" id="l1c"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c1" aria-label="A layered slab of food with a wave entering from above; the wave shortens and fades inside, and each layer glows by the power it absorbs"></canvas><div class="scale">little<i></i>most power absorbed</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Source"><span class="gl">Source</span>
+        <button class="pill" data-src="915" aria-pressed="false">Microwave 915 MHz</button><button class="pill" data-src="2450" aria-pressed="true">Microwave 2,450 MHz</button><button class="pill" data-src="nir" aria-pressed="false">Near-infrared lamp</button><button class="pill" data-src="fir" aria-pressed="false">Far-infrared emitter</button>
+      </div>
+      <div class="group" role="group" aria-label="Food"><span class="gl">Food</span>
+        <button class="pill" data-food="water" aria-pressed="false">Water</button><button class="pill" data-food="potato" aria-pressed="true">Potato</button><button class="pill" data-food="beef" aria-pressed="false">Beef</button><button class="pill" data-food="bread" aria-pressed="false">Bread</button><button class="pill" data-food="ice" aria-pressed="false">Frozen</button>
+      </div>
+    </div>
+    <canvas class="chart" id="u1" height="250" aria-label="Fraction of power remaining against depth on a logarithmic scale, from one micrometre to thirty centimetres, for each source"></canvas>
+    <div class="reads"><div><b id="r1d"></b><span>Penetration depth</span></div><div><b id="r1w"></b><span>Wavelength inside the food</span></div><div><b id="r1e"></b><span>Energy per photon</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="dipoles"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">II</p><p class="kind">Dipolar rotation and Debye relaxation</p>
+    <h2>Water molecules dancing to a field</h2>
+    <div class="prose">
+      <p>A water molecule is lopsided: its oxygen hogs electrons, so one end is slightly negative and the other slightly positive. Put it in an electric field that flips 2.45 billion times a second and it tries to turn and follow.</p>
+      <p>It can’t keep up perfectly. Hydrogen bonds to its neighbours drag on it, so its rotation lags the field. That lag is friction, and friction is heat. Too slow a field and the molecules follow easily; too fast and they barely move. Loss peaks in between, and Debye’s equation predicts where.</p>
+    </div>
+    <div class="eq"><span class="law">ε* = ε<sub>∞</sub> + (ε<sub>s</sub> − ε<sub>∞</sub>) / (1 + jωτ)</span><span class="live" id="l2a"></span></div>
+    <div class="eq"><span class="law">ε″ = (ε<sub>s</sub> − ε<sub>∞</sub>) ωτ / (1 + ω²τ²)</span><span class="live" id="l2b"></span></div>
+    <div class="eq"><span class="law">P = 2πf ε<sub>0</sub> ε″ E<sup>2</sup>,  dT/dt = P / ρc<sub>p</sub></span><span class="live" id="l2c"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c2" aria-label="Water molecules between two plates rotating to follow an oscillating electric field, warming in colour as friction builds"></canvas><div class="scale">cool<i></i>warm</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="ctrl"><label for="fq">Field frequency <output id="fqOut"></output></label><input type="range" id="fq" min="0" max="100" step="0.5" value="40.2"></div>
+      <div class="ctrl"><label for="tw">Water temperature <output id="twOut"></output></label><input type="range" id="tw" min="1" max="95" step="1" value="20"></div>
+      <div class="ctrl"><label for="ef">Field strength <output id="efOut"></output></label><input type="range" id="ef" min="500" max="3000" step="50" value="2000"></div>
+      <div class="btnrow"><button class="pill" data-fp="0.915">915 MHz</button><button class="pill" data-fp="2.45">2.45 GHz</button><button class="pill" id="run2" aria-pressed="false">Run the oven</button><button class="pill" id="ice2" aria-pressed="false">Freeze it</button></div>
+    </div>
+    <canvas class="chart" id="u2" height="250" aria-label="Debye curves: dielectric constant and loss factor of water against frequency, with domestic and industrial microwave frequencies marked"></canvas>
+    <div class="reads"><div><b id="r2e"></b><span>Loss factor ε″</span></div><div><b id="r2l"></b><span>Phase lag behind the field</span></div><div><b id="r2h"></b><span>Heating rate</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="ions"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">III</p><p class="kind">Ionic conduction</p>
+    <h2>Salt joins the dance</h2>
+    <div class="prose">
+      <p>Dissolved salt splits into sodium and chloride ions. The field shoves them back and forth in opposite directions, and every collision with a water molecule turns their motion into heat. This is a second, separate heating mechanism.</p>
+      <p>Ionic loss grows as the frequency falls, so salt matters more at 915 MHz. It also has a cost: the more a food absorbs, the shallower the waves reach. That’s why the salty edges of ham overheat while the middle stays cold.</p>
+    </div>
+    <div class="eq"><span class="law">ε″<sub>total</sub> = ε″<sub>dipolar</sub> + σ / (2πf ε<sub>0</sub>)</span><span class="live" id="l3a"></span></div>
+    <div class="eq"><span class="law">σ ≈ 1.65 S/m per 1% NaCl</span><span class="live" id="l3b"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c3" aria-label="Sodium and chloride ions oscillating in opposite directions through water, throwing off sparks of heat as they collide"></canvas><div class="scale" style="gap:14px"><span style="color:#A796FF">● sodium</span><span style="color:#A8D672">● chloride</span><span style="color:#8FA6C0">· water</span></div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="ctrl"><label for="salt">Salt content <output id="saltOut"></output></label><input type="range" id="salt" min="0" max="3" step="0.1" value="1"></div>
+      <div class="group" role="group" aria-label="Frequency"><span class="gl">Frequency</span><button class="pill" data-f3="915" aria-pressed="false">915 MHz</button><button class="pill" data-f3="2450" aria-pressed="true">2,450 MHz</button></div>
+    </div>
+    <canvas class="chart" id="u3" height="250" aria-label="Dipolar and ionic loss factor against frequency for the chosen salt content"></canvas>
+    <div class="reads"><div><b id="r3i"></b><span>Ionic share of heating</span></div><div><b id="r3e"></b><span>Total ε″</span></div><div><b id="r3d"></b><span>Penetration depth</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="infrared"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">IV</p><p class="kind">Infrared: molecular vibration and Planck emission</p>
+    <h2>Light that rings a molecule like a bell</h2>
+    <div class="prose">
+      <p>Infrared doesn’t turn molecules; it shakes them. Each bond vibrates at its own natural frequencies, and a photon is absorbed only when its energy matches one of them. Water stretches at about 2.9 µm and bends at about 6.1 µm, so radiation near those wavelengths is gobbled up almost instantly.</p>
+      <p>Hot emitters glow across a broad spectrum set by their temperature. Cooler ceramic heaters peak in the far infrared, right on water’s strongest bands, so they heat only the very surface. Hotter halogen lamps shift energy to shorter wavelengths that slip a few millimetres deeper.</p>
+    </div>
+    <div class="eq"><span class="law">B(λ,T) = 2hc² / λ⁵ · 1 / (e<sup>hc/λkT</sup> − 1)</span><span class="live" id="l4a"></span></div>
+    <div class="eq"><span class="law">λ<sub>max</sub> = 2898 µm·K / T</span><span class="live" id="l4b"></span></div>
+    <div class="eq"><span class="law">I(z) = ∫B(λ) e<sup>−α(λ)z</sup> dλ / ∫B(λ) dλ</span><span class="live" id="l4c"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c4" aria-label="A large water molecule vibrating in its stretching and bending modes as infrared photons arrive; photons at matching wavelengths are absorbed"></canvas><div class="scale">short<i></i>long wavelength</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group" role="group" aria-label="Emitter"><span class="gl">Emitter</span><button class="pill" data-em="2200" aria-pressed="false">Halogen lamp, 2,200 K</button><button class="pill" data-em="1200" aria-pressed="true">Quartz tube, 1,200 K</button><button class="pill" data-em="700" aria-pressed="false">Ceramic, 700 K</button></div>
+      <div class="ctrl"><label for="te">Emitter temperature <output id="teOut"></output></label><input type="range" id="te" min="400" max="2600" step="10" value="1200"></div>
+      <div class="group" role="group" aria-label="Mode"><span class="gl">Vibration</span><button class="pill" data-md="sym" aria-pressed="true">Symmetric stretch</button><button class="pill" data-md="asym" aria-pressed="false">Asymmetric stretch</button><button class="pill" data-md="bend" aria-pressed="false">Bend</button></div>
+    </div>
+    <canvas class="chart" id="u4" height="260" aria-label="Planck emission spectrum of the emitter overlaid on water’s absorption coefficient, with the vibrational bands marked"></canvas>
+    <div class="reads"><div><b id="r4p"></b><span>Peak wavelength</span></div><div><b id="r4a"></b><span>Absorbed in the first 0.1 mm</span></div><div><b id="r4b"></b><span>Absorbed in the first 1 mm</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="layers"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">V</p><p class="kind">Heating through the layers</p>
+    <h2>Inside out, or outside in</h2>
+    <div class="prose">
+      <p>Give two identical slabs of potato the same total power, one by microwave and one by infrared. Infrared deposits everything at the surface; the inside waits for slow conduction. Microwaves deposit heat through the depth, while moisture evaporating from the surface keeps the outermost layer cooler than just beneath it.</p>
+      <p>Run it and watch the infrared slab’s surface dry out and climb past 100 °C. That’s a crust, browning and crisping. The microwave slab cooks faster but stays pale and soft, which is exactly why combination ovens exist.</p>
+    </div>
+    <div class="eq"><span class="law">ρc<sub>p</sub> ∂T/∂t = k ∂²T/∂z² + Q(z)</span><span class="live" id="l5a"></span></div>
+    <div class="eq"><span class="law">Q<sub>MW</sub>(z) = Q<sub>0</sub>(e<sup>−z/d<sub>p</sub></sup> + e<sup>−(L−z)/d<sub>p</sub></sup>)</span><span class="live" id="l5b"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c5" aria-label="Two slabs side by side in cross-section, one heated by microwaves and one by infrared emitters, coloured by temperature through their layers"></canvas><div class="scale">20 °C<i></i>130 °C</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="ctrl"><label for="th5">Slab thickness <output id="th5Out"></output></label><input type="range" id="th5" min="1" max="6" step="0.5" value="4"></div>
+      <div class="ctrl"><label for="pw5">Power absorbed, each method <output id="pw5Out"></output></label><input type="range" id="pw5" min="2" max="20" step="1" value="8"></div>
+      <div class="btnrow"><button class="pill" id="play5" aria-pressed="true">Pause</button><button class="pill" id="rst5">Start again</button></div>
+    </div>
+    <canvas class="chart" id="u5" height="280" aria-label="Temperature profiles through the slab thickness for both methods, and centre temperature over time"></canvas>
+    <div class="legend"><span style="--c:#4FA3D1">microwave</span><span style="--c:#E46A2E">infrared</span></div>
+    <div class="reads"><div><b id="r5t"></b><span>Time</span></div><div><b id="r5m"></b><span>Microwave centre / surface</span></div><div><b id="r5i"></b><span>Infrared centre / surface</span></div><div><b id="r5c"></b><span>Infrared crust</span></div></div>
+  </div>
+</div></section>
+
+<section class="ch" id="cavity"><div class="wrap chgrid">
+  <div class="text">
+    <p class="num">VI</p><p class="kind">Standing waves in the oven</p>
+    <h2>Why your oven has a turntable</h2>
+    <div class="prose">
+      <p>Microwaves bounce between the metal walls of the oven and interfere with themselves. Where crests meet crests the field is strong; where they cancel, almost nothing happens. These hot spots sit about half a wavelength apart: 6.1 cm at 2.45 GHz.</p>
+      <p>Lay a plate of cheese in the oven with the turntable off and you’ll melt a pattern of spots. Switch it on and each piece of cheese travels through hot and cold regions, so the heating evens out into rings.</p>
+    </div>
+    <div class="eq"><span class="law">|E|² ∝ Σ a<sub>mn</sub> sin²(mπx/a) sin²(nπz/b)</span><span class="live" id="l6a"></span></div>
+    <div class="eq"><span class="law">spacing = λ/2 = c / 2f</span><span class="live" id="l6b"></span></div>
+  </div>
+  <div>
+    <div class="stage"><canvas id="c6" aria-label="A microwave oven cavity with a pulsing standing-wave field and a plate of cheese melting in hot spots or rings"></canvas><div class="scale">solid<i></i>melted</div><div class="tip">drag to turn</div></div>
+    <div class="panel">
+      <div class="group"><span class="gl">Turntable</span><button class="pill" id="tt" aria-pressed="false">Turntable off</button><button class="pill" id="rst6">Fresh cheese</button></div>
+      <div class="group" role="group" aria-label="Frequency"><span class="gl">Frequency</span><button class="pill" data-f6="2450" aria-pressed="true">2,450 MHz, home oven</button><button class="pill" data-f6="915" aria-pressed="false">915 MHz, industrial</button></div>
+    </div>
+    <div class="reads"><div><b id="r6t"></b><span>Cooking time</span></div><div><b id="r6s"></b><span>Hot-spot spacing</span></div><div><b id="r6u"></b><span>Unevenness, CV of heat</span></div></div>
+  </div>
+</div></section>
+</main>
+
+<footer class="end"><div class="wrap">
+  <h2>Light in, heat out.</h2>
+  <p>Every curve here is computed live: penetration depth from the dielectric constant and loss factor, Debye relaxation with a temperature-dependent relaxation time, ionic loss from salt conductivity, Planck’s law against water’s measured absorption spectrum, a finite-difference heat model with evaporation and crust formation, and standing-wave modes in a rectangular cavity.</p>
+  <p>Values are typical and rounded; real foods vary with composition, temperature and structure. Built by Pickle &amp; Python.</p>
+</div></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+const fmt=(v,d=0)=>Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const W3=v=>Math.abs(v)>=1e4?fmt(v/1000,1)+' kW':fmt(v,Math.abs(v)<10?1:0)+' W';
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let paused=reduce;
+const mBtn=$('motion');const syncM=()=>{mBtn.setAttribute('aria-pressed',paused?'true':'false');mBtn.textContent=paused?'Play motion':'Pause motion'};syncM();mBtn.onclick=()=>{paused=!paused;syncM()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>$(b.dataset.go).scrollIntoView({behavior:reduce?'auto':'smooth'}));
+const H0=location.hash.slice(1);if(['spectrum','dipoles','ions','infrared','layers','cavity'].includes(H0))setTimeout(()=>$(H0).scrollIntoView(),120);
+function pills(sel,cb){const bs=[...document.querySelectorAll(sel)];bs.forEach(b=>b.addEventListener('click',()=>{bs.forEach(o=>o.setAttribute('aria-pressed',o===b?'true':'false'));cb(b)}));return bs}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+if(typeof THREE==='undefined'){document.querySelectorAll('.stage').forEach(s=>{s.insertAdjacentHTML('beforeend','<p style="color:#ccc;padding:2rem">The 3D library could not load. Check your connection and reload.</p>')});return}
+
+/* ---------- colour map and helpers ---------- */
+const CM=['#1E2B55','#2A78A8','#7ACFC5','#F3D27A','#EE7B30','#C22B2D'].map(h=>new THREE.Color(h));
+function tcol(t,out){t=clamp(t,0,1)*5;const i=Math.min(4,Math.floor(t));return out.copy(CM[i]).lerp(CM[i+1],t-i)}
+const _c=new THREE.Color();
+function sprTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);
+  gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,255,255,.8)');gr.addColorStop(.6,'rgba(255,255,255,.18)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
+const SPR=sprTex();
+function cloud(n,size){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3),3));
+  const m=new THREE.PointsMaterial({size,map:SPR,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});const p=new THREE.Points(g,m);p.frustumCulled=false;return p}
+function setPt(p,i,x,y,z,t,bright){const a=p.geometry.attributes;a.position.setXYZ(i,x,y,z);tcol(t,_c);const b=bright==null?1:bright;a.color.setXYZ(i,_c.r*b,_c.g*b,_c.b*b)}
+function flush(p){p.geometry.attributes.position.needsUpdate=true;p.geometry.attributes.color.needsUpdate=true}
+function colorize(geo,fn){const p=geo.attributes.position;let c=geo.attributes.color;if(!c){c=new THREE.BufferAttribute(new Float32Array(p.count*3),3);geo.setAttribute('color',c)}
+  for(let i=0;i<p.count;i++){tcol(fn(p.getX(i),p.getY(i),p.getZ(i)),_c);c.setXYZ(i,_c.r,_c.g,_c.b)}c.needsUpdate=true}
+const heatMat=o=>new THREE.MeshStandardMaterial(Object.assign({vertexColors:true,roughness:.55,metalness:.08},o||{}));
+const glass=(op,col)=>new THREE.MeshStandardMaterial({color:col||0x9fb6c8,transparent:true,opacity:op,roughness:.15,metalness:.1,depthWrite:false,side:THREE.DoubleSide});
+function dispose(o){o.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material&&c.material!==SHARED)(Array.isArray(c.material)?c.material:[c.material]).forEach(m=>m.dispose())})}
+const SHARED=null;
+function line(pts,col,op){const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op==null?1:op}))}
+
+/* ---------- stages ---------- */
+const stages=[];const io=new IntersectionObserver(es=>es.forEach(e=>{const S=stages.find(s=>s.cv===e.target);if(S)S.vis=e.isIntersecting}),{rootMargin:'120px'});
+function stage(id,o){const cv=$(id),wrap=cv.parentElement;const r=new THREE.WebGLRenderer({canvas:cv,antialias:true});r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  const sc=new THREE.Scene();sc.background=new THREE.Color(cssv('--stage')||'#12151B');const cm=new THREE.PerspectiveCamera(o.fov||36,1.6,.1,300);
+  sc.add(new THREE.AmbientLight(0xffffff,.78));const dl=new THREE.DirectionalLight(0xffffff,.55);dl.position.set(5,9,7);sc.add(dl);const rl=new THREE.DirectionalLight(0x8fb0ff,.3);rl.position.set(-7,3,-6);sc.add(rl);
+  const S={cv,wrap,r,sc,cm,ratio:o.ratio||.62,base:o.yaw||.6,yaw:o.yaw||.6,pitch:o.pitch||.3,dist:o.dist||10,tg:new THREE.Vector3(...(o.target||[0,0,0])),fill:!!o.fill,orbit:o.orbit!==false,auto:true,idle:0,clock:0,labels:[],vis:false,update:null};
+  if(S.orbit){let down=false,lx=0,ly=0,mouse=false;
+    cv.addEventListener('pointerdown',e=>{down=true;lx=e.clientX;ly=e.clientY;mouse=e.pointerType==='mouse';if(mouse)try{cv.setPointerCapture(e.pointerId)}catch(_){};S.idle=0;S.auto=false});
+    cv.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;S.yaw-=dx*.008;if(mouse)S.pitch=clamp(S.pitch+dy*.006,-.2,1.35);S.idle=0});
+    ['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{down=false}))}
+  stages.push(S);io.observe(cv);return S}
+function label(S,text,pos,right){const el=document.createElement('div');el.className='lbl';el.textContent=text;if(right){el.style.borderLeft='0';el.style.borderRight='1px solid rgba(237,232,222,.55)';el.style.padding='0 8px 0 0'}
+  S.wrap.appendChild(el);const L={el,pos:new THREE.Vector3(...pos),show:true,right};S.labels.push(L);return L}
+const _v=new THREE.Vector3();
+function draw(S,dt){const w=S.cv.clientWidth;let h=S.fill?S.wrap.clientHeight:Math.round(w*(window.innerWidth<700?Math.min(1,S.ratio*1.45):S.ratio));
+  if(S._w!==w||S._h!==h){S.r.setSize(w,h,false);if(!S.fill)S.cv.style.height=h+'px';S.cm.aspect=w/h;S.cm.updateProjectionMatrix();S._w=w;S._h=h}
+  S.clock+=dt;S.idle+=dt;if(!S.auto&&S.idle>7)S.auto=true;
+  if(S.auto&&S.orbit&&!paused)S.yaw+=(S.base+.32*Math.sin(S.clock*.22)-S.yaw)*Math.min(1,dt*.6);
+  const cp=Math.cos(S.pitch);S.cm.position.set(S.tg.x+S.dist*cp*Math.sin(S.yaw),S.tg.y+S.dist*Math.sin(S.pitch),S.tg.z+S.dist*cp*Math.cos(S.yaw));S.cm.lookAt(S.tg);
+  S.r.render(S.sc,S.cm);
+  for(const L of S.labels){_v.copy(L.pos).project(S.cm);const ok=L.show&&_v.z<1&&Math.abs(_v.x)<1.05&&Math.abs(_v.y)<1.05;L.el.style.opacity=ok?1:0;
+    const px=(_v.x*.5+.5)*w,py=(-_v.y*.5+.5)*h;L.el.style.transform=L.right?`translate(calc(${px}px - 100%),${py}px)`:`translate(${px}px,${py}px)`}}
+function chart(id){const cv=$(id);const d=window.devicePixelRatio||1,w=cv.clientWidth,h=+cv.getAttribute('height');if(cv._w!==w||cv._d!==d){cv.width=w*d;cv.height=h*d;cv.style.height=h+'px';cv._w=w;cv._d=d}
+  const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);return[x,w,h]}
+const CK={ink:()=>cssv('--ink'),ink2:()=>cssv('--ink-2'),rule:()=>cssv('--rule')};
+const hex=t=>'#'+tcol(t,_c).getHexString();
+
+/* ================= physics ================= */
+const C0=2.998e8,E0=8.854e-12;
+const FOOD={water:{e:{915:[78,3.8],2450:[78,10]},w:1,name:'water'},potato:{e:{915:[62,23],2450:[57,17]},w:.8,name:'potato'},beef:{e:{915:[55,24],2450:[52,17]},w:.72,name:'beef'},
+  bread:{e:{915:[4.8,1.3],2450:[4.5,1.2]},w:.35,name:'bread'},ice:{e:{915:[3.2,.002],2450:[3.2,.003]},w:.95,name:'frozen food'}};
+function alphaMW(f,e1,e2){const t=e2/e1;return 2*Math.PI*f/C0*Math.sqrt(e1/2*(Math.sqrt(1+t*t)-1))}
+const dpMW=(f,e1,e2)=>1/(2*alphaMW(f,e1,e2));// metres
+const WA=[[.5,.0003],[.6,.002],[.7,.006],[.8,.02],[.9,.07],[.97,.45],[1.0,.36],[1.1,.17],[1.2,1.0],[1.3,1.2],[1.45,30],[1.6,6],[1.8,8],[1.94,120],[2.1,25],[2.3,20],[2.6,150],[2.75,2000],[2.95,12000],[3.2,2500],[3.5,300],[4,130],[4.7,500],[5,250],[5.5,350],[6.1,2700],[6.5,1000],[7,550],[8,500],[9,550],[10,600],[12,1500],[15,2500],[20,2000],[30,1800]];
+function alphaW(l){if(l<=WA[0][0])return WA[0][1];for(let i=1;i<WA.length;i++){if(l<=WA[i][0]){const[a,b]=[WA[i-1],WA[i]];const f=(Math.log(l)-Math.log(a[0]))/(Math.log(b[0])-Math.log(a[0]));return Math.exp(Math.log(a[1])+f*(Math.log(b[1])-Math.log(a[1])))}}return WA[WA.length-1][1]}
+const LG=Array.from({length:360},(_,i)=>Math.exp(Math.log(.5)+i/359*(Math.log(30)-Math.log(.5))));
+const planck=(l,T)=>1/(Math.pow(l,5)*(Math.exp(14388/(l*T))-1));
+const PW={};function pw(T){T=Math.round(T);if(PW[T])return PW[T];const w=LG.map((l,i)=>planck(l,T)*l);let s=0;w.forEach(v=>s+=v);return PW[T]=w.map(v=>v/s)}
+function irRemain(T,wf,zcm){const w=pw(T);let s=0;for(let i=0;i<LG.length;i++)s+=w[i]*Math.exp(-alphaW(LG[i])*wf*zcm);return s}
+function irDepth(T,wf){let a=-6,b=3;for(let i=0;i<50;i++){const m=(a+b)/2;if(irRemain(T,wf,Math.pow(10,m))>Math.exp(-1))a=m;else b=m}return Math.pow(10,(a+b)/2)}// cm
+function waterD(T){const es=87.74-.40008*T+9.398e-4*T*T-1.41e-6*T*T*T,ei=5.2,tau=8.27e-12*Math.exp(2100*(1/(T+273.15)-1/298.15));return{es,ei,tau}}
+function debye(f,T){const d=waterD(T),x=2*Math.PI*f*d.tau,q=1+x*x;return{e1:d.ei+(d.es-d.ei)/q,e2:(d.es-d.ei)*x/q,lag:Math.atan(x),amp:1/Math.sqrt(q),tau:d.tau,es:d.es,ei:d.ei}}
+const sigmaNaCl=s=>1.65*s*(1-.06*s);
+function lenFmt(cm){if(cm>=1)return fmt(cm,cm<10?1:0)+' cm';if(cm>=.1)return fmt(cm*10,1)+' mm';if(cm>=.01)return fmt(cm*10,2)+' mm';return fmt(cm*1e4,0)+' µm'}
+function axes(x,w,h,o){const L=o.l||52,R=o.r||16,T=o.t||16,B=o.b||36;const lx=v=>o.logx?Math.log10(v):v,ly=v=>o.logy?Math.log10(v):v;
+  const fx=v=>L+(lx(v)-lx(o.x0))/(lx(o.x1)-lx(o.x0))*(w-L-R),fy=v=>h-B-(ly(clamp(v,Math.min(o.y0,o.y1),Math.max(o.y0,o.y1)))-ly(o.y0))/(ly(o.y1)-ly(o.y0))*(h-T-B);
+  x.font='12px "Schibsted Grotesk",sans-serif';x.lineWidth=1;
+  (o.xt||[]).forEach(([v,s])=>{x.strokeStyle=CK.rule();x.beginPath();x.moveTo(fx(v),T);x.lineTo(fx(v),h-B);x.stroke();x.fillStyle=CK.ink2();x.textAlign='center';x.fillText(s,fx(v),h-B+16)});
+  (o.yt||[]).forEach(([v,s])=>{x.strokeStyle=CK.rule();x.beginPath();x.moveTo(L,fy(v));x.lineTo(w-R,fy(v));x.stroke();x.fillStyle=CK.ink2();x.textAlign='right';x.fillText(s,L-6,fy(v)+4)});
+  x.fillStyle=CK.ink2();if(o.xl){x.textAlign='center';x.fillText(o.xl,(L+w-R)/2,h-4)}if(o.yl){x.save();x.translate(12,(T+h-B)/2);x.rotate(-Math.PI/2);x.textAlign='center';x.fillText(o.yl,0,0);x.restore()}
+  return{fx,fy,L,R,T,B}}
+function plotLine(x,pts,col,wd,dash){x.strokeStyle=col;x.lineWidth=wd||2;x.setLineDash(dash||[]);x.beginPath();let s=false;pts.forEach(p=>{if(!isFinite(p[1]))return;s?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]);s=true});x.stroke();x.setLineDash([])}
+/* shared water molecule */
+const MG={O:new THREE.SphereGeometry(1,24,16),H:new THREE.SphereGeometry(1,16,12),B:new THREE.CylinderGeometry(1,1,1,8)};
+const HM=new THREE.MeshStandardMaterial({color:0xeeeeee,roughness:.4}),BM=new THREE.MeshStandardMaterial({color:0x9aa3b0,roughness:.5});
+function waterMol(s){const g=new THREE.Group(),om=new THREE.MeshStandardMaterial({color:0xE2574C,roughness:.35,metalness:.05,emissive:0x000000});
+  const O=new THREE.Mesh(MG.O,om);O.scale.setScalar(.22*s);g.add(O);const half=52.25*Math.PI/180,b=.34*s;
+  [-1,1].forEach(sg=>{const h=new THREE.Mesh(MG.H,HM);h.scale.setScalar(.13*s);h.position.set(sg*Math.sin(half)*b,Math.cos(half)*b,0);g.add(h);
+    const bd=new THREE.Mesh(MG.B,BM);bd.scale.set(.035*s,b,.035*s);bd.position.set(sg*Math.sin(half)*b/2,Math.cos(half)*b/2,0);bd.rotation.z=-sg*half;g.add(bd)});return{g,om}}
+function setBond(m,a,b,r){const d=new THREE.Vector3().subVectors(b,a),L=d.length();m.position.copy(a).addScaledVector(d,.5);m.scale.set(r,L,r);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize())}
+
+/* ================= HERO ================= */
+{const S=stage('cHero',{fill:true,yaw:0,pitch:.05,dist:13,orbit:false,target:[0,0,0]});S.sc.background=new THREE.Color('#0B0D11');
+  const NX=46,NY=18,N=NX*NY,Oc=cloud(N,.42),Hc=cloud(N*2,.22);S.sc.add(Oc,Hc);
+  const M=[];for(let i=0;i<NX;i++)for(let j=0;j<NY;j++)M.push({x:-9+i*18/(NX-1)+rnd(-.08,.08),y:-3.6+j*7.2/(NY-1)+rnd(-.08,.08),z:rnd(-3.5,1.2),ph:rnd(0,6.28),j:rnd(.6,1.4)});
+  const wave=line(Array.from({length:240},(_,i)=>[-10+i*20/239,4.4,0]),0xA796FF,.85);S.sc.add(wave);
+  let om=1.2,tom=1.2,t=0,hov=false;
+  S.cv.addEventListener('pointermove',e=>{const r=S.cv.getBoundingClientRect();tom=.25+Math.pow((e.clientX-r.left)/r.width,1.6)*7;hov=true});S.cv.addEventListener('pointerleave',()=>hov=false);
+  S.update=dt=>{t+=dt;if(!hov)tom=1.2+Math.sin(t*.15)*.9;om+=(tom-om)*Math.min(1,dt*2);const k=.75,w0=1.6,lag=Math.atan(om/w0),amp=1/Math.sqrt(1+Math.pow(om/w0,2));
+    const wp=wave.geometry.attributes.position;for(let i=0;i<wp.count;i++){const X=wp.getX(i);wp.setY(i,4.4+.45*Math.cos(k*X-om*t))}wp.needsUpdate=true;
+    for(let i=0;i<N;i++){const m=M[i],E=Math.cos(k*m.x-om*t-lag),th=1.25*amp*E+.25*Math.sin(t*m.j*3+m.ph)*(.4+lag*.5);
+      const heat=.22+.7*Math.sin(lag)*amp*Math.abs(Math.sin(k*m.x-om*t-lag))+.08*Math.sin(m.ph);setPt(Oc,i,m.x,m.y,m.z,heat,.9);
+      const hx=.17,hy=.13;for(const s of[-1,1]){const lx=s*hx,ly=hy;const X=m.x+lx*Math.cos(th)-ly*Math.sin(th),Y=m.y+lx*Math.sin(th)+ly*Math.cos(th);setPt(Hc,2*i+(s>0?1:0),X,Y,m.z,.5,.5)}}
+    flush(Oc);flush(Hc)};
+  if(reduce){for(let i=0;i<60;i++)S.update(1/30)}}
+
+/* ================= I. Penetration ================= */
+{const S=stage('c1',{yaw:.55,pitch:.22,dist:12.5,target:[0,.8,0]});
+  let src='2450',food='potato';const SL=6;// slab 6 cm -> 3 units
+  const sg=new THREE.BoxGeometry(6,3,3.6,1,140,1);colorize(sg,()=>0);const slab=new THREE.Mesh(sg,heatMat({roughness:.7}));S.sc.add(slab);
+  const skin=new THREE.Mesh(new THREE.BoxGeometry(6.02,.03,3.62),new THREE.MeshBasicMaterial({color:0xff7a3c,transparent:true,opacity:0}));skin.position.y=1.515;S.sc.add(skin);
+  for(let d=1;d<=5;d++){const l=line([[-3.01,1.5-d/2,1.81],[3.01,1.5-d/2,1.81]],0xffffff,.12);S.sc.add(l)}
+  const NW=420,wave=line(Array.from({length:NW},()=>[0,0,0]),0xEDE8DE,.95);S.sc.add(wave);const wave2=line(Array.from({length:NW},()=>[0,0,0]),0xA796FF,.5);S.sc.add(wave2);
+  const Ls=label(S,'surface',[3.1,1.5,1.8]),L1=label(S,'1 cm',[3.1,1.0,1.8]),L3=label(S,'3 cm',[3.1,0,1.8]),L6=label(S,'6 cm',[3.1,-1.5,1.8]),Lw=label(S,'',[-3.2,3.6,1.8]),Ld=label(S,'',[-3,1.2,1.9]);
+  let st={};
+  function props(s,fd){const F=FOOD[fd];if(s==='915'||s==='2450'){const f=+s*1e6,[e1,e2]=F.e[s];const dp=dpMW(f,e1,e2)*100;return{mw:true,f,e1,e2,dp,rem:z=>Math.exp(-z/dp),lam0:C0/f*100,lamIn:C0/f*100/Math.sqrt(e1),eV:6.626e-34*f/1.602e-19}}
+    const T=s==='nir'?2200:700,dp=irDepth(T,F.w),pk=2898/T;return{mw:false,T,dp,rem:z=>irRemain(T,F.w,z),lam0:pk*1e-4,lamIn:pk*1e-4/1.33,eV:1.2398/pk,pk}}
+  function calc(){st=props(src,food);const P=st;const zs=Array.from({length:141},(_,i)=>i/140*SL);const rem=zs.map(z=>P.rem(z));const dens=zs.map((z,i)=>i<140?Math.max(0,rem[i]-rem[i+1]):rem[i]*.0);
+    const mx=Math.max(...dens,1e-12);colorize(sg,(x,y)=>{const i=clamp(Math.round((1.5-y)/3*140),0,140);return Math.pow(dens[i]/mx,.45)});
+    skin.material.opacity=P.mw?0:.9;
+    $('r1d').textContent=lenFmt(P.dp);$('r1w').textContent=P.mw?fmt(P.lamIn,1)+' cm':fmt(P.pk/1.33,2)+' µm';$('r1e').textContent=P.eV<.01?P.eV.toExponential(1)+' eV':fmt(P.eV,2)+' eV';
+    const F=FOOD[food];
+    if(P.mw){$('l1a').textContent=`at ${fmt(P.f/1e6)} MHz in ${F.name}: half the power is gone by ${lenFmt(P.dp*Math.LN2)}`;$('e1mw').classList.remove('dim');
+      $('l1b').textContent=`ε′ = ${P.e1}, ε″ = ${P.e2}, tan δ = ${fmt(P.e2/P.e1,3)}  →  d_p = ${lenFmt(P.dp)}`}
+    else{$('l1a').textContent=`${src==='nir'?'halogen lamp at 2,200 K':'ceramic emitter at 700 K'}: 63% absorbed within ${lenFmt(P.dp)} of the surface`;$('e1mw').classList.add('dim');$('l1b').textContent='for infrared, depth comes from water’s absorption spectrum (chapter IV)'}
+    $('l1c').textContent=P.mw?`${fmt(P.f/1e6)} MHz photon = ${P.eV.toExponential(2)} eV; breaking a C–C bond takes about 3.6 eV`:`peak ${fmt(P.pk,2)} µm photon = ${fmt(P.eV,2)} eV, enough to excite vibrations, far too little to break bonds`;
+    Lw.el.textContent=P.mw?`free-space wavelength ${fmt(P.lam0,1)} cm`:`peak wavelength ${fmt(P.pk,2)} µm, drawn not to scale`;Ld.el.textContent=P.mw?'':'absorbed in the top '+lenFmt(P.dp);Ld.show=!P.mw;
+    drawChart()}
+  function drawChart(){const[x,w,h]=chart('u1');const A=axes(x,w,h,{x0:1e-4,x1:30,y0:0,y1:1,logx:true,xt:[[1e-4,'1 µm'],[1e-3,'10 µm'],[1e-2,'100 µm'],[.1,'1 mm'],[1,'1 cm'],[10,'10 cm']],yt:[[0,'0'],[.5,'50%'],[1,'100%']],xl:'depth into the food',yl:'power left'});
+    const S4=[['915','#2A78A8','915 MHz'],['2450','#7ACFC5','2,450 MHz'],['nir','#F3B07A','near-IR'],['fir','#C22B2D','far-IR']];
+    S4.forEach(([s,c,nm])=>{const P=props(s,food);const pts=[];for(let i=0;i<=160;i++){const z=Math.pow(10,-4+i/160*Math.log10(3e5));pts.push([A.fx(z),A.fy(P.rem(z))])}plotLine(x,pts,c,s===src?4:1.6);
+      const zl=clamp(P.dp,1.5e-4,20);x.fillStyle=c;x.font=(s===src?'600 ':'')+'12px "Schibsted Grotesk",sans-serif';x.textAlign='left';x.fillText(nm,A.fx(zl)+6,A.fy(Math.exp(-1))-6-(['915','nir'].includes(s)?14:0))});
+    x.strokeStyle=CK.ink2();x.setLineDash([3,4]);x.beginPath();x.moveTo(A.L,A.fy(Math.exp(-1)));x.lineTo(w-A.R,A.fy(Math.exp(-1)));x.stroke();x.setLineDash([]);x.fillStyle=CK.ink2();x.textAlign='right';x.fillText('1/e',w-A.R,A.fy(Math.exp(-1))-4)}
+  pills('[data-src]',b=>{src=b.dataset.src;calc()});pills('[data-food]',b=>{food=b.dataset.food;calc()});calc();window.addEventListener('resize',drawChart);
+  let t=0;S.update=dt=>{t+=dt;const P=st,wp=wave.geometry.attributes.position,wp2=wave2.geometry.attributes.position;const yTop=4.6,yBot=-1.5;
+    for(let i=0;i<NW;i++){const y=yTop-(yTop-yBot)*i/(NW-1);let X,amp;
+      if(P.mw){const lv0=P.lam0/2,lv=P.lamIn/2;if(y>1.5){const s=(yTop-y);X=Math.sin(2*Math.PI*s/lv0-t*4)*.7}else{const z=(1.5-y)*2;const s0=(yTop-1.5);amp=Math.exp(-z/(2*P.dp));X=Math.sin(2*Math.PI*(s0/lv0+(1.5-y)/lv)-t*4)*.7*amp}}
+      else{const lv=.16;if(y>1.5)X=Math.sin(2*Math.PI*(yTop-y)/lv-t*8)*.45;else{const zv=(1.5-y);const dv=Math.max(P.dp/2,.025);X=Math.sin(2*Math.PI*(yTop-y)/lv-t*8)*.45*Math.exp(-zv/dv)}}
+      wp.setXYZ(i,-1.4+X,y,1.85);wp2.setXYZ(i,-1.4,y,1.85+X*.6)}wp.needsUpdate=true;wp2.needsUpdate=true;
+    skin.material.opacity=P.mw?0:.6+.3*Math.sin(t*6)}}
+
+/* ================= II. Dipoles ================= */
+{const S=stage('c2',{yaw:.5,pitch:.2,dist:11.5,target:[0,0,0]});
+  const fqEl=$('fq'),twEl=$('tw'),efEl=$('ef');fqEl.value=(Math.log10(2.45e9)-8)/4*100;
+  let f=2.45e9,T=20,Tf=20,E=2000,run=false,ice=false,st={};
+  const mols=[];for(let i=0;i<4;i++)for(let j=0;j<4;j++)for(let k=0;k<4;k++){const m=waterMol(1.6);m.g.position.set(-2.4+i*1.6+rnd(-.2,.2),-1.8+j*1.2+rnd(-.15,.15),-2.4+k*1.6+rnd(-.2,.2));
+    m.off=rnd(-1,1);m.tx=rnd(-.5,.5);m.ty=rnd(0,6.28);m.ph=rnd(0,6.28);m.g.rotation.order='YXZ';S.sc.add(m.g);mols.push(m)}
+  const plates=[2.9,-2.9].map(y=>{const p=new THREE.Mesh(new THREE.BoxGeometry(6.6,.08,6.6),new THREE.MeshStandardMaterial({color:0x333a46,emissive:0x000000,metalness:.6,roughness:.4,transparent:true,opacity:.85}));p.position.y=y;S.sc.add(p);return p});
+  const arr=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(4,0,0),2,0xA796FF,.4,.25);S.sc.add(arr);
+  const Le=label(S,'electric field',[4.15,1.2,0]),Lp1=label(S,'',[3.3,2.9,0]),Lp2=label(S,'',[3.3,-2.9,0]);
+  const spark=cloud(160,.35);S.sc.add(spark);const SP=Array.from({length:160},()=>({x:0,y:0,z:0,l:0}));
+  function calc(){f=Math.pow(10,8+fqEl.value/100*4);T=(run&&!ice)?Tf:+twEl.value;E=+efEl.value;
+    st=ice?{e1:3.2,e2:.003,lag:Math.PI/2*.98,amp:.02,tau:2e-5}:debye(f,T);const P=2*Math.PI*f*E0*st.e2*E*E,rate=P/4.18e6;st.P=P;st.rate=rate;
+    $('fqOut').textContent=f>=1e9?fmt(f/1e9,f<1e10?2:0)+' GHz':fmt(f/1e6)+' MHz';$('twOut').textContent=ice?'−18 °C, ice':T+' °C';$('efOut').textContent=fmt(E)+' V/m';
+    $('r2e').textContent=st.e2<.01?st.e2.toFixed(3):fmt(st.e2,1);$('r2l').textContent=fmt(st.lag*180/Math.PI,1)+'°';$('r2h').textContent=(rate<.01?rate.toExponential(1):fmt(rate,2))+' °C/s';
+    if(ice){$('l2a').textContent='ice: molecules locked in a crystal lattice, relaxation time about 20 µs, a million times too slow to follow';$('l2b').textContent='ε″ ≈ 0.003, so frozen food is almost transparent to microwaves'}
+    else{$('l2a').textContent=`ε_s = ${fmt(st.es,1)}, ε∞ = 5.2, τ = ${fmt(st.tau*1e12,1)} ps at ${T} °C  →  relaxation peak at ${fmt(1/(2*Math.PI*st.tau)/1e9,1)} GHz`;
+      $('l2b').textContent=`ωτ = ${fmt(2*Math.PI*f*st.tau,3)}  →  ε′ = ${fmt(st.e1,1)},  ε″ = ${fmt(st.e2,2)},  tan δ = ${fmt(st.e2/st.e1,3)}`}
+    $('l2c').textContent=`2π × ${f.toExponential(2)} × 8.85×10⁻¹² × ${st.e2<.01?st.e2.toFixed(3):fmt(st.e2,2)} × ${fmt(E)}² = ${P>1e5?(P/1e6).toFixed(2)+' MW/m³':fmt(P)+' W/m³'}  →  ${rate<.01?rate.toExponential(1):fmt(rate,2)} °C/s`;
+    drawChart()}
+  function drawChart(){const[x,w,h]=chart('u2');const A=axes(x,w,h,{x0:1e8,x1:1e12,y0:0,y1:90,logx:true,xt:[[1e8,'100 MHz'],[1e9,'1 GHz'],[1e10,'10 GHz'],[1e11,'100 GHz'],[1e12,'1 THz']],yt:[[0,'0'],[20,'20'],[40,'40'],[60,'60'],[80,'80']],yl:'ε′ and ε″'});
+    const Tc=ice?20:T,curve=(TT,k)=>Array.from({length:121},(_,i)=>{const ff=Math.pow(10,8+i/30);const d=debye(ff,TT);return[A.fx(ff),A.fy(k==='e1'?d.e1:d.e2)]});
+    plotLine(x,curve(Tc,'e1'),'#2A78A8',2.5);plotLine(x,curve(Tc,'e2'),'#E46A2E',3);
+    if(!ice){plotLine(x,curve(clamp(Tc+40,1,95),'e2'),'#E46A2E',1,[4,4]);x.fillStyle='#E46A2E';x.font='12px "Schibsted Grotesk",sans-serif';x.textAlign='left';const d2=debye(3e10,clamp(Tc+40,1,95));x.fillText('ε″ at '+clamp(Tc+40,1,95)+' °C',A.fx(1.2e11),A.fy(d2.e2*.6))}
+    [[9.15e8,'915 MHz'],[2.45e9,'2.45 GHz']].forEach(([ff,s])=>{x.strokeStyle=CK.ink2();x.setLineDash([3,4]);x.beginPath();x.moveTo(A.fx(ff),A.T);x.lineTo(A.fx(ff),h-A.B);x.stroke();x.setLineDash([]);x.fillStyle=CK.ink2();x.textAlign='left';x.fillText(s,A.fx(ff)+4,A.T+10)});
+    x.fillStyle='#2A78A8';x.textAlign='left';x.fillText('ε′, stores energy',A.fx(1.2e8),A.fy(debye(1e8,Tc).e1)+16);x.fillStyle='#E46A2E';x.fillText('ε″, turns it into heat',A.fx(4e10),A.fy(Math.max(debye(1.9e10,Tc).e2,10))-8);
+    if(!ice){x.fillStyle=CK.ink();x.beginPath();x.arc(A.fx(f),A.fy(st.e2),6,0,7);x.fill()}}
+  [fqEl,twEl,efEl].forEach(e=>e.oninput=()=>{if(e===twEl){Tf=+twEl.value;if(ice){ice=false;syncIce()}}calc()});
+  document.querySelectorAll('[data-fp]').forEach(b=>b.onclick=()=>{fqEl.value=(Math.log10(+b.dataset.fp*1e9)-8)/4*100;calc()});
+  const rb=$('run2');rb.onclick=()=>{run=!run;Tf=T;rb.setAttribute('aria-pressed',run);rb.textContent=run?'Stop the oven':'Run the oven'};
+  const ib=$('ice2');function syncIce(){ib.setAttribute('aria-pressed',ice);ib.textContent=ice?'Thaw it':'Freeze it'}ib.onclick=()=>{ice=!ice;if(!ice){twEl.value=1}syncIce();calc()};calc();
+  window.addEventListener('resize',drawChart);
+  let t=0,acc=0;S.update=dt=>{t+=dt;const W=2*Math.PI*.55,Ef=Math.cos(W*t),A=st.amp,lag=st.lag;
+    if(run&&!ice&&Tf<95){Tf=Math.min(95,Tf+st.rate*dt*3);twEl.value=Tf;T=Tf;acc+=dt;if(acc>.25){acc=0;calc()}}
+    arr.setLength(Math.max(.25,Math.abs(Ef)*2.2),.4,.25);arr.setDirection(new THREE.Vector3(0,Ef>=0?1:-1,0));arr.position.y=Ef>=0?-Math.abs(Ef)*1.1:Math.abs(Ef)*1.1;
+    plates[0].material.emissive.set(Ef>0?0x6a3a10:0x0f3a44);plates[1].material.emissive.set(Ef>0?0x0f3a44:0x6a3a10);plates[0].material.emissiveIntensity=plates[1].material.emissiveIntensity=Math.abs(Ef);
+    Lp1.el.textContent=Ef>0?'−':'+';Lp2.el.textContent=Ef>0?'+':'−';
+    const heatT=ice?0:clamp(T/95,0,1),noise=ice?.05:.35*(T+273)/373;tcol(.2+.75*heatT,_c);
+    for(const m of mols){const resp=A*Math.cos(W*t-lag);const th=ice?m.off*.4:(Math.PI/2)*(1-resp)*(.85+.15*Math.abs(m.off))+noise*Math.sin(t*3.1+m.ph)*(ice?.1:1);
+      m.g.rotation.set(m.tx,m.ty*.0,ice?th:(m.off>0?th:-th));m.om.color.copy(_c);m.om.emissive.copy(_c).multiplyScalar(.15)}
+    const rate=ice?0:clamp(st.rate/1.5,0,1);for(let i=0;i<SP.length;i++){const p=SP[i];p.l-=dt*2.5;if(p.l<=0&&Math.random()<rate*dt*30){const m=mols[Math.floor(Math.random()*mols.length)];p.x=m.g.position.x;p.y=m.g.position.y;p.z=m.g.position.z;p.l=1}
+      setPt(spark,i,p.x,p.y,p.z,.8,Math.max(0,p.l)*.9)}flush(spark)}}
+
+/* ================= III. Ions ================= */
+{const S=stage('c3',{yaw:.45,pitch:.25,dist:11.5,target:[0,0,0]});
+  let salt=1,f=2.45e9,st={};const MAXP=36;
+  const box=new THREE.Mesh(new THREE.BoxGeometry(7,4.4,4.4),glass(.05,0x5ab4d6));S.sc.add(box);
+  const plates=[-3.6,3.6].map(x=>{const p=new THREE.Mesh(new THREE.BoxGeometry(.08,4.6,4.6),new THREE.MeshStandardMaterial({color:0x333a46,emissive:0x000000,metalness:.6,roughness:.4}));p.position.x=x;S.sc.add(p);return p});
+  const wat=cloud(520,.18);S.sc.add(wat);const WP=Array.from({length:520},()=>({x:rnd(-3.3,3.3),y:rnd(-2,2),z:rnd(-2,2)}));
+  const naM=new THREE.MeshStandardMaterial({color:0xA796FF,emissive:0x2a1d66,roughness:.3}),clM=new THREE.MeshStandardMaterial({color:0xA8D672,emissive:0x1f3a10,roughness:.35});
+  const ions=[];for(let i=0;i<MAXP;i++){for(const [mat,r,q] of[[naM,.15,1],[clM,.23,-1]]){const m=new THREE.Mesh(MG.O,mat);m.scale.setScalar(r);S.sc.add(m);ions.push({m,q,x:rnd(-2.8,2.8),y:rnd(-1.8,1.8),z:rnd(-1.8,1.8),ph:rnd(0,6.28),k:i})}}
+  const spk=cloud(220,.4);S.sc.add(spk);const SK=Array.from({length:220},()=>({x:0,y:0,z:0,l:0}));
+  const Lna=label(S,'Na⁺',[0,0,0]),Lcl=label(S,'Cl⁻',[0,0,0]);
+  function props(s,ff){const d=debye(ff,20),sg=sigmaNaCl(s),ei=sg/(2*Math.PI*ff*E0),e2=d.e2+ei;return{d,sg,ei,e2,e1:d.e1,dp:dpMW(ff,d.e1,e2)*100,P:2*Math.PI*ff*E0*e2*4e6}}
+  function calc(){salt=+$('salt').value;st=props(salt,f);$('saltOut').textContent=fmt(salt,1)+'% NaCl';
+    $('r3i').textContent=Math.round(st.ei/st.e2*100)+'%';$('r3e').textContent=fmt(st.e2,1);$('r3d').textContent=lenFmt(st.dp);
+    $('l3a').textContent=`${fmt(st.d.e2,1)} (dipolar) + ${fmt(st.ei,1)} (ionic) = ${fmt(st.e2,1)} at ${f>1e9?'2.45 GHz':'915 MHz'}`;
+    $('l3b').textContent=`σ = ${fmt(st.sg,2)} S/m;  heating at 2 kV/m = ${fmt(st.P/4.18e6,2)} °C/s, penetration ${lenFmt(st.dp)}`;
+    ions.forEach((o,i)=>o.m.visible=o.k<Math.round(salt*12));drawChart()}
+  function drawChart(){const[x,w,h]=chart('u3');const A=axes(x,w,h,{x0:1e8,x1:1e11,y0:.1,y1:1000,logx:true,logy:true,xt:[[1e8,'100 MHz'],[1e9,'1 GHz'],[1e10,'10 GHz'],[1e11,'100 GHz']],yt:[[.1,'0.1'],[1,'1'],[10,'10'],[100,'100'],[1000,'1000']],yl:'loss factor ε″'});
+    const F=(k)=>Array.from({length:121},(_,i)=>{const ff=Math.pow(10,8+i/40);const p=props(salt,ff);return[A.fx(ff),A.fy(k==='d'?p.d.e2:k==='i'?Math.max(p.ei,.1):p.e2)]});
+    plotLine(x,F('d'),'#2A78A8',2);if(salt>0)plotLine(x,F('i'),'#7DBF4E',2);plotLine(x,F('t'),CK.ink(),3.2);
+    x.font='12px "Schibsted Grotesk",sans-serif';x.textAlign='left';x.fillStyle='#2A78A8';x.fillText('dipolar (water)',A.fx(1.3e8),A.fy(debye(1.3e8,20).e2)-6);
+    if(salt>0){x.fillStyle='#5E9E33';x.fillText('ionic (salt)',A.fx(1.3e8),A.fy(props(salt,1.3e8).ei)+16)}x.fillStyle=CK.ink();x.fillText('total',A.fx(3e10),A.fy(props(salt,3e10).e2)-8);
+    [[9.15e8,'915 MHz'],[2.45e9,'2.45 GHz']].forEach(([ff,s])=>{x.strokeStyle=CK.ink2();x.setLineDash([3,4]);x.beginPath();x.moveTo(A.fx(ff),A.T);x.lineTo(A.fx(ff),h-A.B);x.stroke();x.setLineDash([]);x.fillStyle=CK.ink2();x.fillText(s,A.fx(ff)+4,A.T+10)});
+    x.fillStyle=CK.ink();x.beginPath();x.arc(A.fx(f),A.fy(st.e2),6,0,7);x.fill()}
+  $('salt').oninput=calc;pills('[data-f3]',b=>{f=+b.dataset.f3*1e6;calc()});calc();window.addEventListener('resize',drawChart);
+  let t=0;S.update=dt=>{t+=dt;const W=2*Math.PI*.6,Ef=Math.sin(W*t),amp=clamp(.5*(2.45e9/f),.2,1.3);
+    plates[0].material.emissive.set(Ef>0?0x6a3a10:0x0f3a44);plates[1].material.emissive.set(Ef>0?0x0f3a44:0x6a3a10);plates[0].material.emissiveIntensity=plates[1].material.emissiveIntensity=Math.abs(Ef)*.8;
+    let shown=0,first={na:null,cl:null};
+    for(const o of ions){if(!o.m.visible)continue;shown++;o.y+=rnd(-.3,.3)*dt;o.z+=rnd(-.3,.3)*dt;o.y=clamp(o.y,-1.9,1.9);o.z=clamp(o.z,-1.9,1.9);
+      const X=clamp(o.x+o.q*amp*Ef,-3.2,3.2);o.m.position.set(X,o.y,o.z);if(o.q>0&&!first.na)first.na=o.m.position;if(o.q<0&&!first.cl)first.cl=o.m.position}
+    Lna.show=!!first.na;Lcl.show=!!first.cl;if(first.na)Lna.pos.copy(first.na).add(new THREE.Vector3(.15,.25,0));if(first.cl)Lcl.pos.copy(first.cl).add(new THREE.Vector3(.2,.3,0));
+    for(let i=0;i<WP.length;i++){const p=WP[i];p.x+=rnd(-.4,.4)*dt;p.y+=rnd(-.4,.4)*dt;p.z+=rnd(-.4,.4)*dt;setPt(wat,i,clamp(p.x,-3.3,3.3),clamp(p.y,-2.1,2.1),clamp(p.z,-2.1,2.1),.28,.35)}flush(wat);
+    const rate=clamp(st.ei/30,0,1)*Math.abs(Math.cos(W*t));for(let i=0;i<SK.length;i++){const p=SK[i];p.l-=dt*3;
+      if(p.l<=0&&shown&&Math.random()<rate*dt*40){const vis=ions.filter(o=>o.m.visible);const o=vis[Math.floor(Math.random()*vis.length)];p.x=o.m.position.x;p.y=o.m.position.y;p.z=o.m.position.z;p.l=1}
+      setPt(spk,i,p.x,p.y,p.z,.82,Math.max(0,p.l))}flush(spk)}}
+
+/* ================= IV. Infrared ================= */
+{const S=stage('c4',{yaw:.35,pitch:.18,dist:10,target:[0,.2,0]});
+  let T=1200,mode='sym';const MODES={sym:{l:2.73,lq:2.9,name:'symmetric stretch',w:3},asym:{l:2.66,lq:2.9,name:'asymmetric stretch',w:3.1},bend:{l:6.27,lq:6.1,name:'bend',w:1.6}};
+  const O=new THREE.Mesh(MG.O,new THREE.MeshStandardMaterial({color:0xE2574C,roughness:.3,emissive:0x220000}));O.scale.setScalar(.55);S.sc.add(O);
+  const Hs=[0,1].map(()=>{const m=new THREE.Mesh(MG.H,new THREE.MeshStandardMaterial({color:0xf2f2f2,roughness:.3,emissive:0x111111}));m.scale.setScalar(.33);S.sc.add(m);return m});
+  const Bs=[0,1].map(()=>{const m=new THREE.Mesh(MG.B,new THREE.MeshStandardMaterial({color:0xA796FF,emissive:0x2a1d66,roughness:.4}));S.sc.add(m);return m});
+  const glowO=cloud(1,3.2);S.sc.add(glowO);
+  const em=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,4.5,24),new THREE.MeshStandardMaterial({color:0x331a10,emissive:0xff6a2a,emissiveIntensity:1}));em.position.set(-5.8,0,0);S.sc.add(em);
+  const refl=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,4.7,32,1,true,Math.PI*.5,Math.PI),new THREE.MeshStandardMaterial({color:0x8d96a5,metalness:.9,roughness:.2,side:THREE.DoubleSide}));refl.position.set(-5.9,0,0);S.sc.add(refl);
+  const NP=90,TR=7,ph=cloud(NP*TR,.26);S.sc.add(ph);const PH=Array.from({length:NP},()=>({x:rnd(-5.5,6),y:rnd(-1.8,1.8),z:rnd(-1.2,1.2),l:2.5,abs:false,dead:false}));
+  const flash=cloud(40,.9);S.sc.add(flash);const FL=Array.from({length:40},()=>({x:0,y:0,z:0,l:0}));
+  const Lm=label(S,'',[0,1.9,0]),Le=label(S,'emitter',[-5.6,2.5,0]),Lo=label(S,'O',[0,0,0]);
+  let cdf=[];
+  function sampleL(){const r=Math.random();let i=cdf.findIndex(v=>v>=r);return LG[Math.max(0,i)]}
+  const lcol=l=>clamp((Math.log(l)-Math.log(.7))/(Math.log(15)-Math.log(.7)),0,1);
+  function calc(){T=+$('te').value;const w=pw(T);let s=0;cdf=w.map(v=>s+=v);const pk=2898/T;$('teOut').textContent=fmt(T)+' K';
+    const a1=1-irRemain(T,1,.01),a2=1-irRemain(T,1,.1);$('r4p').textContent=fmt(pk,2)+' µm';$('r4a').textContent=Math.round(a1*100)+'%';$('r4b').textContent=Math.round(a2*100)+'%';
+    $('l4a').textContent=`emitter at ${fmt(T)} K glows ${T>1800?'visibly bright':T>900?'dull red':'invisibly'}; most of its output lies between ${fmt(pk*.6,1)} and ${fmt(pk*3,1)} µm`;
+    $('l4b').textContent=`2898 / ${fmt(T)} = ${fmt(pk,2)} µm, photon energy ${fmt(1.2398/pk,2)} eV`;
+    $('l4c').textContent=`in water: ${Math.round(a1*100)}% absorbed within 0.1 mm, ${Math.round(a2*100)}% within 1 mm`;
+    tcol(clamp((T-400)/2200,0,1)*.55+.45,_c);em.material.emissive.copy(_c);em.material.emissiveIntensity=.4+T/2600;
+    const M=MODES[mode];Lm.el.textContent=`${M.name}, ${M.l} µm (${fmt(1e4/M.l)} cm⁻¹)`;drawChart()}
+  function drawChart(){const[x,w,h]=chart('u4');const A=axes(x,w,h,{x0:.7,x1:15,y0:0,y1:1.05,logx:true,r:52,xt:[[1,'1 µm'],[2,'2'],[3,'3'],[5,'5'],[10,'10'],[15,'15 µm']],yt:[[0,'0'],[.5,'0.5'],[1,'1']],yl:'emission, relative',xl:'wavelength'});
+    const pk=2898/T,Bp=planck(pk,T);const pts=[];for(let i=0;i<=200;i++){const l=Math.exp(Math.log(.7)+i/200*Math.log(15/.7));pts.push([A.fx(l),A.fy(planck(l,T)/Bp)])}
+    x.fillStyle='rgba(238,123,48,.18)';x.beginPath();x.moveTo(pts[0][0],A.fy(0));pts.forEach(p=>x.lineTo(p[0],p[1]));x.lineTo(pts[pts.length-1][0],A.fy(0));x.fill();plotLine(x,pts,'#E46A2E',2.5);
+    const ay=v=>A.fy(0)-(Math.log10(v)+2)/6*(A.fy(0)-A.fy(1.05));const ap=[];for(let i=0;i<=200;i++){const l=Math.exp(Math.log(.7)+i/200*Math.log(15/.7));ap.push([A.fx(l),ay(alphaW(l))])}plotLine(x,ap,'#2A78A8',2);
+    x.fillStyle='#2A78A8';x.textAlign='left';x.font='12px "Schibsted Grotesk",sans-serif';[[.01,'0.01'],[1,'1'],[100,'100'],[1e4,'10⁴ cm⁻¹']].forEach(([v,s])=>x.fillText(s,w-A.R+4,ay(v)+4));
+    x.fillText('water absorption',A.fx(.75),ay(alphaW(.8))-8);x.fillStyle='#E46A2E';x.fillText('emitter, '+fmt(T)+' K',A.fx(pk)+6,A.fy(1)+2);
+    [[2.9,'O–H stretch'],[6.1,'H–O–H bend']].forEach(([l,s])=>{x.strokeStyle=CK.ink2();x.setLineDash([3,4]);x.beginPath();x.moveTo(A.fx(l),A.T);x.lineTo(A.fx(l),h-A.B);x.stroke();x.setLineDash([]);x.fillStyle=CK.ink2();x.fillText(s,A.fx(l)+4,A.T+22)})}
+  $('te').oninput=()=>{calc()};pills('[data-em]',b=>{$('te').value=b.dataset.em;calc()});pills('[data-md]',b=>{mode=b.dataset.md;calc()});calc();window.addEventListener('resize',drawChart);
+  const half=52.25*Math.PI/180,b0=1.3;let t=0,exc=.3;
+  S.update=dt=>{t+=dt;const M=MODES[mode],wgt=planck(M.l,T)/planck(2898/T,T);exc+=((.12+.55*wgt)-exc)*Math.min(1,dt*2);const s=Math.sin(t*2*Math.PI*M.w*.5)*exc;
+    let hp=[];for(const sg of[-1,1]){let ang=half,bl=b0;if(mode==='sym')bl=b0+.35*s;else if(mode==='asym')bl=b0+.35*s*sg;else ang=half+.32*s;hp.push(new THREE.Vector3(sg*Math.sin(ang)*bl,Math.cos(ang)*bl-.45,0))}
+    const oy=-.45-(mode==='bend'?-.04*s:mode==='sym'?-.05*s:0),ox=mode==='asym'?-.06*s:0;O.position.set(ox,oy,0);
+    hp.forEach((p,i)=>{Hs[i].position.copy(p);setBond(Bs[i],O.position,p,.07)});
+    setPt(glowO,0,ox,oy,0,.6+.35*exc,exc*.9);flush(glowO);
+    for(let i=0;i<NP;i++){const p=PH[i];if(p.dead||p.x>6.5){p.x=-5.4;p.y=rnd(-1.8,1.8);p.z=rnd(-1.2,1.2);p.l=sampleL();p.abs=Math.abs(p.l-M.lq)/M.lq<.16||Math.abs(p.l-M.l)/M.l<.12;p.dead=false}
+      p.x+=dt*3.2;const near=Math.hypot(p.x-ox,p.y-oy*.5)<1.1;if(p.abs&&p.x>-.4){p.dead=true;const fl=FL.find(q=>q.l<=0);if(fl){fl.x=ox;fl.y=oy;fl.z=0;fl.l=1}}
+      const wl=.12+.05*p.l;for(let k=0;k<TR;k++){const xx=p.x-k*.12;setPt(ph,i*TR+k,xx,p.y+Math.sin(xx/wl*2)*.12,p.z,lcol(p.l),(1-k/TR)*(p.dead?0:.9))}}
+    flush(ph);for(let i=0;i<FL.length;i++){const q=FL[i];q.l-=dt*2.5;setPt(flash,i,q.x,q.y,q.z,.85,Math.max(0,q.l)*.8)}flush(flash);Lo.pos.set(ox+.6,oy-.4,0)}}
+
+/* ================= V. Layers ================= */
+{const S=stage('c5',{yaw:.4,pitch:.25,dist:12,target:[0,0,0]});
+  const N=81,k=.55,rc=3.6e6,h=10,hev=20,Ta=25,LAT=9e5,dpm=dpMW(2.45e9,57,17);// m
+  let Lcm=4,P=8000,play=true;let M,I,mw,mi,time,hist,G=null,crust=0;
+  const tn=T=>(T-20)/110;
+  function reset(){M=new Float64Array(N).fill(20);I=new Float64Array(N).fill(20);mw=[LAT,LAT];mi=[LAT,LAT];time=0;hist=[];crust=0;build()}
+  function build(){if(G){S.sc.remove(G);dispose(G)}G=new THREE.Group();S.sc.add(G);const H=Lcm*.6;
+    const mk=x=>{const g=new THREE.BoxGeometry(2.4,H,2.4,1,N-1,1);colorize(g,()=>0);const m=new THREE.Mesh(g,heatMat({roughness:.8}));m.position.x=x;G.add(m);return g};S.gM=mk(-1.8);S.gI=mk(1.8);
+    S.cr=[H/2+.01,-H/2-.01].map(y=>{const c=new THREE.Mesh(new THREE.BoxGeometry(2.42,.04,2.42),new THREE.MeshStandardMaterial({color:0x7a3b14,transparent:true,opacity:0,roughness:.9}));c.position.set(1.8,y,0);G.add(c);return c});
+    S.rods=[];[H/2+.7,-H/2-.7].forEach(y=>[-.7,0,.7].forEach(z=>{const r=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.8,12),new THREE.MeshStandardMaterial({color:0x331a10,emissive:0xff5a1a,emissiveIntensity:1}));r.rotation.z=Math.PI/2;r.position.set(1.8,y,z);G.add(r);S.rods.push(r)}));
+    S.shell=new THREE.Mesh(new THREE.BoxGeometry(2.9,H+.5,2.9),new THREE.MeshBasicMaterial({color:0x5ab4d6,transparent:true,opacity:.06,depthWrite:false,wireframe:false}));S.shell.position.x=-1.8;G.add(S.shell);
+    S.H=H;if(!S.Lm){S.Lm=label(S,'microwave',[0,0,0]);S.Li=label(S,'infrared',[0,0,0])}S.Lm.pos.set(-1.8,H/2+.9,0);S.Li.pos.set(1.8,H/2+1.15,0);
+    $('th5Out').textContent=fmt(Lcm,1)+' cm';$('pw5Out').textContent=fmt(P/1000)+' kW/m²'}
+  function step(T,dt,isMW,moist){const L=Lcm/100,dz=L/(N-1),Q0=P/(2*dpm*(1-Math.exp(-L/dpm)));const o=T.slice();
+    for(let i=0;i<N;i++){const z=i*dz,Q=isMW?Q0*(Math.exp(-z/dpm)+Math.exp(-(L-z)/dpm)):0;
+      if(i===0||i===N-1){const nb=i===0?o[1]:o[N-2],f=i===0?0:1,qin=isMW?0:P/2,ev=moist[f]>0&&o[i]<100?hev*(o[i]-Ta):0;
+        let Tn=o[i]+dt/(rc*dz/2)*(k*(nb-o[i])/dz+qin-h*(o[i]-Ta)-ev)+dt*Q/rc;if(ev>0)moist[f]-=ev*dt*.15;
+        if(Tn>100&&moist[f]>0){moist[f]-=(Tn-100)*rc*dz/2;Tn=100}T[i]=Tn}
+      else{let Tn=o[i]+dt/rc*(k*(o[i-1]-2*o[i]+o[i+1])/(dz*dz)+Q);T[i]=Math.min(Tn,100)}}}
+  function paint(){const c=(g,T)=>{const p=g.attributes.position,cl=g.attributes.color;for(let i=0;i<p.count;i++){const j=clamp(Math.round((S.H/2-p.getY(i))/S.H*(N-1)),0,N-1);tcol(tn(T[j]),_c);cl.setXYZ(i,_c.r,_c.g,_c.b)}cl.needsUpdate=true};c(S.gM,M);c(S.gI,I);
+    const dry=mi[0]<=0;crust=dry?clamp((I[0]-100)/40,0,1):0;S.cr.forEach(c=>c.material.opacity=crust*.85);
+    const m=Math.floor(time/60),s=Math.floor(time%60);$('r5t').textContent=m+':'+String(s).padStart(2,'0');const c0=(N-1)/2;
+    $('r5m').textContent=fmt(M[c0],0)+' / '+fmt(M[0],0)+' °C';$('r5i').textContent=fmt(I[c0],0)+' / '+fmt(I[0],0)+' °C';$('r5c').textContent=dry?(crust>.05?'forming':'surface dry'):'not yet';
+    $('l5a').textContent=`potato: k = 0.55 W/m·K, ρc_p = 3.6 MJ/m³·K, slab ${fmt(Lcm,1)} cm, both faces exposed`;
+    $('l5b').textContent=`d_p = ${lenFmt(dpm*100)} at 2.45 GHz;  Q₀ chosen so both slabs absorb ${fmt(P/1000)} kW/m²`;drawChart()}
+  function drawChart(){const[x,w,h2]=chart('u5');const half=w/2-10;const c0=(N-1)/2;
+    const A=axes(x,half,h2,{x0:0,x1:Lcm*10,y0:20,y1:130,xt:[[0,'0'],[Lcm*5,fmt(Lcm*5,0)+' mm'],[Lcm*10,fmt(Lcm*10,0)]],yt:[[20,'20'],[60,'60'],[100,'100 °C'],[130,'130']],xl:'depth through the slab'});
+    plotLine(x,Array.from(M,(T,i)=>[A.fx(i/(N-1)*Lcm*10),A.fy(T)]),'#4FA3D1',3);plotLine(x,Array.from(I,(T,i)=>[A.fx(i/(N-1)*Lcm*10),A.fy(T)]),'#E46A2E',3);
+    x.save();x.translate(half+20,0);const tmax=Math.max(300,time);const B=axes(x,half-10,h2,{x0:0,x1:tmax,y0:20,y1:130,l:40,xt:[[0,'0'],[tmax/2,fmt(tmax/120,1)+' min'],[tmax,fmt(tmax/60,1)]],yt:[[20,''],[60,''],[100,''],[130,'']],xl:'time'});
+    plotLine(x,hist.map(p=>[B.fx(p[0]),B.fy(p[1])]),'#4FA3D1',2.5);plotLine(x,hist.map(p=>[B.fx(p[0]),B.fy(p[2])]),'#E46A2E',2.5);
+    plotLine(x,hist.map(p=>[B.fx(p[0]),B.fy(p[3])]),'#4FA3D1',1.2,[3,3]);plotLine(x,hist.map(p=>[B.fx(p[0]),B.fy(p[4])]),'#E46A2E',1.2,[3,3]);
+    x.fillStyle=CK.ink2();x.font='12px "Schibsted Grotesk",sans-serif';x.textAlign='left';x.fillText('solid: centre, dashed: surface',B.L+4,B.T+10);x.restore()}
+  $('th5').oninput=e=>{Lcm=+e.target.value;reset();paint()};$('pw5').oninput=e=>{P=+e.target.value*1000;$('pw5Out').textContent=fmt(P/1000)+' kW/m²'};
+  const pb=$('play5');pb.onclick=()=>{play=!play;pb.setAttribute('aria-pressed',play);pb.textContent=play?'Pause':'Play'};$('rst5').onclick=()=>{reset();paint()};
+  reset();paint();window.addEventListener('resize',drawChart);let acc=0,tt=0;
+  S.update=dt=>{tt+=dt;S.rods.forEach(r=>r.material.emissiveIntensity=.7+.3*Math.sin(tt*5));S.shell.material.opacity=.04+.04*Math.abs(Math.sin(tt*3));
+    if(!play||time>=1200)return;const L=Lcm/100,dz=L/(N-1),dmax=.4*dz*dz*rc/k,sim=dt*15,n=Math.ceil(sim/dmax),d=sim/n;
+    for(let i=0;i<n;i++){step(M,d,true,mw);step(I,d,false,mi)}time+=sim;const c0=(N-1)/2;
+    if(!hist.length||time-hist[hist.length-1][0]>3)hist.push([time,M[c0],I[c0],M[0],I[0]]);acc+=dt;if(acc>.1){acc=0;paint()}}}
+
+/* ================= VI. Cavity ================= */
+{const S=stage('c6',{yaw:.6,pitch:.35,dist:11,target:[0,-.2,0]});
+  const a=4.6,b=4.6,hh=3,yp=-1.2,R=1.7;let turn=false,f=2450,time=0,phi=0;
+  const MODES={2450:[[5,4,3,1],[4,5,2,.9],[3,5,3,.7],[5,3,2,.8],[4,4,3,.6]],915:[[2,1,1,1],[1,2,1,.9],[2,2,1,.55]]};
+  const Ifield=(x,y,z)=>{let s=0,ws=0;for(const [m,n,p,w] of MODES[f]){s+=w*Math.pow(Math.sin(m*Math.PI*(x+a/2)/a),2)*Math.pow(Math.sin(n*Math.PI*(z+b/2)/b),2)*(.4+.6*Math.pow(Math.sin(p*Math.PI*(y+hh/2)/hh),2));ws+=w}return s/ws};
+  const edges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(a,hh,b)),new THREE.LineBasicMaterial({color:0x8a93a8,transparent:true,opacity:.6}));S.sc.add(edges);
+  [[0,0,-b/2,0],[ -a/2,0,0,Math.PI/2]].forEach(([x,y,z,ry])=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(ry?b:a,hh),new THREE.MeshStandardMaterial({color:0x2a2f38,metalness:.8,roughness:.35,side:THREE.DoubleSide}));w.position.set(x,y,z);w.rotation.y=ry;S.sc.add(w)});
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(a,b),new THREE.MeshStandardMaterial({color:0x252a33,metalness:.7,roughness:.4}));fl.rotation.x=-Math.PI/2;fl.position.y=-hh/2;S.sc.add(fl);
+  const wg=new THREE.Mesh(new THREE.BoxGeometry(.9,.5,1.2),new THREE.MeshStandardMaterial({color:0x4a5260,metalness:.7,roughness:.35}));wg.position.set(a/2+.45,hh/2-.6,0);S.sc.add(wg);
+  const mag=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.7,24),new THREE.MeshStandardMaterial({color:0x6b4a2a,metalness:.6,roughness:.4,emissive:0x331100}));mag.position.set(a/2+.9,hh/2-.6,0);mag.rotation.z=Math.PI/2;S.sc.add(mag);
+  label(S,'magnetron',[a/2+1.2,hh/2-.1,0]);label(S,'waveguide',[a/2+.2,hh/2-.2,.7]);
+  const glassD=new THREE.Mesh(new THREE.CylinderGeometry(R+.15,R+.15,.06,64),glass(.25,0xbfd8e8));glassD.position.y=yp-.07;S.sc.add(glassD);
+  const pg=new THREE.RingGeometry(.001,R,96,36);pg.rotateX(-Math.PI/2);const base=Float32Array.from(pg.attributes.position.array);const NV=pg.attributes.position.count,Eacc=new Float32Array(NV);
+  pg.setAttribute('color',new THREE.BufferAttribute(new Float32Array(NV*3),3));const plate=new THREE.Mesh(pg,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,side:THREE.DoubleSide}));plate.position.y=yp;S.sc.add(plate);
+  const field=cloud(2200,.3);S.sc.add(field);const FP=[];for(let i=0;i<13;i++)for(let j=0;j<13;j++)for(let k=0;k<13;k++)if(FP.length<2200)FP.push([-a/2+(i+.5)*a/13,-hh/2+(j+.5)*hh/13,-b/2+(k+.5)*b/13]);let FI=[];
+  function fieldCache(){FI=FP.map(p=>Ifield(...p))}fieldCache();
+  const cheese=new THREE.Color('#EBD27A'),bub=new THREE.Color('#E8892E'),brown=new THREE.Color('#9C4A1E'),cc=new THREE.Color();
+  function paint(){const pos=pg.attributes.position,col=pg.attributes.color;let s=0,s2=0;
+    for(let i=0;i<NV;i++){const m=clamp(Eacc[i]/14,0,1.6);if(m<1)cc.copy(cheese).lerp(bub,m);else cc.copy(bub).lerp(brown,m-1);col.setXYZ(i,cc.r,cc.g,cc.b);pos.setY(i,base[i*3+1]+Math.min(m,1)*.07*(.6+.4*Math.sin(i*1.7+time)));s+=Eacc[i];s2+=Eacc[i]*Eacc[i]}
+    col.needsUpdate=true;pos.needsUpdate=true;pg.computeVertexNormals();const mean=s/NV,cv=mean>0?Math.sqrt(Math.max(0,s2/NV-mean*mean))/mean:0;
+    const m=Math.floor(time/60),sec=Math.floor(time%60);$('r6t').textContent=m+':'+String(sec).padStart(2,'0');$('r6s').textContent=fmt(C0/(f*1e6)/2*100,1)+' cm';$('r6u').textContent=mean>0?Math.round(cv*100)+'%':'–';
+    $('l6a').textContent=`${MODES[f].length} cavity modes mixed in a 29 × 29 × 19 cm oven at ${fmt(f)} MHz`;$('l6b').textContent=`${fmt(C0,0)} / (2 × ${fmt(f)}×10⁶) = ${fmt(C0/(f*1e6)/2*100,1)} cm`}
+  function rst(){Eacc.fill(0);time=0;paint()}
+  const tb=$('tt');tb.onclick=()=>{turn=!turn;tb.setAttribute('aria-pressed',turn);tb.textContent=turn?'Turntable on':'Turntable off'};$('rst6').onclick=rst;pills('[data-f6]',b=>{f=+b.dataset.f6;fieldCache();rst()});rst();
+  let t=0,acc=0;S.update=dt=>{t+=dt;time+=dt;if(turn)phi+=dt*.55;plate.rotation.y=phi;const c=Math.cos(phi),s=Math.sin(phi);
+    for(let i=0;i<NV;i++){const lx=base[i*3],lz=base[i*3+2],wx=lx*c+lz*s,wz=-lx*s+lz*c;Eacc[i]+=Ifield(wx,yp,wz)*dt}
+    acc+=dt;if(acc>.12){acc=0;paint()}
+    const pulse=Math.abs(Math.cos(t*2.2));for(let i=0;i<FP.length;i++){const p=FP[i],v=FI[i];setPt(field,i,p[0],p[1],p[2],.05+.3*v,v>.3?v*v*pulse*.9:0)}flush(field);
+    mag.material.emissiveIntensity=.6+.4*Math.sin(t*20)}}
+
+/* ================= loop ================= */
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{const c=cssv('--stage');stages.forEach(S=>{if(S.cv.id!=='cHero')S.sc.background.set(c)});window.dispatchEvent(new Event('resize'))});
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const S of stages){if(!S.vis)continue;if(!paused&&S.update)S.update(dt);draw(S,paused?0:dt)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>
